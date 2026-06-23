@@ -1,0 +1,20 @@
+{
+  "name": "CSS Atelier — 手を動かして学ぶ CSS",
+  "short_name": "CSS Atelier",
+  "description": "解説とチャレンジで CSS を学ぶ。Flexbox / Grid から :has() や container queries まで。3D 概念ビジュアライザ付き。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f6fb",
+  "theme_color": "#f4f6fb",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

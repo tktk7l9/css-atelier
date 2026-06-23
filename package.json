@@ -1,0 +1,26 @@
+{
+  "name": "css-atelier",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "手を動かして学ぶインタラクティブ CSS 学習アプリ。解説→チャレンジ形式 + Three.js 製の3D概念ビジュアライザ（製図スタジオ風）",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "three": "0.184.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.184.0",
+    "@vitest/coverage-v8": "^4.1.6",
+    "typescript": "6.0.3",
+    "vite": "8.0.16",
+    "vitest": "^4.1.6"
+  }
+}
