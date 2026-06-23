@@ -22,6 +22,8 @@ export interface Editor {
   getValue(): string;
   setValue(v: string): void;
   onInput(cb: (v: string) => void): void;
+  /** Fired on Cmd/Ctrl+Enter (a "submit/check" shortcut). */
+  onSubmit(cb: () => void): void;
   focus(): void;
 }
 
@@ -44,6 +46,7 @@ export function createEditor(label = "CSS"): Editor {
   root.append(stack);
 
   let listener: ((v: string) => void) | null = null;
+  let submitListener: (() => void) | null = null;
 
   function highlight(css: string): void {
     pre.textContent = "";
@@ -71,6 +74,41 @@ export function createEditor(label = "CSS"): Editor {
     pre.scrollLeft = textarea.scrollLeft;
   });
 
+  textarea.addEventListener("keydown", (e) => {
+    // Cmd/Ctrl+Enter = check.
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      submitListener?.();
+      return;
+    }
+    // Escape releases the editor so keyboard users aren't trapped by Tab-indent.
+    if (e.key === "Escape") {
+      textarea.blur();
+      return;
+    }
+    // Tab inserts/removes two-space indentation instead of moving focus.
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const v = textarea.value;
+      const lineStart = v.lastIndexOf("\n", start - 1) + 1;
+      if (e.shiftKey) {
+        const lead = v.slice(lineStart).match(/^ {1,2}/);
+        if (lead) {
+          const n = lead[0].length;
+          textarea.value = v.slice(0, lineStart) + v.slice(lineStart + n);
+          textarea.selectionStart = textarea.selectionEnd = Math.max(lineStart, start - n);
+        }
+      } else {
+        textarea.value = v.slice(0, start) + "  " + v.slice(end);
+        textarea.selectionStart = textarea.selectionEnd = start + 2;
+      }
+      render();
+      listener?.(textarea.value);
+    }
+  });
+
   return {
     root,
     getValue: () => textarea.value,
@@ -80,6 +118,9 @@ export function createEditor(label = "CSS"): Editor {
     },
     onInput(cb) {
       listener = cb;
+    },
+    onSubmit(cb) {
+      submitListener = cb;
     },
     focus: () => textarea.focus(),
   };

@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { LESSONS, TRACKS, lessonById, nextLesson, trackOf } from "./index.js";
 import type { ValidatorSpec } from "../validate/primitives.js";
+import type { Challenge } from "./types.js";
 import { normalizeProp, normalizeSelector, normalizeValue, parseCss } from "../validate/css-parse.js";
 
 const CONCEPTS = new Set(["box-model", "flexbox", "grid", "none"]);
+
+/** Every validator a challenge runs: the main set plus all responsive states. */
+function allSpecs(challenge: Challenge): ValidatorSpec[] {
+  return [...challenge.validators, ...(challenge.states ?? []).flatMap((s) => s.validators)];
+}
 
 /** Flatten allOf/anyOf so we can inspect every leaf validator. */
 function flatten(specs: readonly ValidatorSpec[]): ValidatorSpec[] {
@@ -64,7 +70,7 @@ describe("content integrity", () => {
       });
 
       it("references only element ids present in the starter HTML", () => {
-        const leaves = flatten(challenge.validators);
+        const leaves = flatten(allSpecs(challenge));
         const ids = new Set(leaves.flatMap(referencedIds));
         for (const id of ids) {
           expect(challenge.starterHTML).toContain(`data-id="${id}"`);
@@ -76,7 +82,7 @@ describe("content integrity", () => {
 
       it("the solution satisfies its own declaration validators", () => {
         const rules = parseCss(challenge.solution);
-        for (const spec of flatten(challenge.validators)) {
+        for (const spec of flatten(allSpecs(challenge))) {
           if (spec.kind === "declarationEquals") {
             const sel = normalizeSelector(spec.selector);
             const prop = normalizeProp(spec.prop);

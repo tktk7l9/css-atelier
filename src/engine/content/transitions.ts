@@ -14,18 +14,18 @@ export const transitionsTrack: Track = {
       mdnPath: "/ja/docs/Web/CSS/transition",
       viz: { concept: "none" },
       challenge: {
-        starterHTML: '<div data-id="box" class="box">hover me</div>',
+        starterHTML: '<div data-id="box" class="box">マウスを乗せてみて</div>',
         starterCSS:
-          ".box {\n  width: 140px;\n  padding: 14px;\n  background: #dbe4fb;\n}\n",
-        task: ".box に 0.3 秒のトランジションを設定しよう。",
+          ".box {\n  width: 180px;\n  padding: 14px;\n  background: #dbe4fb;\n  cursor: pointer;\n}\n.box:hover {\n  background: #2f5fd0;\n  color: #fff;\n}\n",
+        task: "ホバーで背景が 0.3 秒かけて変わるよう transition を設定しよう（プレビューの箱にマウスを乗せると確認できます）。",
         snapshot: { props: ["transition-duration"] },
         validators: [
           { kind: "sourceMatches", pattern: "transition" },
           { kind: "computedEquals", id: "box", prop: "transition-duration", value: "0.3s" },
         ],
-        hints: ["transition: background 0.3s; など", "0.3s = 300ms"],
+        hints: ["プレビューの箱にマウスを乗せると変化が見られます", "transition: background 0.3s;"],
         solution:
-          ".box {\n  width: 140px;\n  padding: 14px;\n  background: #dbe4fb;\n  transition: background 0.3s;\n}\n",
+          ".box {\n  width: 180px;\n  padding: 14px;\n  background: #dbe4fb;\n  cursor: pointer;\n  transition: background 0.3s;\n}\n.box:hover {\n  background: #2f5fd0;\n  color: #fff;\n}\n",
       },
     },
     {

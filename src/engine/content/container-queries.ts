@@ -37,19 +37,27 @@ export const containerQueriesTrack: Track = {
       mdnPath: "/ja/docs/Web/CSS/@container",
       viz: { concept: "none" },
       challenge: {
+        viewport: 500,
         starterHTML:
           '<div data-id="panel" class="panel"><div data-id="card" class="card">カード</div></div>',
         starterCSS:
-          ".panel {\n  container-type: inline-size;\n  width: 500px;\n  background: #dbe4fb;\n  padding: 10px;\n}\n.card {\n  background: #fff;\n  padding: 8px;\n  font-size: 14px;\n}\n",
+          ".panel {\n  container-type: inline-size;\n  width: 100%;\n  background: #dbe4fb;\n  padding: 10px;\n}\n.card {\n  background: #fff;\n  padding: 8px;\n  font-size: 14px;\n}\n",
         task: "コンテナ幅が 400px 以上のとき、.card の文字を 24px にしよう（@container を使う）。",
         snapshot: { props: ["font-size"] },
         validators: [
           { kind: "sourceMatches", pattern: "@container" },
           { kind: "computedEquals", id: "card", prop: "font-size", value: "24px" },
         ],
+        // 狭いコンテナ（360px）では適用されない＝親の幅で切り替わることを検証。
+        states: [
+          {
+            viewport: 360,
+            validators: [{ kind: "computedEquals", id: "card", prop: "font-size", value: "14px" }],
+          },
+        ],
         hints: ["@container (min-width: 400px) { .card { … } } の形です", "font-size: 24px"],
         solution:
-          ".panel {\n  container-type: inline-size;\n  width: 500px;\n  background: #dbe4fb;\n  padding: 10px;\n}\n.card {\n  background: #fff;\n  padding: 8px;\n  font-size: 14px;\n}\n@container (min-width: 400px) {\n  .card {\n    font-size: 24px;\n  }\n}\n",
+          ".panel {\n  container-type: inline-size;\n  width: 100%;\n  background: #dbe4fb;\n  padding: 10px;\n}\n.card {\n  background: #fff;\n  padding: 8px;\n  font-size: 14px;\n}\n@container (min-width: 400px) {\n  .card {\n    font-size: 24px;\n  }\n}\n",
       },
     },
   ],

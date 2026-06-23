@@ -80,5 +80,32 @@ export const gridTrack: Track = {
           ".grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 16px;\n  width: 320px;\n  background: #dbe4fb;\n}\n.grid > div {\n  height: 48px;\n  background: #2f5fd0;\n  border-radius: 6px;\n}\n",
       },
     },
+    {
+      id: "grid-areas",
+      title: "領域で組む: grid-template-areas",
+      explanation:
+        "<p><code>grid-template-areas</code> は名前付きの領域でレイアウトを“絵”のように書けます。各要素に <code>grid-area</code> で名前を割り当てます。</p>",
+      mdnPath: "/ja/docs/Web/CSS/grid-template-areas",
+      viz: { concept: "grid", containerId: "layout" },
+      challenge: {
+        starterHTML:
+          '<div data-id="layout" class="layout"><div data-id="head" class="head">Head</div><div data-id="side" class="side">Side</div><div data-id="main" class="main">Main</div></div>',
+        starterCSS:
+          ".layout {\n  display: grid;\n  grid-template-columns: 100px 1fr;\n  width: 300px;\n}\n.head { background: #2f5fd0; color: #fff; padding: 8px; }\n.side { background: #dbe4fb; padding: 8px; }\n.main { background: #eef1f8; padding: 8px; }\n",
+        task: "上段に head を全幅、その下に side（左100px）と main（右）を配置しよう（grid-template-areas を使う）。",
+        snapshot: { props: ["display"] },
+        validators: [
+          { kind: "sourceMatches", pattern: "grid-template-areas" },
+          { kind: "sizeApprox", id: "head", w: 300, tol: 3 },
+          { kind: "order", ids: ["head", "side"], axis: "y" },
+          { kind: "alignedEdge", ids: ["side", "main"], edge: "top" },
+          { kind: "order", ids: ["side", "main"], axis: "x" },
+          { kind: "sizeApprox", id: "side", w: 100, tol: 3 },
+        ],
+        hints: ['grid-template-areas: "head head" "side main";', "各要素に grid-area: head / side / main を割り当てます"],
+        solution:
+          ".layout {\n  display: grid;\n  grid-template-columns: 100px 1fr;\n  grid-template-areas: \"head head\" \"side main\";\n  width: 300px;\n}\n.head { grid-area: head; background: #2f5fd0; color: #fff; padding: 8px; }\n.side { grid-area: side; background: #dbe4fb; padding: 8px; }\n.main { grid-area: main; background: #eef1f8; padding: 8px; }\n",
+      },
+    },
   ],
 };

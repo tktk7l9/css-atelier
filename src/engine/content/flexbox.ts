@@ -100,5 +100,52 @@ export const flexboxTrack: Track = {
           ".row {\n  display: flex;\n  width: 300px;\n  background: #dbe4fb;\n}\n.box {\n  width: 60px;\n  height: 60px;\n  background: #2f5fd0;\n  border-radius: 8px;\n}\n",
       },
     },
+    {
+      id: "flexbox-grow",
+      title: "余白を埋める: flex: 1",
+      explanation:
+        "<p><code>flex: 1</code> を付けた要素は、余ったスペースを伸びて埋めます。他の要素は自分のサイズを保ちます。</p>",
+      mdnPath: "/ja/docs/Web/CSS/flex",
+      viz: { concept: "flexbox", containerId: "row" },
+      challenge: {
+        starterHTML:
+          '<div data-id="row" class="row"><div data-id="a" class="grow">伸びる</div><div data-id="b" class="fixed">固定</div></div>',
+        starterCSS:
+          ".row {\n  display: flex;\n  width: 300px;\n}\n.grow {\n  background: #2f5fd0;\n  color: #fff;\n  padding: 10px;\n}\n.fixed {\n  width: 80px;\n  background: #dbe4fb;\n  padding: 10px;\n}\n",
+        task: "「伸びる」箱を flex: 1 で伸ばし、固定80px 以外の残りスペースを埋めよう。",
+        snapshot: { props: ["display"] },
+        validators: [
+          { kind: "declarationEquals", selector: ".row", prop: "display", value: "flex" },
+          { kind: "sizeApprox", id: "a", w: 220, tol: 4 },
+          { kind: "alignedEdge", ids: ["a", "b"], edge: "top" },
+        ],
+        hints: ["伸ばしたい要素に flex: 1 を指定します", "残り = 300 − 80 = 220px"],
+        solution:
+          ".row {\n  display: flex;\n  width: 300px;\n}\n.grow {\n  flex: 1;\n  background: #2f5fd0;\n  color: #fff;\n  padding: 10px;\n}\n.fixed {\n  width: 80px;\n  background: #dbe4fb;\n  padding: 10px;\n}\n",
+      },
+    },
+    {
+      id: "flexbox-gap",
+      title: "間隔を空ける: gap",
+      explanation:
+        "<p>flex コンテナでも <code>gap</code> で子要素どうしの間隔をまとめて指定できます。マージンより簡単で端に余白が出ません。</p>",
+      mdnPath: "/ja/docs/Web/CSS/gap",
+      viz: { concept: "flexbox", containerId: "row" },
+      challenge: {
+        starterHTML:
+          '<div data-id="row" class="row"><div data-id="a" class="item"></div><div data-id="b" class="item"></div><div data-id="c" class="item"></div></div>',
+        starterCSS:
+          ".row {\n  display: flex;\n  width: 300px;\n}\n.item {\n  width: 60px;\n  height: 50px;\n  background: #2f5fd0;\n  border-radius: 6px;\n}\n",
+        task: "箱の間に 16px の間隔（gap）を空けよう。",
+        snapshot: { props: ["display", "column-gap"] },
+        validators: [
+          { kind: "declarationEquals", selector: ".row", prop: "display", value: "flex" },
+          { kind: "computedEquals", id: "row", prop: "column-gap", value: "16px" },
+        ],
+        hints: ["gap: 16px を flex コンテナに指定します"],
+        solution:
+          ".row {\n  display: flex;\n  gap: 16px;\n  width: 300px;\n}\n.item {\n  width: 60px;\n  height: 50px;\n  background: #2f5fd0;\n  border-radius: 6px;\n}\n",
+      },
+    },
   ],
 };

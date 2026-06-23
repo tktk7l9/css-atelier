@@ -18,8 +18,12 @@ export const layersTrack: Track = {
         starterCSS: "/* @layer base, theme; の順で宣言し、theme を優先させよう */\n",
         task: "base レイヤーで赤、theme レイヤーで青を指定し、青を勝たせよう（文字色）。",
         snapshot: { props: ["color"] },
+        // 構造（base→theme の順序宣言＋各レイヤーの定義）と結果（青）の両方を要求し、
+        // 無条件の color:blue では通らないようにする。
         validators: [
-          { kind: "sourceMatches", pattern: "@layer" },
+          { kind: "sourceMatches", pattern: "@layer\\s+base\\s*,\\s*theme" },
+          { kind: "sourceMatches", pattern: "@layer\\s+base\\s*\\{[^}]*color\\s*:\\s*red" },
+          { kind: "sourceMatches", pattern: "@layer\\s+theme\\s*\\{[^}]*color\\s*:\\s*blue" },
           { kind: "computedMatches", id: "box", prop: "color", pattern: "0[,\\s]+0[,\\s]+255" },
         ],
         hints: ["@layer base, theme; で順序を先に宣言します", "@layer base { .box{color:red} } @layer theme { .box{color:blue} }"],

@@ -10,7 +10,9 @@ import { snapshotToSignals } from "./engine/viz-map.js";
 import { lessonById, nextLesson } from "./engine/content/index.js";
 import type { Lesson } from "./engine/content/types.js";
 import { markComplete, type ProgressStore } from "./engine/progress.js";
-import { createVisualizer, type Visualizer } from "./viz/index.js";
+// Three.js lives in viz/index.js — imported dynamically only for 3D lessons so
+// the ~22 non-3D lessons never pull the Three chunk.
+import type { Visualizer } from "./viz/index.js";
 
 const store: ProgressStore = {
   getItem: (k) => {
@@ -69,13 +71,13 @@ export function createApp(callbacks: AppCallbacks): AppController {
   const actions = el("div", { class: "actions" });
   actions.append(checkBtn, resetBtn, hintBtn, solBtn, nextBtn);
 
-  const banner = el("div", { class: "banner" });
+  const banner = el("div", { class: "banner", attrs: { role: "status", "aria-live": "polite" } });
   const hints = el("div", { class: "hints" });
   doc.append(title, explain, task, mdn, editor.root, actions, banner, hints);
 
   // ---- right: 3D stage + live preview ----
   const stage = el("div", { class: "viz__stage" });
-  const canvas = el("canvas", { attrs: { id: "scene" } });
+  const canvas = el("canvas", { attrs: { id: "scene", "aria-hidden": "true" } });
   const badge = el("div", { class: "viz__badge" });
   stage.append(canvas, badge);
 
@@ -117,6 +119,8 @@ export function createApp(callbacks: AppCallbacks): AppController {
     }
   }
 
+  const nextFrame = (): Promise<void> => new Promise((r) => requestAnimationFrame(() => r()));
+
   function refreshViz(): void {
     if (!current) return;
     const snap = sandbox.snapshot(current.challenge.snapshot);
@@ -128,21 +132,38 @@ export function createApp(callbacks: AppCallbacks): AppController {
     requestAnimationFrame(refreshViz);
   }, 120);
 
-  function check(): void {
+  async function check(): Promise<void> {
     if (!current) return;
-    sandbox.setUserCSS(editor.getValue());
     const lesson = current;
-    requestAnimationFrame(() => {
-      const snap = sandbox.snapshot(lesson.challenge.snapshot);
-      const result = evaluate(lesson.challenge.validators, snap);
-      showBanner(result.passed, result.failures);
-      visualizer?.update(snapshotToSignals(snap, lesson.viz));
-      if (result.passed) {
-        markComplete(store, lesson.id);
-        callbacks.onComplete(lesson.id);
-        nextBtn.classList.add("btn--primary");
-      }
-    });
+    const { challenge } = lesson;
+    sandbox.setUserCSS(editor.getValue());
+
+    // Main state (at the lesson's viewport).
+    sandbox.setViewport(challenge.viewport ?? null);
+    await nextFrame();
+    const mainSnap = sandbox.snapshot(challenge.snapshot);
+    const failures = [...evaluate(challenge.validators, mainSnap).failures];
+    visualizer?.update(snapshotToSignals(mainSnap, lesson.viz));
+
+    // Extra states (other viewports) — e.g. proving a query is conditional.
+    for (const state of challenge.states ?? []) {
+      sandbox.setViewport(state.viewport);
+      await nextFrame();
+      const snap = sandbox.snapshot(challenge.snapshot);
+      failures.push(...evaluate(state.validators, snap).failures);
+    }
+    if (challenge.states?.length) {
+      sandbox.setViewport(challenge.viewport ?? null); // restore the preview
+      await nextFrame();
+    }
+
+    const passed = failures.length === 0;
+    showBanner(passed, failures);
+    if (passed) {
+      markComplete(store, lesson.id);
+      callbacks.onComplete(lesson.id);
+      nextBtn.classList.add("btn--primary");
+    }
   }
 
   function revealHint(): void {
@@ -155,7 +176,8 @@ export function createApp(callbacks: AppCallbacks): AppController {
   }
 
   editor.onInput(liveUpdate);
-  checkBtn.addEventListener("click", check);
+  editor.onSubmit(() => void check());
+  checkBtn.addEventListener("click", () => void check());
   resetBtn.addEventListener("click", () => {
     if (current) {
       editor.setValue(current.challenge.starterCSS);
@@ -203,12 +225,17 @@ export function createApp(callbacks: AppCallbacks): AppController {
     badge.textContent =
       lesson.viz.concept === "none" ? "プレビュー" : `3D: ${lesson.viz.concept}`;
 
-    // Lazily attach the 3D visualizer (skips the WebGL setup for "none" lessons).
+    // Move focus to the heading so screen-reader users get lesson context.
+    title.tabIndex = -1;
+    title.focus({ preventScroll: true });
+
+    // Lazily attach the 3D visualizer — Three.js loads only for 3D lessons.
     if (lesson.viz.concept === "none") {
       stage.classList.add("hidden");
     } else {
       stage.classList.remove("hidden");
       if (!visualizer) {
+        const { createVisualizer } = await import("./viz/index.js");
         visualizer = createVisualizer(canvas, callbacks.reducedMotion);
       }
       visualizer.setConcept(lesson.viz.concept);

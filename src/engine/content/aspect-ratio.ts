@@ -27,5 +27,26 @@ export const aspectRatioTrack: Track = {
           ".frame {\n  width: 320px;\n  aspect-ratio: 16 / 9;\n  background: #2f5fd0;\n  border-radius: 8px;\n}\n",
       },
     },
+    {
+      id: "aspect-ratio-square",
+      title: "正方形を保つ: aspect-ratio: 1",
+      explanation:
+        "<p><code>aspect-ratio: 1</code>（= 1 / 1）で、幅に対して高さを等しくし正方形を保てます。</p>",
+      mdnPath: "/ja/docs/Web/CSS/aspect-ratio",
+      viz: { concept: "none" },
+      challenge: {
+        starterHTML: '<div data-id="frame" class="frame"></div>',
+        starterCSS: ".frame {\n  width: 160px;\n  background: #2f5fd0;\n  border-radius: 8px;\n}\n",
+        task: "幅 160px のまま、正方形（高さも 160px）にしよう。",
+        snapshot: { props: ["aspect-ratio"] },
+        validators: [
+          { kind: "sourceMatches", pattern: "aspect-ratio" },
+          { kind: "sizeApprox", id: "frame", h: 160, tol: 2 },
+        ],
+        hints: ["aspect-ratio: 1 を指定します"],
+        solution:
+          ".frame {\n  width: 160px;\n  aspect-ratio: 1;\n  background: #2f5fd0;\n  border-radius: 8px;\n}\n",
+      },
+    },
   ],
 };

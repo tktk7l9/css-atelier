@@ -43,8 +43,15 @@ export interface Challenge {
   readonly snapshot: SnapshotRequest;
   /** Fix the preview iframe width (px) — for media-query / responsive lessons. */
   readonly viewport?: number;
-  /** Composed validators; the challenge passes when all pass. */
+  /** Composed validators; the challenge passes when all pass (at `viewport`). */
   readonly validators: readonly ValidatorSpec[];
+  /** Extra checks at other viewport widths, e.g. to prove a media/container
+   *  query is conditional (the effect must NOT apply at a different width).
+   *  All states must pass too. */
+  readonly states?: ReadonlyArray<{
+    readonly viewport: number;
+    readonly validators: readonly ValidatorSpec[];
+  }>;
   readonly hints: readonly string[];
   /** A reference CSS known to satisfy the validators. */
   readonly solution: string;

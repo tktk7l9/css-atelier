@@ -24,6 +24,13 @@ export const mediaQueriesTrack: Track = {
           { kind: "sourceMatches", pattern: "@media" },
           { kind: "computedEquals", id: "box", prop: "font-size", value: "14px" },
         ],
+        // 広い幅では適用されない（=条件付き）ことも検証し、無条件指定を防ぐ。
+        states: [
+          {
+            viewport: 600,
+            validators: [{ kind: "computedEquals", id: "box", prop: "font-size", value: "20px" }],
+          },
+        ],
         hints: ["@media (max-width: 400px) { .box { … } } の形です", "font-size: 14px"],
         solution:
           ".box {\n  padding: 12px;\n  background: #dbe4fb;\n  font-size: 20px;\n}\n@media (max-width: 400px) {\n  .box {\n    font-size: 14px;\n  }\n}\n",
@@ -46,6 +53,15 @@ export const mediaQueriesTrack: Track = {
         validators: [
           { kind: "sourceMatches", pattern: "@media" },
           { kind: "computedMatches", id: "box", prop: "background-color", pattern: "31[,\\s]+157[,\\s]+104" },
+        ],
+        // 狭い幅では元の背景（#dbe4fb）のままであることも検証する。
+        states: [
+          {
+            viewport: 400,
+            validators: [
+              { kind: "computedMatches", id: "box", prop: "background-color", pattern: "219[,\\s]+228[,\\s]+251" },
+            ],
+          },
         ],
         hints: ["@media (min-width: 600px) { .box { … } }", "background: #1f9d68"],
         solution:
