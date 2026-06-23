@@ -8,7 +8,8 @@
   --paper-2: #ffffff;
   --ink: #18203a;
   --ink-soft: #5b6685;
-  --ink-faint: #8b95ad;
+  /* Darkened so faint text clears WCAG 4.5:1 on both white cards and the paper bg. */
+  --ink-faint: #5b6478;
 
   --blueprint: #2f5fd0;
   --blueprint-700: #234aa8;
