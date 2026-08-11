@@ -2,7 +2,7 @@
 
 MDN の CSS ドキュメントを片手に、**解説を読んで → 実際に CSS を書いて → 自動採点**で学べるインタラクティブ学習アプリ。Flexbox / Grid はもちろん、`:has()` や container queries などモダンな機能まで。製図スタジオ風の明るい UI と、概念を立体で見せる 3D ビジュアライザ（Three.js）付き。
 
-**▶ [Play Now](https://css-atelier.vercel.app/)**
+**▶ [Play Now](https://css-atelier.saitotakuya0719.workers.dev/)**
 
 ## 特徴
 
@@ -61,3 +61,14 @@ Vanilla TypeScript · Vite · Three.js · Vitest（フレームワーク・ル�
 ## セキュリティ
 
 外部スタイルシートのみ・厳格な CSP（`vercel.json`、`unsafe-inline` / `unsafe-eval` なし）・`frame-ancestors 'none'`・HSTS。サンドボックス iframe は `allow-same-origin` のみ（スクリプト不可、CSS だけを注入）。
+
+## ホスティング
+
+本番は **Cloudflare Workers (static assets)**: https://css-atelier.saitotakuya0719.workers.dev
+
+2026-08-11、Vercel 無料枠の超過でアカウントが停止（全プロジェクトが
+`402 DEPLOYMENT_DISABLED`）したため移行した。ビルド成果物は純粋な静的
+ファイルなので Worker スクリプトは無く、`wrangler.jsonc` の `assets` だけで
+配信している。セキュリティヘッダーは `public/_headers`（`vercel.json` の
+`headers` を移植したもの）。`npm run deploy` で build + wrangler deploy。
+Vercel 側の設定も残置してあるので、復旧すれば両方に出せる。
