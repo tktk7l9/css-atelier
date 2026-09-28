@@ -29,7 +29,11 @@ export interface Editor {
 
 export function createEditor(label = "CSS"): Editor {
   const root = el("div", { class: "editor-wrap" });
-  root.append(el("div", { class: "editor-label", text: label }));
+  const head = el("div", { class: "editor-label" });
+  // Make the Cmd/Ctrl+Enter shortcut discoverable (SHIG 22).
+  const shortcut = el("span", { class: "editor-shortcut", text: "⌘/Ctrl + Enter でチェック" });
+  head.append(el("span", { text: label }), shortcut);
+  root.append(head);
 
   const stack = el("div", { class: "editor-stack" });
   const pre = el("pre", { attrs: { "aria-hidden": "true" } });
@@ -39,7 +43,7 @@ export function createEditor(label = "CSS"): Editor {
       autocapitalize: "off",
       autocomplete: "off",
       autocorrect: "off",
-      "aria-label": `${label} エディタ`,
+      "aria-label": label,
     },
   });
   stack.append(pre, textarea);
