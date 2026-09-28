@@ -10,6 +10,8 @@ import { snapshotToSignals } from "./engine/viz-map.js";
 import { lessonById, nextLesson } from "./engine/content/index.js";
 import type { Lesson } from "./engine/content/types.js";
 import { markComplete, type ProgressStore } from "./engine/progress.js";
+import { loadDraft, saveDraft } from "./engine/drafts.js";
+import { conceptLabel, hintButtonLabel } from "./engine/navigation.js";
 // Three.js lives in viz/index.js — imported dynamically only for 3D lessons so
 // the ~22 non-3D lessons never pull the Three chunk.
 import type { Visualizer } from "./viz/index.js";
@@ -63,17 +65,36 @@ export function createApp(callbacks: AppCallbacks): AppController {
   const mdn = el("a", { class: "mdn-link", attrs: { target: "_blank", rel: "noopener" } });
   const editor: Editor = createEditor("CSS エディタ");
 
-  const checkBtn = el("button", { class: "btn btn--primary", text: "チェック" });
-  const resetBtn = el("button", { class: "btn btn--ghost", text: "リセット" });
-  const hintBtn = el("button", { class: "btn btn--ghost", text: "ヒント" });
-  const solBtn = el("button", { class: "btn btn--ghost", text: "解答を見る" });
-  const nextBtn = el("button", { class: "btn", text: "次のレッスン →" });
+  const btn = (cls: string, text: string): HTMLButtonElement =>
+    el("button", { class: cls, text, attrs: { type: "button" } });
+  const checkBtn = btn("btn btn--primary", "チェック");
+  checkBtn.setAttribute("aria-keyshortcuts", "Meta+Enter Control+Enter");
+  const nextBtn = btn("btn", "次のレッスン →");
+  const hintBtn = btn("btn btn--ghost", "ヒント");
+  const resetBtn = btn("btn btn--ghost", "リセット");
+  const solBtn = btn("btn btn--ghost", "解答を見る");
+  // Main actions first; the ones that overwrite the learner's CSS sit in a
+  // separate group away from "check" (SHIG 16, 13).
   const actions = el("div", { class: "actions" });
-  actions.append(checkBtn, resetBtn, hintBtn, solBtn, nextBtn);
+  const mainActions = el("div", { class: "actions__main" });
+  mainActions.append(checkBtn, nextBtn);
+  const subActions = el("div", { class: "actions__sub" });
+  subActions.append(hintBtn, resetBtn, solBtn);
+  actions.append(mainActions, subActions);
+
+  // Undo notice for reset / show-solution (SHIG 57, 54: act, then allow undo).
+  // The live region stays in the DOM; only the inner box is shown/hidden, so
+  // screen readers reliably announce the message when it appears.
+  const undoNote = el("div", { attrs: { role: "status" } });
+  const undoBox = el("div", { class: "undo hidden" });
+  const undoText = el("span");
+  const undoBtn = btn("undo__btn", "元に戻す");
+  undoBox.append(undoText, undoBtn);
+  undoNote.append(undoBox);
 
   const banner = el("div", { class: "banner", attrs: { role: "status", "aria-live": "polite" } });
   const hints = el("div", { class: "hints" });
-  doc.append(title, explain, task, mdn, editor.root, actions, banner, hints);
+  doc.append(title, explain, task, mdn, editor.root, actions, undoNote, banner, hints);
 
   // ---- right: 3D stage + live preview ----
   const stage = el("div", { class: "viz__stage" });
@@ -100,6 +121,41 @@ export function createApp(callbacks: AppCallbacks): AppController {
   let visualizer: Visualizer | null = null;
   let current: Lesson | null = null;
   let hintsShown = 0;
+  let undoCSS: string | null = null;
+
+  function hideUndo(): void {
+    undoCSS = null;
+    undoBox.classList.add("hidden");
+    undoText.textContent = "";
+  }
+
+  /** Replace the editor contents, keeping the previous CSS for one undo. */
+  function replaceCSS(css: string, message: string): void {
+    if (!current) return;
+    const previous = editor.getValue();
+    applyCSS(css);
+    if (previous === css) {
+      hideUndo();
+      return;
+    }
+    undoCSS = previous;
+    undoBox.classList.remove("hidden");
+    undoText.textContent = message;
+  }
+
+  function applyCSS(css: string): void {
+    if (!current) return;
+    editor.setValue(css);
+    sandbox.setUserCSS(css);
+    saveDraft(store, current.id, css, current.challenge.starterCSS);
+    requestAnimationFrame(refreshViz);
+  }
+
+  function updateHintBtn(): void {
+    const total = current?.challenge.hints.length ?? 0;
+    hintBtn.textContent = hintButtonLabel(hintsShown, total);
+    hintBtn.disabled = hintsShown >= total;
+  }
 
   function clearBanner(): void {
     banner.className = "banner";
@@ -172,27 +228,33 @@ export function createApp(callbacks: AppCallbacks): AppController {
       hints.append(el("div", { class: "hint", text: `💡 ${current.challenge.hints[hintsShown]}` }));
       hintsShown++;
     }
-    if (hintsShown >= current.challenge.hints.length) hintBtn.disabled = true;
+    updateHintBtn();
   }
 
-  editor.onInput(liveUpdate);
+  editor.onInput((css) => {
+    hideUndo();
+    // Save right away (not debounced) so a reload or navigation within the
+    // debounce window cannot drop the last keystrokes.
+    if (current) saveDraft(store, current.id, css, current.challenge.starterCSS);
+    liveUpdate();
+  });
   editor.onSubmit(() => void check());
   checkBtn.addEventListener("click", () => void check());
   resetBtn.addEventListener("click", () => {
-    if (current) {
-      editor.setValue(current.challenge.starterCSS);
-      sandbox.setUserCSS(current.challenge.starterCSS);
-      clearBanner();
-      requestAnimationFrame(refreshViz);
-    }
+    if (!current) return;
+    clearBanner();
+    replaceCSS(current.challenge.starterCSS, "最初の状態に戻しました。");
   });
   hintBtn.addEventListener("click", revealHint);
   solBtn.addEventListener("click", () => {
-    if (current) {
-      editor.setValue(current.challenge.solution);
-      sandbox.setUserCSS(current.challenge.solution);
-      requestAnimationFrame(refreshViz);
-    }
+    if (!current) return;
+    replaceCSS(current.challenge.solution, "解答を表示しました。");
+  });
+  undoBtn.addEventListener("click", () => {
+    if (undoCSS === null) return;
+    applyCSS(undoCSS);
+    hideUndo();
+    editor.focus();
   });
   nextBtn.addEventListener("click", () => {
     const n = current ? nextLesson(current.id) : undefined;
@@ -205,8 +267,10 @@ export function createApp(callbacks: AppCallbacks): AppController {
     if (!lesson) return;
     current = lesson;
     hintsShown = 0;
-    hintBtn.disabled = false;
+    updateHintBtn();
+    hideUndo();
     nextBtn.classList.remove("btn--primary");
+    nextBtn.textContent = nextLesson(lesson.id) ? "次のレッスン →" : "レッスン一覧へ";
     clearBanner();
     hints.textContent = "";
 
@@ -221,9 +285,9 @@ export function createApp(callbacks: AppCallbacks): AppController {
       mdn.classList.add("hidden");
     }
 
-    editor.setValue(lesson.challenge.starterCSS);
-    badge.textContent =
-      lesson.viz.concept === "none" ? "プレビュー" : `3D: ${lesson.viz.concept}`;
+    const css = loadDraft(store, lesson.id) ?? lesson.challenge.starterCSS;
+    editor.setValue(css);
+    badge.textContent = conceptLabel(lesson.viz.concept);
 
     // Move focus to the heading so screen-reader users get lesson context.
     title.tabIndex = -1;
@@ -241,7 +305,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
       visualizer.setConcept(lesson.viz.concept);
     }
 
-    await sandbox.load(lesson.challenge.starterHTML, lesson.challenge.starterCSS);
+    await sandbox.load(lesson.challenge.starterHTML, css);
     sandbox.setViewport(lesson.challenge.viewport ?? null);
     vpLabel.textContent = lesson.challenge.viewport ? `${lesson.challenge.viewport}px` : "auto";
     requestAnimationFrame(refreshViz);
