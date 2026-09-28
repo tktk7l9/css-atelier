@@ -6,6 +6,7 @@ import "./styles.css";
 import { byId, el } from "./ui/dom.js";
 import { renderCatalogue } from "./ui/catalogue.js";
 import { lessonById, trackOf } from "./engine/content/index.js";
+import { lessonPosition } from "./engine/navigation.js";
 import type { ProgressStore } from "./engine/progress.js";
 import type { AppController } from "./app.js";
 
@@ -46,7 +47,7 @@ const brand = el("button", { class: "brand", attrs: { type: "button" } });
 brand.append(el("img", { attrs: { src: "/favicon.svg", alt: "" } }));
 brand.append(el("span", { text: "CSS Atelier" }));
 brand.append(el("small", { text: "手を動かして学ぶ CSS" }));
-const crumb = el("div", { class: "crumb" });
+const crumb = el("nav", { class: "crumb", attrs: { "aria-label": "現在地" } });
 topbar.append(brand, el("div", { class: "topbar-spacer" }), crumb);
 
 const main = el("main");
@@ -91,10 +92,20 @@ async function showLesson(id: string): Promise<void> {
   const lesson = lessonById(id);
   const track = trackOf(id);
   crumb.textContent = "";
-  if (track && lesson) {
+  // Explicit way back: the installed PWA runs standalone with no browser back
+  // button (SHIG 59, 60, 82).
+  crumb.append(el("a", { class: "crumb__back", text: "← レッスン一覧", attrs: { href: "#" } }));
+  const pos = lessonPosition(id);
+  if (track && lesson && pos) {
+    const path = el("span", { class: "crumb__path" });
+    path.append(document.createTextNode(`${track.title} › `), el("b", { text: lesson.title }));
     crumb.append(
-      document.createTextNode(`${track.title} › `),
-      el("b", { text: lesson.title }),
+      path,
+      el("span", {
+        class: "crumb__pos",
+        text: `${pos.index}/${pos.total}`,
+        attrs: { "aria-label": `${track.title}の${pos.total}レッスン中${pos.index}番目` },
+      }),
     );
   }
   main.replaceChildren(controller.root);
