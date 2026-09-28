@@ -10,8 +10,8 @@ export default defineConfig({
       include: ["src/engine/**/*.ts"],
       exclude: ["src/**/*.test.ts"],
       reporter: ["text", "json-summary", "html"],
-      // 純ロジック層（content / validate / tokenize / viz-map / progress）は
-      // 100% を維持する。DOM・iframe・Three.js は presentation 層として対象外。
+      // Keep the pure logic layer (content / validate / tokenize / viz-map / progress)
+      // at 100%. DOM, iframes, and Three.js are excluded as the presentation layer.
       thresholds: {
         "src/engine/**/*.ts": {
           statements: 100,

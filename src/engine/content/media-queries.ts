@@ -24,7 +24,7 @@ export const mediaQueriesTrack: Track = {
           { kind: "sourceMatches", pattern: "@media" },
           { kind: "computedEquals", id: "box", prop: "font-size", value: "14px" },
         ],
-        // 広い幅では適用されない（=条件付き）ことも検証し、無条件指定を防ぐ。
+        // Also verify it does not apply at a wide width (= it is conditional), to reject unconditional rules.
         states: [
           {
             viewport: 600,
@@ -54,7 +54,7 @@ export const mediaQueriesTrack: Track = {
           { kind: "sourceMatches", pattern: "@media" },
           { kind: "computedMatches", id: "box", prop: "background-color", pattern: "31[,\\s]+157[,\\s]+104" },
         ],
-        // 狭い幅では元の背景（#dbe4fb）のままであることも検証する。
+        // Also verify the background stays the original (#dbe4fb) at a narrow width.
         states: [
           {
             viewport: 400,

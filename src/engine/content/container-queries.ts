@@ -48,7 +48,7 @@ export const containerQueriesTrack: Track = {
           { kind: "sourceMatches", pattern: "@container" },
           { kind: "computedEquals", id: "card", prop: "font-size", value: "24px" },
         ],
-        // 狭いコンテナ（360px）では適用されない＝親の幅で切り替わることを検証。
+        // Verify it does not apply in a narrow container (360px), i.e. it switches on the parent's width.
         states: [
           {
             viewport: 360,

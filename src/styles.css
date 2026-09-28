@@ -1,5 +1,5 @@
-/* CSS Atelier — 明るい「製図スタジオ / 設計図」テーマ
-   方眼紙の背景・ドラフティングブルー・薄い罫線。snippet-sprint のネオンと正反対。 */
+/* CSS Atelier — bright "drafting studio / blueprint" theme
+   Graph-paper background, drafting blue, faint rules. The exact opposite of snippet-sprint's neon. */
 
 :root {
   color-scheme: light;
@@ -48,7 +48,7 @@ body {
   font-family: var(--sans);
   color: var(--ink);
   background-color: var(--paper);
-  /* 方眼紙: 8px 細線 + 64px 太線 */
+  /* Graph paper: 8px thin lines + 64px thick lines */
   background-image: linear-gradient(var(--grid-minor) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px),
     linear-gradient(var(--grid-major) 1px, transparent 1px),
