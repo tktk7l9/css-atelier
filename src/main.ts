@@ -101,10 +101,16 @@ async function showLesson(id: string): Promise<void> {
     path.append(document.createTextNode(`${track.title} › `), el("b", { text: lesson.title }));
     crumb.append(
       path,
+      // aria-label is ignored on a plain span, so speak the position as
+      // visually hidden text and hide the terse "1/3" from assistive tech.
       el("span", {
         class: "crumb__pos",
         text: `${pos.index}/${pos.total}`,
-        attrs: { "aria-label": `${track.title}の${pos.total}レッスン中${pos.index}番目` },
+        attrs: { "aria-hidden": "true" },
+      }),
+      el("span", {
+        class: "sr-only",
+        text: `${track.title}の${pos.total}レッスン中${pos.index}番目`,
       }),
     );
   }

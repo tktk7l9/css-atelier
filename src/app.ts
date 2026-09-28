@@ -83,10 +83,14 @@ export function createApp(callbacks: AppCallbacks): AppController {
   actions.append(mainActions, subActions);
 
   // Undo notice for reset / show-solution (SHIG 57, 54: act, then allow undo).
-  const undoNote = el("div", { class: "undo hidden", attrs: { role: "status" } });
+  // The live region stays in the DOM; only the inner box is shown/hidden, so
+  // screen readers reliably announce the message when it appears.
+  const undoNote = el("div", { attrs: { role: "status" } });
+  const undoBox = el("div", { class: "undo hidden" });
   const undoText = el("span");
   const undoBtn = btn("undo__btn", "元に戻す");
-  undoNote.append(undoText, undoBtn);
+  undoBox.append(undoText, undoBtn);
+  undoNote.append(undoBox);
 
   const banner = el("div", { class: "banner", attrs: { role: "status", "aria-live": "polite" } });
   const hints = el("div", { class: "hints" });
@@ -121,7 +125,8 @@ export function createApp(callbacks: AppCallbacks): AppController {
 
   function hideUndo(): void {
     undoCSS = null;
-    undoNote.classList.add("hidden");
+    undoBox.classList.add("hidden");
+    undoText.textContent = "";
   }
 
   /** Replace the editor contents, keeping the previous CSS for one undo. */
@@ -134,8 +139,8 @@ export function createApp(callbacks: AppCallbacks): AppController {
       return;
     }
     undoCSS = previous;
+    undoBox.classList.remove("hidden");
     undoText.textContent = message;
-    undoNote.classList.remove("hidden");
   }
 
   function applyCSS(css: string): void {
@@ -179,9 +184,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
   }
 
   const liveUpdate = debounce(() => {
-    const css = editor.getValue();
-    sandbox.setUserCSS(css);
-    if (current) saveDraft(store, current.id, css, current.challenge.starterCSS);
+    sandbox.setUserCSS(editor.getValue());
     requestAnimationFrame(refreshViz);
   }, 120);
 
@@ -228,8 +231,11 @@ export function createApp(callbacks: AppCallbacks): AppController {
     updateHintBtn();
   }
 
-  editor.onInput(() => {
+  editor.onInput((css) => {
     hideUndo();
+    // Save right away (not debounced) so a reload or navigation within the
+    // debounce window cannot drop the last keystrokes.
+    if (current) saveDraft(store, current.id, css, current.challenge.starterCSS);
     liveUpdate();
   });
   editor.onSubmit(() => void check());

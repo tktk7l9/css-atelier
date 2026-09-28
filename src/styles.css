@@ -482,6 +482,12 @@ main {
   letter-spacing: 0;
   text-transform: none;
 }
+/* Touch-only devices have no hardware keyboard shortcut to show (SHIG 1). */
+@media (hover: none) and (pointer: coarse) {
+  .editor-shortcut {
+    display: none;
+  }
+}
 
 /* token colours for the highlight overlay */
 .tok-sel {
