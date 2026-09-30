@@ -356,6 +356,9 @@ export function createApp(callbacks: AppCallbacks): AppController {
     // Lazily attach the 3D visualizer — Three.js loads only for 3D lessons.
     if (lesson.viz.concept === "none") {
       stage.classList.add("hidden");
+      // Tear the previous concept down too; otherwise the hidden canvas keeps
+      // animating and re-rendering a stale scene from the last 3D lesson.
+      visualizer?.setConcept("none");
     } else {
       stage.classList.remove("hidden");
       if (!visualizer) {
