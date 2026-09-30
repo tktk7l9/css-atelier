@@ -11,6 +11,7 @@ import { lessonById, nextLesson } from "./engine/content/index.js";
 import type { Lesson } from "./engine/content/types.js";
 import { isComplete, markComplete, type ProgressStore } from "./engine/progress.js";
 import { loadDraft, saveDraft } from "./engine/drafts.js";
+import { createRevision } from "./engine/revision.js";
 import { conceptLabel, hintButtonLabel, viewportLabel } from "./engine/navigation.js";
 // Three.js lives in viz/index.js — imported dynamically only for 3D lessons so
 // the ~22 non-3D lessons never pull the Three chunk.
@@ -133,6 +134,9 @@ export function createApp(callbacks: AppCallbacks): AppController {
   let hintsShown = 0;
   let undoCSS: string | null = null;
   let checking = false;
+  // Bumped on every CSS change and lesson switch, so a check that finishes
+  // afterwards is dropped instead of reporting on code that is gone (SHIG 25).
+  const revision = createRevision();
 
   /** Bring freshly added feedback into view without yanking the page (SHIG 65, 66). */
   function reveal(node: HTMLElement): void {
@@ -147,6 +151,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
    * banner and make "check" the one primary action again (SHIG 25, 15, 74).
    */
   function markDirty(): void {
+    revision.bump();
     clearBanner();
     checkBtn.classList.add("btn--primary");
     nextBtn.classList.remove("btn--primary");
@@ -232,11 +237,16 @@ export function createApp(callbacks: AppCallbacks): AppController {
 
   async function runCheck(lesson: Lesson): Promise<void> {
     const { challenge } = lesson;
+    const fresh = revision.ticket();
+    // After a lesson switch the iframe belongs to the new lesson: stop without
+    // touching its viewport or visualizer.
+    const switched = (): boolean => current !== lesson;
     sandbox.setUserCSS(editor.getValue());
 
     // Main state (at the lesson's viewport).
     sandbox.setViewport(challenge.viewport ?? null);
     await nextFrame();
+    if (switched()) return;
     const mainSnap = sandbox.snapshot(challenge.snapshot);
     const failures = [...evaluate(challenge.validators, mainSnap).failures];
     visualizer?.update(snapshotToSignals(mainSnap, lesson.viz));
@@ -245,6 +255,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
     for (const state of challenge.states ?? []) {
       sandbox.setViewport(state.viewport);
       await nextFrame();
+      if (switched()) return;
       const snap = sandbox.snapshot(challenge.snapshot);
       failures.push(...evaluate(state.validators, snap).failures);
     }
@@ -252,6 +263,8 @@ export function createApp(callbacks: AppCallbacks): AppController {
       sandbox.setViewport(challenge.viewport ?? null); // restore the preview
       await nextFrame();
     }
+    // The CSS was edited while the check ran: this result is already stale.
+    if (!fresh()) return;
 
     const passed = failures.length === 0;
     showBanner(passed, failures);

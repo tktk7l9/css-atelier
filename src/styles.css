@@ -385,7 +385,7 @@ main {
 .lesson__done {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--good);
+  color: var(--good-ink);
   background: var(--good-bg);
   border: 1px solid #bfe6d2;
   border-radius: 999px;
