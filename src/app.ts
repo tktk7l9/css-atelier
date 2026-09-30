@@ -59,7 +59,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
 
   // ---- left: doc + editor + actions ----
   const doc = el("div", { class: "panel lesson__doc" });
-  const title = el("h2");
+  const title = el("h1");
   const explain = el("div", { class: "explain" });
   const task = el("div", { class: "task" });
   const mdn = el("a", { class: "mdn-link", attrs: { target: "_blank", rel: "noopener" } });
@@ -106,7 +106,12 @@ export function createApp(callbacks: AppCallbacks): AppController {
   const previewHead = el("div", { class: "preview__head", text: "プレビュー" });
   const vpLabel = el("span", { class: "preview__viewport" });
   previewHead.append(vpLabel);
-  const frame = el("div", { class: "preview__frame" });
+  // The frame scrolls when a lesson viewport is wider than the column, so it
+  // must be reachable by keyboard (WCAG 2.1.1).
+  const frame = el("div", {
+    class: "preview__frame",
+    attrs: { tabindex: "0", role: "group", "aria-label": "プレビューの表示領域" },
+  });
   const iframe = el("iframe", {
     attrs: { sandbox: "allow-same-origin", title: "プレビュー", "aria-label": "プレビュー" },
   }) as HTMLIFrameElement;
