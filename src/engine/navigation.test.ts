@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { LESSONS, TRACKS } from "./content/index.js";
-import { conceptLabel, hintButtonLabel, lessonPosition, resumeLesson } from "./navigation.js";
+import {
+  conceptLabel,
+  hintButtonLabel,
+  lessonPosition,
+  resumeLesson,
+  viewportLabel,
+} from "./navigation.js";
 
 describe("lessonPosition", () => {
   it("returns the 1-based index within the lesson's track", () => {
@@ -22,10 +28,36 @@ describe("resumeLesson", () => {
     expect(resumeLesson([])?.id).toBe(LESSONS[0]!.id);
   });
   it("skips completed lessons in catalogue order", () => {
-    expect(resumeLesson([LESSONS[0]!.id, LESSONS[2]!.id])?.id).toBe(LESSONS[1]!.id);
+    expect(resumeLesson([LESSONS[1]!.id, LESSONS[0]!.id])?.id).toBe(LESSONS[2]!.id);
   });
   it("returns undefined when every lesson is complete", () => {
     expect(resumeLesson(LESSONS.map((l) => l.id))).toBeUndefined();
+  });
+  // Completion order is the learner's own path (SHIG 12, 20, 77): resume after
+  // the lesson they finished most recently, not at the top of the catalogue.
+  it("continues after the most recently completed lesson", () => {
+    expect(resumeLesson([LESSONS[4]!.id])?.id).toBe(LESSONS[5]!.id);
+    expect(resumeLesson([LESSONS[0]!.id, LESSONS[4]!.id])?.id).toBe(LESSONS[5]!.id);
+    expect(resumeLesson([LESSONS[4]!.id, LESSONS[0]!.id])?.id).toBe(LESSONS[1]!.id);
+  });
+  it("skips already completed lessons after the most recent one", () => {
+    expect(resumeLesson([LESSONS[5]!.id, LESSONS[4]!.id])?.id).toBe(LESSONS[6]!.id);
+  });
+  it("wraps to the first unfinished lesson when the most recent one is the last", () => {
+    const last = LESSONS[LESSONS.length - 1]!;
+    expect(resumeLesson([last.id])?.id).toBe(LESSONS[0]!.id);
+  });
+  it("ignores unknown ids in the completed list", () => {
+    expect(resumeLesson(["nope"])?.id).toBe(LESSONS[0]!.id);
+  });
+});
+
+describe("viewportLabel", () => {
+  it("says nothing when the preview follows the panel width (SHIG 1, 11)", () => {
+    expect(viewportLabel(undefined)).toBe("");
+  });
+  it("explains a fixed width in plain words", () => {
+    expect(viewportLabel(380)).toBe("幅 380px に固定");
   });
 });
 

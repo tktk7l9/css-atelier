@@ -108,7 +108,7 @@ function dispatch(spec: ValidatorSpec, s: Snapshot): ValidationResult {
       if (actual === undefined) return fail(`${spec.id} の ${spec.prop} が取得されていません`);
       return normalizeValue(actual) === normalizeValue(spec.value)
         ? ok
-        : fail(`${spec.id} の ${spec.prop} は ${spec.value} になっていません`);
+        : fail(`${spec.id} の ${spec.prop} は ${spec.value} になっていません（現在 ${actual}）`);
     }
     case "computedMatches": {
       const el = getEl(s, spec.id);
@@ -117,7 +117,7 @@ function dispatch(spec: ValidatorSpec, s: Snapshot): ValidationResult {
       if (actual === undefined) return fail(`${spec.id} の ${spec.prop} が取得されていません`);
       return new RegExp(spec.pattern).test(actual)
         ? ok
-        : fail(`${spec.id} の ${spec.prop} の値を見直しましょう`);
+        : fail(`${spec.id} の ${spec.prop} の値を見直しましょう（現在 ${actual}）`);
     }
     case "centeredIn": {
       const el = getEl(s, spec.id);
@@ -197,10 +197,10 @@ function dispatch(spec: ValidatorSpec, s: Snapshot): ValidationResult {
       if (!el) return fail(`要素 ${spec.id} が見つかりません`);
       const tol = spec.tol ?? TOL;
       if (spec.w !== undefined && Math.abs(el.rect.w - spec.w) > tol) {
-        return fail(`${spec.id} の幅が ${spec.w}px になっていません`);
+        return fail(`${spec.id} の幅が ${spec.w}px になっていません（現在 ${Math.round(el.rect.w)}px）`);
       }
       if (spec.h !== undefined && Math.abs(el.rect.h - spec.h) > tol) {
-        return fail(`${spec.id} の高さが ${spec.h}px になっていません`);
+        return fail(`${spec.id} の高さが ${spec.h}px になっていません（現在 ${Math.round(el.rect.h)}px）`);
       }
       return ok;
     }
