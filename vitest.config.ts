@@ -5,6 +5,8 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts"],
+    // Load styles.css for real so styles.test.ts can read it via "?raw".
+    css: { include: [/styles\.css/] },
     coverage: {
       provider: "v8",
       include: ["src/engine/**/*.ts"],

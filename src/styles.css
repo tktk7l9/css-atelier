@@ -668,7 +668,6 @@ main {
   position: relative;
   background: repeating-conic-gradient(#f3f5fa 0% 25%, #fff 0% 50%) 50% / 18px 18px;
   display: flex;
-  justify-content: center;
   padding: 14px;
   overflow: auto;
 }
@@ -680,6 +679,9 @@ main {
   border: 0;
   /* Keep the lesson viewport width; the frame scrolls instead of shrinking it. */
   flex: none;
+  /* Auto margins centre the iframe but collapse to 0 when it overflows, so the
+     left edge stays reachable by scrolling (justify-content: center would clip it). */
+  margin-inline: auto;
   background: #fff;
   box-shadow: 0 1px 0 rgba(24, 32, 58, 0.08);
   width: 100%;
@@ -700,7 +702,9 @@ main {
 /* ---------- Responsive ---------- */
 @media (max-width: 920px) {
   .lesson {
-    grid-template-columns: 1fr;
+    /* minmax(0, …) so a fixed lesson viewport (e.g. 720px) scrolls inside the
+       preview frame instead of widening the page. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .viz {
     position: static;
