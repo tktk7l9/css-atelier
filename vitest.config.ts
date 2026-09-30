@@ -27,9 +27,9 @@ export default defineConfig({
           statements: 100,
           branches: 100,
           functions: 100,
-          lines: 96,
+          lines: 100,
         },
-        // UI layer (aggregate): behavioural tests through the DOM. Set two
+        // UI layer (aggregate): behavioural tests through the DOM. Set about three
         // points under the measured value so a small refactor does not flake.
         [`{${UI_GLOBS.join(",")}}`]: {
           statements: 96,

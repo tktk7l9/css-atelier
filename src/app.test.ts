@@ -225,7 +225,7 @@ describe("createApp: opening a lesson", () => {
     expect(fakes.state.loaded[0].css).toBe(".card { padding: 1px }");
   });
 
-  it("resets per-lesson state (hints, banner, undo) when moving between lessons", async () => {
+  it("resets per-lesson state (hints, banner, undo, Next emphasis) when moving between lessons", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
     await app.open(PADDING);
@@ -233,8 +233,15 @@ describe("createApp: opening a lesson", () => {
     await user.click(button(root, "解答を見る"));
     expect(getByText(root, "解答を表示しました。")).toBeTruthy();
     expect(root.querySelectorAll(".hint").length).toBe(1);
+    fakes.state.computed = { card: { "padding-top": "20px", "padding-left": "20px" } };
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(true);
 
     await app.open(CLASS);
+    // The pass banner and the promoted Next button belong to the old lesson.
+    expect(banner(root).textContent).toBe("");
+    expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(false);
     expect(root.querySelectorAll(".hint").length).toBe(0);
     expect(root.querySelector(".undo")?.classList.contains("hidden")).toBe(true);
     const total = lessonById(CLASS)!.challenge.hints.length;

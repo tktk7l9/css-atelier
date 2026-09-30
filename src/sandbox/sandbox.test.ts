@@ -96,6 +96,20 @@ describe("createSandbox", () => {
     expect(snap.declarations).toEqual([{ selector: ".row", decls: { gap: "4px" } }]);
   });
 
+  it("links each element to its nearest data-id ancestor, not an outer one", async () => {
+    const sandbox = createSandbox(mountFrame());
+    await sandbox.load(
+      '<div data-id="outer"><section data-id="inner"><p><span data-id="leaf">x</span></p></section></div>',
+      "",
+    );
+    const snap = sandbox.snapshot({ props: [] });
+    expect(snap.elements.map((e) => [e.id, e.parentId])).toEqual([
+      ["outer", null],
+      ["inner", "outer"],
+      ["leaf", "inner"],
+    ]);
+  });
+
   it("returns an empty snapshot when the frame has no document", () => {
     const iframe = document.createElement("iframe");
     const sandbox = createSandbox(iframe);

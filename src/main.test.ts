@@ -35,6 +35,8 @@ vi.mock("./app.js", () => ({
   },
 }));
 
+const devRegister = vi.fn().mockResolvedValue(undefined);
+
 const FIRST = LESSONS[0];
 const FIRST_TRACK = TRACKS[0];
 
@@ -53,6 +55,8 @@ async function atLesson(id: string): Promise<void> {
 beforeAll(async () => {
   // jsdom has no matchMedia; report "reduce" so the preference is observable below.
   window.matchMedia = ((q: string) => ({ matches: q.includes("reduce") })) as typeof window.matchMedia;
+  // A service worker API exists, so only the PROD guard keeps dev builds from registering.
+  Object.defineProperty(navigator, "serviceWorker", { value: { register: devRegister }, configurable: true });
   document.body.innerHTML = '<div id="app"></div>';
   location.hash = "";
   await import("./main.js");
@@ -146,8 +150,14 @@ describe("shell", () => {
   it("re-opens the current lesson when navigating to the hash already shown", async () => {
     location.hash = `#${FIRST.id}`;
     await atLesson(FIRST.id);
+    // Drain hashchange events still queued from earlier navigations: route()
+    // reads the current hash, so a late event would re-open FIRST by itself and
+    // hide a broken same-hash path.
+    await new Promise((r) => setTimeout(r, 50));
+    fakes.opened = [];
     fakes.callbacks?.onOpen(FIRST.id);
-    await waitFor(() => expect(fakes.opened).toEqual([FIRST.id, FIRST.id]));
+    await waitFor(() => expect(fakes.opened).toEqual([FIRST.id]));
+    expect(location.hash).toBe(`#${FIRST.id}`);
   });
 
   it("shows resume progress from the stored completion", async () => {
@@ -172,5 +182,11 @@ describe("shell", () => {
     } finally {
       spy.mockRestore();
     }
+  });
+
+  it("development builds load neither the analytics beacon nor the service worker", () => {
+    window.dispatchEvent(new Event("load"));
+    expect(devRegister).not.toHaveBeenCalled();
+    expect(document.head.querySelector('script[src*="cloudflareinsights"]')).toBeNull();
   });
 });
