@@ -60,7 +60,7 @@ export function renderCatalogue(
     const card = el("div", { class: "track-card" });
     const head = el("div", { class: "track-card__head" });
     head.append(el("span", { class: "track-card__emoji", text: track.emoji }));
-    head.append(el("span", { class: "track-card__title", text: track.title }));
+    head.append(el("h2", { class: "track-card__title", text: track.title }));
     card.append(head);
     card.append(el("div", { class: "track-card__summary", text: track.summary }));
 

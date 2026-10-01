@@ -16,8 +16,11 @@
   --blueprint-soft: #9fb2e6;
   --good: #1f9d68;
   --good-bg: #e6f6ee;
+  /* Text-on-tint variants: same hues, darkened to clear WCAG 4.5:1 on the tints. */
+  --good-ink: #15704a;
   --bad: #d6455f;
   --bad-bg: #fdeaed;
+  --bad-ink: #a92e45;
   --warn: #b9791b;
 
   --line: #d6dded;
@@ -229,6 +232,7 @@ main {
   line-height: 1;
 }
 .track-card__title {
+  margin: 0;
   font-weight: 700;
   font-size: 1.05rem;
 }
@@ -367,12 +371,12 @@ main {
 .lesson__doc {
   padding: 18px 18px 16px;
 }
-.lesson__doc h2 {
+.lesson__doc h1 {
   margin: 0 0 8px;
   font-size: 1.3rem;
 }
 /* Programmatic focus target for screen readers — no ring as visual noise (SHIG 1). */
-.lesson__doc h2:focus {
+.lesson__doc h1:focus {
   outline: none;
 }
 .lesson__doc .explain {
@@ -477,6 +481,11 @@ main {
 .editor-stack > textarea::selection {
   background: rgba(47, 95, 208, 0.2);
 }
+/* The textarea hides its own outline; show focus on the frame instead (WCAG 2.4.7). */
+.editor-wrap:focus-within {
+  border-color: var(--blueprint);
+  box-shadow: 0 0 0 2px rgba(47, 95, 208, 0.25);
+}
 
 .editor-shortcut {
   letter-spacing: 0;
@@ -566,12 +575,12 @@ main {
 }
 .banner--pass {
   background: var(--good-bg);
-  color: var(--good);
+  color: var(--good-ink);
   border: 1px solid #bfe6d2;
 }
 .banner--fail {
   background: var(--bad-bg);
-  color: var(--bad);
+  color: var(--bad-ink);
   border: 1px solid #f3c6cf;
 }
 .banner ul {
@@ -659,12 +668,20 @@ main {
   position: relative;
   background: repeating-conic-gradient(#f3f5fa 0% 25%, #fff 0% 50%) 50% / 18px 18px;
   display: flex;
-  justify-content: center;
   padding: 14px;
   overflow: auto;
 }
+.preview__frame:focus-visible {
+  outline: 2px solid var(--blueprint);
+  outline-offset: -2px;
+}
 .preview__frame iframe {
   border: 0;
+  /* Keep the lesson viewport width; the frame scrolls instead of shrinking it. */
+  flex: none;
+  /* Auto margins centre the iframe but collapse to 0 when it overflows, so the
+     left edge stays reachable by scrolling (justify-content: center would clip it). */
+  margin-inline: auto;
   background: #fff;
   box-shadow: 0 1px 0 rgba(24, 32, 58, 0.08);
   width: 100%;
@@ -685,7 +702,9 @@ main {
 /* ---------- Responsive ---------- */
 @media (max-width: 920px) {
   .lesson {
-    grid-template-columns: 1fr;
+    /* minmax(0, …) so a fixed lesson viewport (e.g. 720px) scrolls inside the
+       preview frame instead of widening the page. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .viz {
     position: static;
