@@ -121,8 +121,21 @@ const editorOf = (root: HTMLElement): HTMLTextAreaElement =>
 const button = (root: HTMLElement, name: string | RegExp): HTMLButtonElement =>
   getByRole(root, "button", { name }) as HTMLButtonElement;
 const banner = (root: HTMLElement): HTMLElement => root.querySelector(".banner") as HTMLElement;
+const doneTag = (root: HTMLElement): HTMLElement =>
+  root.querySelector(".lesson__done") as HTMLElement;
+const isPrimary = (b: HTMLElement): boolean => b.classList.contains("btn--primary");
+
+const PASSING = { card: { "padding-top": "20px", "padding-left": "20px" } };
+const FAILING = { card: { "padding-top": "0px", "padding-left": "0px" } };
+
+// jsdom does not implement scrollIntoView; record who was revealed and how.
+const revealed: { node: Element; options: unknown }[] = [];
 
 beforeEach(() => {
+  revealed.length = 0;
+  Element.prototype.scrollIntoView = function (this: Element, options?: unknown): void {
+    revealed.push({ node: this, options });
+  };
   localStorage.clear();
   const s = fakes.state;
   s.css = "";
@@ -153,7 +166,9 @@ describe("createApp: opening a lesson", () => {
     expect(fakes.state.loaded).toEqual([
       { html: lesson.challenge.starterHTML, css: lesson.challenge.starterCSS },
     ]);
-    expect(getByText(root, "auto")).toBeTruthy();
+    // An automatic width shows no label at all (no "auto" jargon).
+    expect(root.querySelector(".preview__viewport")?.textContent).toBe("");
+    expect(queryByText(root, "auto")).toBeNull();
     // The scrollable preview frame is keyboard-reachable and named (WCAG 2.1.1).
     const frame = getByRole(root, "group", { name: "プレビューの表示領域" });
     expect(frame.getAttribute("tabindex")).toBe("0");
@@ -172,7 +187,8 @@ describe("createApp: opening a lesson", () => {
   it("shows the preview width for a fixed-viewport lesson and restores it afterwards", async () => {
     const { app, root } = mount();
     await app.open(CQ);
-    expect(getByText(root, "500px")).toBeTruthy();
+    expect(getByText(root, "幅 500px に固定")).toBeTruthy();
+    expect(root.querySelector(".preview__viewport")?.textContent).toBe("幅 500px に固定");
     expect(fakes.state.viewports.at(-1)).toBe(500);
     expect(getByText(root, "プレビュー", { selector: ".preview__head" })).toBeTruthy();
   });
@@ -240,11 +256,14 @@ describe("createApp: opening a lesson", () => {
     await user.click(button(root, "チェック"));
     await settle();
     expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(true);
+    expect(doneTag(root).classList.contains("hidden")).toBe(false);
 
     await app.open(CLASS);
-    // The pass banner and the promoted Next button belong to the old lesson.
+    // The pass banner, the promoted Next button and the "done" tag belong to the old lesson.
     expect(banner(root).textContent).toBe("");
     expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(false);
+    expect(isPrimary(button(root, "チェック"))).toBe(true);
+    expect(doneTag(root).classList.contains("hidden")).toBe(true);
     expect(root.querySelectorAll(".hint").length).toBe(0);
     expect(root.querySelector(".undo")?.classList.contains("hidden")).toBe(true);
     const total = lessonById(CLASS)!.challenge.hints.length;
@@ -265,6 +284,8 @@ describe("createApp: checking", () => {
     expect(callbacks.onComplete).toHaveBeenCalledWith(PADDING);
     expect(JSON.parse(localStorage.getItem("css-atelier:progress:v1") ?? "[]")).toEqual([PADDING]);
     expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(true);
+    // "Next" is the single primary action after a pass.
+    expect(isPrimary(button(root, "チェック"))).toBe(false);
   });
 
   it("lists every failure when the check does not pass", async () => {
@@ -278,10 +299,14 @@ describe("createApp: checking", () => {
     const items = within(banner(root)).getAllByRole("listitem");
     expect(items.length).toBe(2);
     expect(items[0].textContent).toContain("padding-top");
+    // The failure text carries the current value so the learner sees the gap.
+    expect(items[0].textContent).toContain("（現在 0px）");
     expect(banner(root).className).toContain("banner--fail");
     expect(callbacks.onComplete).not.toHaveBeenCalled();
     expect(localStorage.getItem("css-atelier:progress:v1")).toBeNull();
     expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(false);
+    expect(isPrimary(button(root, "チェック"))).toBe(true);
+    expect(doneTag(root).classList.contains("hidden")).toBe(true);
   });
 
   it("sends the editor CSS to the sandbox before measuring", async () => {
@@ -334,6 +359,164 @@ describe("createApp: checking", () => {
     await user.click(button(root, "チェック"));
     await settle();
     expect(banner(root).textContent).toBe("");
+  });
+});
+
+describe("createApp: the result always describes the current CSS", () => {
+  it("shows the lesson's own completion state on open and after a pass", async () => {
+    const user = userEvent.setup();
+    const { app, root } = mount();
+    await app.open(PADDING);
+    expect(doneTag(root).textContent).toBe("完了済み");
+    expect(doneTag(root).classList.contains("hidden")).toBe(true);
+    fakes.state.computed = PASSING;
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(doneTag(root).classList.contains("hidden")).toBe(false);
+
+    await app.open(CLASS);
+    expect(doneTag(root).classList.contains("hidden")).toBe(true);
+    // A revisit reads the stored progress.
+    await app.open(PADDING);
+    expect(doneTag(root).classList.contains("hidden")).toBe(false);
+    expect(doneTag(root).parentElement).toBe(getByRole(root, "heading", { level: 1 }).parentElement);
+  });
+
+  it("drops the result and hands the primary action back to Check once the CSS is edited", async () => {
+    const user = userEvent.setup();
+    const { app, root } = mount();
+    await app.open(PADDING);
+    fakes.state.computed = PASSING;
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(isPrimary(button(root, "次のレッスン →"))).toBe(true);
+
+    await user.click(editorOf(root));
+    await user.keyboard("x");
+    expect(banner(root).textContent).toBe("");
+    expect(banner(root).className).toBe("banner");
+    expect(isPrimary(button(root, "チェック"))).toBe(true);
+    expect(isPrimary(button(root, "次のレッスン →"))).toBe(false);
+    // Completion itself is not taken back.
+    expect(doneTag(root).classList.contains("hidden")).toBe(false);
+  });
+
+  it("drops the result when the solution is shown and again when that is undone", async () => {
+    const user = userEvent.setup();
+    const { app, root } = mount();
+    await app.open(PADDING);
+    fakes.state.computed = FAILING;
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(banner(root).className).toContain("banner--fail");
+    await user.click(button(root, "解答を見る"));
+    expect(banner(root).textContent).toBe("");
+
+    fakes.state.computed = PASSING;
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(isPrimary(button(root, "次のレッスン →"))).toBe(true);
+    await user.click(button(root, "元に戻す"));
+    expect(banner(root).textContent).toBe("");
+    expect(isPrimary(button(root, "チェック"))).toBe(true);
+    expect(isPrimary(button(root, "次のレッスン →"))).toBe(false);
+  });
+
+  it("ignores a second check while one is running", async () => {
+    const user = userEvent.setup();
+    const { app, root, callbacks } = mount();
+    await app.open(CQ);
+    fakes.state.viewports = [];
+    fakes.state.computed = { card: { "font-size": "24px" } };
+    fakes.state.computedAt = { "360": { card: { "font-size": "14px" } } };
+    editorOf(root).value = "@container (min-width: 400px) { .card { font-size: 24px } }";
+    button(root, "チェック").click();
+    button(root, "チェック").click();
+    await settle();
+    // One run only: lesson width, narrow state, restore.
+    expect(fakes.state.viewports).toEqual([500, 360, 500]);
+    expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
+
+    // The guard is released afterwards.
+    fakes.state.viewports = [];
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(fakes.state.viewports).toEqual([500, 360, 500]);
+  });
+
+  it("discards a check whose CSS was edited while it ran", async () => {
+    const { app, root, callbacks } = mount();
+    await app.open(PADDING);
+    fakes.state.computed = PASSING;
+    const ta = editorOf(root);
+    button(root, "チェック").click();
+    // Edit synchronously, before the check's first frame resolves.
+    ta.value += "x";
+    ta.dispatchEvent(new Event("input", { bubbles: true }));
+    await settle();
+    expect(banner(root).textContent).toBe("");
+    expect(callbacks.onComplete).not.toHaveBeenCalled();
+    expect(localStorage.getItem("css-atelier:progress:v1")).toBeNull();
+    expect(doneTag(root).classList.contains("hidden")).toBe(true);
+    expect(revealed).toEqual([]);
+  });
+
+  it("discards a check when the learner moves to another lesson meanwhile", async () => {
+    const { app, root, callbacks } = mount();
+    await app.open(CQ);
+    fakes.state.computed = { card: { "font-size": "24px" } };
+    fakes.state.computedAt = { "360": { card: { "font-size": "14px" } } };
+    editorOf(root).value = "@container (min-width: 400px) { .card { font-size: 24px } }";
+    button(root, "チェック").click();
+    await app.open(CLASS);
+    fakes.state.viewports = [];
+    await settle();
+    // The old lesson's result, done tag and preview widths never reach the new lesson.
+    expect(banner(root).textContent).toBe("");
+    expect(doneTag(root).classList.contains("hidden")).toBe(true);
+    expect(callbacks.onComplete).not.toHaveBeenCalled();
+    expect(fakes.state.viewports).toEqual([]);
+    expect(root.querySelector(".preview__viewport")?.textContent).toBe("");
+  });
+
+  it("discards a check when the lesson changes during an extra viewport state", async () => {
+    const { app, root, callbacks } = mount();
+    await app.open(CQ);
+    fakes.state.computed = { card: { "font-size": "24px" } };
+    fakes.state.computedAt = { "360": { card: { "font-size": "14px" } } };
+    button(root, "チェック").click();
+    await nextFrame(); // main state measured; now waiting on the 360px state
+    expect(fakes.state.viewports.at(-1)).toBe(360);
+    await app.open(CLASS);
+    fakes.state.viewports = [];
+    await settle();
+    expect(banner(root).textContent).toBe("");
+    expect(callbacks.onComplete).not.toHaveBeenCalled();
+    expect(fakes.state.viewports).toEqual([]);
+  });
+
+  it("scrolls the result banner and each new hint into view, smoothly unless motion is reduced", async () => {
+    const user = userEvent.setup();
+    const { app, root } = mount();
+    await app.open(PADDING);
+    expect(revealed).toEqual([]);
+    await user.click(button(root, /ヒント/));
+    expect(revealed).toEqual([
+      { node: root.querySelector(".hint"), options: { block: "nearest", behavior: "smooth" } },
+    ]);
+    fakes.state.computed = FAILING;
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(revealed.at(-1)).toEqual({
+      node: banner(root),
+      options: { block: "nearest", behavior: "smooth" },
+    });
+    document.body.innerHTML = "";
+
+    const reduced = mount({ reducedMotion: true });
+    await reduced.app.open(PADDING);
+    await user.click(button(reduced.root, /ヒント/));
+    expect(revealed.at(-1)?.options).toEqual({ block: "nearest", behavior: "instant" });
   });
 });
 
@@ -390,6 +573,11 @@ describe("createApp: hints, reset, solution, undo", () => {
     await user.click(ta);
     await user.keyboard("/* x */");
     expect(JSON.parse(localStorage.getItem("css-atelier:drafts:v1") ?? "{}")[PADDING]).toBe(ta.value);
+    // Typing already dropped the stale result; check again so reset has one to clear.
+    expect(banner(root).textContent).toBe("");
+    await user.click(button(root, "チェック"));
+    await settle();
+    expect(banner(root).textContent).not.toBe("");
 
     await user.click(button(root, "リセット"));
     expect(ta.value).toBe(lesson.challenge.starterCSS);
