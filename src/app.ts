@@ -9,9 +9,10 @@ import { evaluate } from "./engine/validate/run.js";
 import { snapshotToSignals } from "./engine/viz-map.js";
 import { lessonById, nextLesson } from "./engine/content/index.js";
 import type { Lesson } from "./engine/content/types.js";
-import { markComplete, type ProgressStore } from "./engine/progress.js";
+import { isComplete, markComplete, type ProgressStore } from "./engine/progress.js";
 import { loadDraft, saveDraft } from "./engine/drafts.js";
-import { conceptLabel, hintButtonLabel } from "./engine/navigation.js";
+import { createRevision } from "./engine/revision.js";
+import { conceptLabel, hintButtonLabel, viewportLabel } from "./engine/navigation.js";
 // Three.js lives in viz/index.js — imported dynamically only for 3D lessons so
 // the ~22 non-3D lessons never pull the Three chunk.
 import type { Visualizer } from "./viz/index.js";
@@ -59,7 +60,12 @@ export function createApp(callbacks: AppCallbacks): AppController {
 
   // ---- left: doc + editor + actions ----
   const doc = el("div", { class: "panel lesson__doc" });
+  const heading = el("div", { class: "lesson__heading" });
   const title = el("h1");
+  // The lesson shows its own completion state, so a revisit does not depend on
+  // remembering the catalogue (SHIG 25, 12).
+  const doneTag = el("span", { class: "lesson__done hidden", text: "完了済み" });
+  heading.append(title, doneTag);
   const explain = el("div", { class: "explain" });
   const task = el("div", { class: "task" });
   const mdn = el("a", { class: "mdn-link", attrs: { target: "_blank", rel: "noopener" } });
@@ -94,7 +100,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
 
   const banner = el("div", { class: "banner", attrs: { role: "status", "aria-live": "polite" } });
   const hints = el("div", { class: "hints" });
-  doc.append(title, explain, task, mdn, editor.root, actions, undoNote, banner, hints);
+  doc.append(heading, explain, task, mdn, editor.root, actions, undoNote, banner, hints);
 
   // ---- right: 3D stage + live preview ----
   const stage = el("div", { class: "viz__stage" });
@@ -127,6 +133,29 @@ export function createApp(callbacks: AppCallbacks): AppController {
   let current: Lesson | null = null;
   let hintsShown = 0;
   let undoCSS: string | null = null;
+  let checking = false;
+  // Bumped on every CSS change and lesson switch, so a check that finishes
+  // afterwards is dropped instead of reporting on code that is gone (SHIG 25).
+  const revision = createRevision();
+
+  /** Bring freshly added feedback into view without yanking the page (SHIG 65, 66). */
+  function reveal(node: HTMLElement): void {
+    node.scrollIntoView({
+      block: "nearest",
+      behavior: callbacks.reducedMotion ? "instant" : "smooth",
+    });
+  }
+
+  /**
+   * The CSS changed, so the last result no longer describes it: drop the
+   * banner and make "check" the one primary action again (SHIG 25, 15, 74).
+   */
+  function markDirty(): void {
+    revision.bump();
+    clearBanner();
+    checkBtn.classList.add("btn--primary");
+    nextBtn.classList.remove("btn--primary");
+  }
 
   function hideUndo(): void {
     undoCSS = null;
@@ -139,6 +168,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
     if (!current) return;
     const previous = editor.getValue();
     applyCSS(css);
+    markDirty();
     if (previous === css) {
       hideUndo();
       return;
@@ -194,14 +224,29 @@ export function createApp(callbacks: AppCallbacks): AppController {
   }, 120);
 
   async function check(): Promise<void> {
-    if (!current) return;
-    const lesson = current;
+    // A check spans several frames and toggles the preview width; a second
+    // run in the middle would race the first over the viewport (SHIG 15).
+    if (!current || checking) return;
+    checking = true;
+    try {
+      await runCheck(current);
+    } finally {
+      checking = false;
+    }
+  }
+
+  async function runCheck(lesson: Lesson): Promise<void> {
     const { challenge } = lesson;
+    const fresh = revision.ticket();
+    // After a lesson switch the iframe belongs to the new lesson: stop without
+    // touching its viewport or visualizer.
+    const switched = (): boolean => current !== lesson;
     sandbox.setUserCSS(editor.getValue());
 
     // Main state (at the lesson's viewport).
     sandbox.setViewport(challenge.viewport ?? null);
     await nextFrame();
+    if (switched()) return;
     const mainSnap = sandbox.snapshot(challenge.snapshot);
     const failures = [...evaluate(challenge.validators, mainSnap).failures];
     visualizer?.update(snapshotToSignals(mainSnap, lesson.viz));
@@ -210,6 +255,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
     for (const state of challenge.states ?? []) {
       sandbox.setViewport(state.viewport);
       await nextFrame();
+      if (switched()) return;
       const snap = sandbox.snapshot(challenge.snapshot);
       failures.push(...evaluate(state.validators, snap).failures);
     }
@@ -217,27 +263,36 @@ export function createApp(callbacks: AppCallbacks): AppController {
       sandbox.setViewport(challenge.viewport ?? null); // restore the preview
       await nextFrame();
     }
+    // The CSS was edited while the check ran: this result is already stale.
+    if (!fresh()) return;
 
     const passed = failures.length === 0;
     showBanner(passed, failures);
+    reveal(banner);
     if (passed) {
       markComplete(store, lesson.id);
       callbacks.onComplete(lesson.id);
+      doneTag.classList.remove("hidden");
+      // One next step: "next lesson" takes over as the single primary (SHIG 47, 74, 41).
       nextBtn.classList.add("btn--primary");
+      checkBtn.classList.remove("btn--primary");
     }
   }
 
   function revealHint(): void {
     if (!current) return;
     if (hintsShown < current.challenge.hints.length) {
-      hints.append(el("div", { class: "hint", text: `💡 ${current.challenge.hints[hintsShown]}` }));
+      const hint = el("div", { class: "hint", text: `💡 ${current.challenge.hints[hintsShown]}` });
+      hints.append(hint);
       hintsShown++;
+      reveal(hint);
     }
     updateHintBtn();
   }
 
   editor.onInput((css) => {
     hideUndo();
+    markDirty();
     // Save right away (not debounced) so a reload or navigation within the
     // debounce window cannot drop the last keystrokes.
     if (current) saveDraft(store, current.id, css, current.challenge.starterCSS);
@@ -247,7 +302,6 @@ export function createApp(callbacks: AppCallbacks): AppController {
   checkBtn.addEventListener("click", () => void check());
   resetBtn.addEventListener("click", () => {
     if (!current) return;
-    clearBanner();
     replaceCSS(current.challenge.starterCSS, "最初の状態に戻しました。");
   });
   hintBtn.addEventListener("click", revealHint);
@@ -258,6 +312,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
   undoBtn.addEventListener("click", () => {
     if (undoCSS === null) return;
     applyCSS(undoCSS);
+    markDirty();
     hideUndo();
     editor.focus();
   });
@@ -274,9 +329,9 @@ export function createApp(callbacks: AppCallbacks): AppController {
     hintsShown = 0;
     updateHintBtn();
     hideUndo();
-    nextBtn.classList.remove("btn--primary");
+    markDirty();
+    doneTag.classList.toggle("hidden", !isComplete(store, lesson.id));
     nextBtn.textContent = nextLesson(lesson.id) ? "次のレッスン →" : "レッスン一覧へ";
-    clearBanner();
     hints.textContent = "";
 
     title.textContent = lesson.title;
@@ -312,7 +367,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
 
     await sandbox.load(lesson.challenge.starterHTML, css);
     sandbox.setViewport(lesson.challenge.viewport ?? null);
-    vpLabel.textContent = lesson.challenge.viewport ? `${lesson.challenge.viewport}px` : "auto";
+    vpLabel.textContent = viewportLabel(lesson.challenge.viewport);
     requestAnimationFrame(refreshViz);
   }
 

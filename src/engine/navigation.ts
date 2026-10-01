@@ -17,10 +17,23 @@ export function lessonPosition(lessonId: string): LessonPosition | undefined {
   return { index, total: track.lessons.length };
 }
 
-/** First not-yet-completed lesson in catalogue order (undefined when all done). */
+/**
+ * Where to pick up: the first unfinished lesson after the one completed most
+ * recently (`completed` is in completion order), falling back to the first
+ * unfinished lesson in catalogue order. A learner who started mid-catalogue
+ * is not sent back to the top (SHIG 12, 20, 77). Undefined when all done.
+ */
 export function resumeLesson(completed: readonly string[]): Lesson | undefined {
   const done = new Set(completed);
-  return LESSONS.find((l) => !done.has(l.id));
+  const unfinished = (l: Lesson): boolean => !done.has(l.id);
+  const latest = completed[completed.length - 1];
+  const from = latest === undefined ? -1 : LESSONS.findIndex((l) => l.id === latest);
+  return LESSONS.slice(from + 1).find(unfinished) ?? LESSONS.find(unfinished);
+}
+
+/** Preview width note in plain words; empty when the preview just fills the panel. */
+export function viewportLabel(width: number | undefined): string {
+  return width === undefined ? "" : `幅 ${width}px に固定`;
 }
 
 const CONCEPT_LABEL: Record<ConceptViz, string> = {

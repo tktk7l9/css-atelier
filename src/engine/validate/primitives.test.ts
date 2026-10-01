@@ -226,6 +226,28 @@ describe("combinators", () => {
   });
 });
 
+describe("constructive failure messages (SHIG 55)", () => {
+  const s = snap([
+    elem("box", { x: 0, y: 0, w: 100, h: 50 }, { computed: { "justify-content": "start" } }),
+  ]);
+  it("computedEquals names the current value", () => {
+    const r = runSpec({ kind: "computedEquals", id: "box", prop: "justify-content", value: "center" }, s);
+    expect(r.message).toBe("box の justify-content は center になっていません（現在 start）");
+  });
+  it("computedMatches names the current value", () => {
+    const r = runSpec({ kind: "computedMatches", id: "box", prop: "justify-content", pattern: "^end$" }, s);
+    expect(r.message).toBe("box の justify-content の値を見直しましょう（現在 start）");
+  });
+  it("sizeApprox names the current size", () => {
+    expect(runSpec({ kind: "sizeApprox", id: "box", w: 200 }, s).message).toBe(
+      "box の幅が 200px になっていません（現在 100px）",
+    );
+    expect(runSpec({ kind: "sizeApprox", id: "box", h: 80 }, s).message).toBe(
+      "box の高さが 80px になっていません（現在 50px）",
+    );
+  });
+});
+
 describe("message override", () => {
   const s = snap([], [{ selector: ".a", decls: { color: "red" } }]);
   it("overrides the failure message when provided", () => {

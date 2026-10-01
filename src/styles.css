@@ -371,9 +371,25 @@ main {
 .lesson__doc {
   padding: 18px 18px 16px;
 }
-.lesson__doc h1 {
+.lesson__heading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
   margin: 0 0 8px;
+}
+.lesson__doc h1 {
+  margin: 0;
   font-size: 1.3rem;
+}
+.lesson__done {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--good-ink);
+  background: var(--good-bg);
+  border: 1px solid #bfe6d2;
+  border-radius: 999px;
+  padding: 2px 10px;
 }
 /* Programmatic focus target for screen readers — no ring as visual noise (SHIG 1). */
 .lesson__doc h1:focus {
@@ -701,13 +717,14 @@ main {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 920px) {
+  /* minmax(0, 1fr): a fixed-width preview (380–720px) must scroll inside its
+     frame instead of widening the column and the whole page (SHIG 85, 95). */
   .lesson {
-    /* minmax(0, …) so a fixed lesson viewport (e.g. 720px) scrolls inside the
-       preview frame instead of widening the page. */
     grid-template-columns: minmax(0, 1fr);
   }
   .viz {
     position: static;
+    min-width: 0;
   }
   /* Keep the live result next to the editor (SHIG 30). */
   .preview {
