@@ -35,6 +35,10 @@ describe("renderCatalogue", () => {
     expect(getByRole(root, "heading", { level: 1 }).textContent).toBe("CSS Atelier");
     expect(getByText(root, /解説を読み、エディタに CSS を書いて/)).toBeTruthy();
     expect(root.querySelectorAll(".track-card").length).toBe(TRACKS.length);
+    // Track names sit one level under the page title (heading order, SHIG 59).
+    expect(getAllByRole(root, "heading", { level: 2 }).map((h) => h.textContent)).toEqual(
+      TRACKS.map((t) => t.title),
+    );
     for (const track of TRACKS) {
       expect(getByText(root, track.title)).toBeTruthy();
       expect(getByText(root, track.summary)).toBeTruthy();

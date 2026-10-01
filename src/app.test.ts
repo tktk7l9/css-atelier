@@ -143,7 +143,7 @@ describe("createApp: opening a lesson", () => {
     const { app, root } = mount();
     const lesson = lessonById(PADDING)!;
     await app.open(PADDING);
-    expect(getByRole(root, "heading", { level: 2 }).textContent).toBe(lesson.title);
+    expect(getByRole(root, "heading", { level: 1 }).textContent).toBe(lesson.title);
     expect(root.querySelector(".explain")?.innerHTML).toBe(lesson.explanation);
     expect(getByText(root, "課題")).toBeTruthy();
     expect(root.querySelector(".task")?.textContent).toContain(lesson.challenge.task);
@@ -154,10 +154,13 @@ describe("createApp: opening a lesson", () => {
       { html: lesson.challenge.starterHTML, css: lesson.challenge.starterCSS },
     ]);
     expect(getByText(root, "auto")).toBeTruthy();
+    // The scrollable preview frame is keyboard-reachable and named (WCAG 2.1.1).
+    const frame = getByRole(root, "group", { name: "プレビューの表示領域" });
+    expect(frame.getAttribute("tabindex")).toBe("0");
     expect(getByText(root, "3D: ボックスモデル")).toBeTruthy();
     expect(button(root, "ヒント（残り 2）").disabled).toBe(false);
     expect(button(root, "次のレッスン →")).toBeTruthy();
-    expect(document.activeElement).toBe(getByRole(root, "heading", { level: 2 }));
+    expect(document.activeElement).toBe(getByRole(root, "heading", { level: 1 }));
   });
 
   it("ignores an unknown lesson id", async () => {
