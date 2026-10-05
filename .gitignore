@@ -5,3 +5,7 @@ coverage
 .DS_Store
 .vercel
 *.tsbuildinfo
+# env files and wrangler local secrets (incl. keyway pull outputs)
+.env*
+.dev.vars*
+.wrangler
