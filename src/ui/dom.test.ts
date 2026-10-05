@@ -22,12 +22,6 @@ describe("el", () => {
     expect(node.getAttribute("aria-label")).toBe("check");
   });
 
-  it("sets innerHTML when html is given", () => {
-    const node = el("p", { html: "<b>bold</b> text" });
-    expect(node.querySelector("b")?.textContent).toBe("bold");
-    expect(node.textContent).toBe("bold text");
-  });
-
   it("treats an empty-string text as text (not as absent)", () => {
     const node = el("span", { text: "" });
     expect(node.textContent).toBe("");

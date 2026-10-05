@@ -120,7 +120,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
   });
   const iframe = el("iframe", {
     attrs: { sandbox: "allow-same-origin", title: "プレビュー", "aria-label": "プレビュー" },
-  }) as HTMLIFrameElement;
+  });
   frame.append(iframe);
   preview.append(previewHead, frame);
 
