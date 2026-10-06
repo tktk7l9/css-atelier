@@ -54,3 +54,17 @@ describe("drafts", () => {
     expect(loadDraft(s, "a")).toBe("x");
   });
 });
+
+describe("drafts with hostile stored JSON", () => {
+  it("ignores keys that only exist on Object.prototype", () => {
+    const s = memStore("{}");
+    expect(loadDraft(s, "constructor")).toBeUndefined();
+    expect(loadDraft(s, "toString")).toBeUndefined();
+  });
+
+  it("does not let a stored __proto__ key leak into other lessons", () => {
+    const s = memStore('{"__proto__":{"a":"p { color: red }"}}');
+    expect(loadDraft(s, "a")).toBeUndefined();
+    expect(({} as Record<string, unknown>)["a"]).toBeUndefined();
+  });
+});
