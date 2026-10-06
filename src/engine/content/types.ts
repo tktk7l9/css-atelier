@@ -12,8 +12,10 @@ export type TrackId =
   | "box-model"
   | "units"
   | "custom-props"
+  | "registered-props"
   | "modern-selectors"
   | "nesting"
+  | "scope"
   | "flexbox"
   | "grid"
   | "media-queries"
@@ -23,8 +25,10 @@ export type TrackId =
   | "layers"
   | "color"
   | "color-functions"
+  | "text-wrap"
   | "subgrid"
   | "anchor-positioning"
+  | "scroll-snap"
   | "transitions"
   | "entry-animations";
 
