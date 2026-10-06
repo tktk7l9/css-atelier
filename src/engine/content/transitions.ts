@@ -11,7 +11,7 @@ export const transitionsTrack: Track = {
       title: "滑らかに変化させる: transition",
       explanation:
         "<p><code>transition</code> はプロパティの変化に時間をかけて滑らかにします。<code>transition: background 0.3s;</code> なら背景が 0.3 秒かけて変わります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/transition",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/transition",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box">マウスを乗せてみて</div>',
@@ -33,7 +33,7 @@ export const transitionsTrack: Track = {
       title: "拡大する: transform: scale()",
       explanation:
         "<p><code>transform: scale(1.2)</code> は要素を 1.2 倍に拡大します（レイアウトは動かさず見た目だけ変形）。</p>",
-      mdnPath: "/ja/docs/Web/CSS/transform",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/transform",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box"></div>',

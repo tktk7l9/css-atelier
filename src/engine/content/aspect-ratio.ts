@@ -11,7 +11,7 @@ export const aspectRatioTrack: Track = {
       title: "16:9 を保つ: aspect-ratio",
       explanation:
         "<p><code>aspect-ratio: 16 / 9</code> は、幅に対して高さを比率で自動計算します。動画やサムネイルの枠に便利です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/aspect-ratio",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/aspect-ratio",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="frame" class="frame"></div>',
@@ -32,7 +32,7 @@ export const aspectRatioTrack: Track = {
       title: "正方形を保つ: aspect-ratio: 1",
       explanation:
         "<p><code>aspect-ratio: 1</code>（= 1 / 1）で、幅に対して高さを等しくし正方形を保てます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/aspect-ratio",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/aspect-ratio",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="frame" class="frame"></div>',

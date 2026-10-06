@@ -10,8 +10,8 @@ export const mediaQueriesTrack: Track = {
       id: "media-max-width",
       title: "狭い画面で切り替える: @media (max-width)",
       explanation:
-        "<p><code>@media (max-width: 400px) { … }</code> は画面（ビューポート）幅が 400px 以下のときだけ適用されます。プレビューは幅 380px に固定しています。</p>",
-      mdnPath: "/ja/docs/Web/CSS/@media",
+        "<p><code>@media (max-width: 400px) { … }</code> は画面（ビューポート）幅が 400px 以下のときだけ適用されます。範囲構文で <code>@media (width <= 400px)</code> と書いても同じです（主要ブラウザすべてで利用可）。プレビューは幅 380px に固定しています。</p>",
+      mdnPath: "/ja/docs/Web/CSS/Reference/At-rules/@media",
       viz: { concept: "none" },
       challenge: {
         viewport: 380,
@@ -40,8 +40,8 @@ export const mediaQueriesTrack: Track = {
       id: "media-min-width",
       title: "広い画面で切り替える: @media (min-width)",
       explanation:
-        "<p><code>@media (min-width: 600px) { … }</code> は幅が 600px 以上のときに適用されます。ここではプレビューを 720px に固定しています。</p>",
-      mdnPath: "/ja/docs/Web/CSS/@media",
+        "<p><code>@media (min-width: 600px) { … }</code> は幅が 600px 以上のときに適用されます。範囲構文なら <code>@media (width >= 600px)</code> です。ここではプレビューを 720px に固定しています。</p>",
+      mdnPath: "/ja/docs/Web/CSS/Reference/At-rules/@media",
       viz: { concept: "none" },
       challenge: {
         viewport: 720,

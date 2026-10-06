@@ -11,7 +11,7 @@ export const nestingTrack: Track = {
       title: "入れ子で書く: & とネスト",
       explanation:
         "<p>CSS ネストでは、ルールの中に別のルールを入れ子にできます。<code>&</code> は<b>親セレクタ</b>を指します。<code>.card { &amp; a { … } }</code> は <code>.card a</code> と同じ意味です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/CSS_nesting",
+      mdnPath: "/ja/docs/Web/CSS/Guides/Nesting",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="card" class="card"><a data-id="link" href="#">カード内リンク</a></div>',

@@ -11,7 +11,7 @@ export const gridTrack: Track = {
       title: "列を作る: grid-template-columns",
       explanation:
         "<p><code>display: grid</code> と <code>grid-template-columns</code> で列（トラック）を定義します。<code>1fr</code> は余りスペースを比率で分け合う単位です。<code>repeat(3, 1fr)</code> で等幅3列に。</p>",
-      mdnPath: "/ja/docs/Web/CSS/grid-template-columns",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/grid-template-columns",
       viz: { concept: "grid", containerId: "grid" },
       challenge: {
         starterHTML:
@@ -37,7 +37,7 @@ export const gridTrack: Track = {
       title: "比率で分ける: fr 単位",
       explanation:
         "<p><code>fr</code> は比率です。<code>1fr 2fr 1fr</code> なら中央の列が両端の<b>2倍</b>の幅になります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/grid-template-columns",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/grid-template-columns",
       viz: { concept: "grid", containerId: "grid" },
       challenge: {
         starterHTML:
@@ -62,7 +62,7 @@ export const gridTrack: Track = {
       title: "すき間を空ける: gap",
       explanation:
         "<p><code>gap</code> はトラック間のすき間（溝）をまとめて指定します。マージンより簡単で、外側に余白が出ません。</p>",
-      mdnPath: "/ja/docs/Web/CSS/gap",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/gap",
       viz: { concept: "grid", containerId: "grid" },
       challenge: {
         starterHTML:
@@ -85,7 +85,7 @@ export const gridTrack: Track = {
       title: "領域で組む: grid-template-areas",
       explanation:
         "<p><code>grid-template-areas</code> は名前付きの領域でレイアウトを“絵”のように書けます。各要素に <code>grid-area</code> で名前を割り当てます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/grid-template-areas",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/grid-template-areas",
       viz: { concept: "grid", containerId: "layout" },
       challenge: {
         starterHTML:

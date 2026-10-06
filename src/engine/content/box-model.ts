@@ -32,7 +32,7 @@ export const boxModelTrack: Track = {
       title: "内側の余白: padding",
       explanation:
         "<p>すべての要素は content / padding / border / margin の<b>4層</b>でできています。<code>padding</code> は枠線の内側、コンテンツとの余白です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/padding",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/padding",
       viz: { concept: "box-model", subjectId: "card" },
       challenge: {
         starterHTML: '<div data-id="card" class="card">Atelier</div>',
@@ -54,7 +54,7 @@ export const boxModelTrack: Track = {
       title: "枠線: border",
       explanation:
         "<p><code>border</code> は太さ・線種・色をまとめて指定します（例: <code>3px solid #335</code>）。padding と margin の境界になります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/border",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/border",
       viz: { concept: "box-model", subjectId: "card" },
       challenge: {
         starterHTML: '<div data-id="card" class="card">Atelier</div>',
@@ -76,7 +76,7 @@ export const boxModelTrack: Track = {
       title: "外側の余白で中央寄せ: margin auto",
       explanation:
         "<p><code>margin</code> は枠線の外側の余白です。左右のマージンを <code>auto</code> にすると、ブロックは親の中で<b>水平中央</b>に寄ります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/margin",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/margin",
       viz: { concept: "box-model", subjectId: "box" },
       challenge: {
         starterHTML:

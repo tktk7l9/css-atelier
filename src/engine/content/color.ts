@@ -10,21 +10,21 @@ export const colorTrack: Track = {
       id: "color-hsl",
       title: "色相・彩度・明度: hsl()",
       explanation:
-        "<p><code>hsl(色相, 彩度, 明度)</code> は人間に分かりやすい色指定です。色相は 0–360 の角度（0=赤, 120=緑, 240=青）です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/color_value/hsl",
+        "<p><code>hsl(色相 彩度 明度)</code> は人間に分かりやすい色指定です。色相は 0–360 の角度（0=赤, 120=緑, 240=青）です。値は空白で区切るのが現在の書き方で、<code>hsl(220 70% 50% / 50%)</code> のように <code>/</code> の後ろに不透明度も書けます。カンマ区切りの <code>hsl(220, 70%, 50%)</code> は古い書き方ですが今も動きます。</p>",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Values/color_value/hsl",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box"></div>',
         starterCSS: ".box {\n  width: 90px;\n  height: 90px;\n  border-radius: 10px;\n}\n",
-        task: "背景を hsl() で青系（例: hsl(220, 70%, 50%)）にしよう。",
+        task: "背景を hsl() で青系（例: hsl(220 70% 50%)）にしよう。",
         snapshot: { props: ["background-color"] },
         validators: [
           { kind: "sourceMatches", pattern: "hsl\\(" },
           { kind: "computedMatches", id: "box", prop: "background-color", pattern: "rgb\\(" },
         ],
-        hints: ["background: hsl(220, 70%, 50%)"],
+        hints: ["background: hsl(220 70% 50%)"],
         solution:
-          ".box {\n  width: 90px;\n  height: 90px;\n  border-radius: 10px;\n  background: hsl(220, 70%, 50%);\n}\n",
+          ".box {\n  width: 90px;\n  height: 90px;\n  border-radius: 10px;\n  background: hsl(220 70% 50%);\n}\n",
       },
     },
     {
@@ -32,7 +32,7 @@ export const colorTrack: Track = {
       title: "知覚均等な色: oklch()",
       explanation:
         "<p><code>oklch(明度 彩度 色相)</code> は知覚的に均等で、明るさを保ったまま色を変えやすい新しい色空間です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/color_value/oklch",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Values/color_value/oklch",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box"></div>',
