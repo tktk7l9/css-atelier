@@ -5,12 +5,13 @@
 import type { ValidatorSpec } from "../validate/primitives.js";
 import type { SnapshotRequest } from "../validate/snapshot.js";
 
-export type ConceptViz = "box-model" | "flexbox" | "grid" | "none";
+export type ConceptViz = "box-model" | "flexbox" | "grid" | "transform-3d" | "none";
 
 export type TrackId =
   | "selectors"
   | "box-model"
   | "units"
+  | "math-functions"
   | "custom-props"
   | "registered-props"
   | "modern-selectors"
@@ -29,11 +30,16 @@ export type TrackId =
   | "subgrid"
   | "anchor-positioning"
   | "scroll-snap"
+  | "clip-mask"
+  | "filters"
   | "transitions"
+  | "transforms-3d"
   | "entry-animations";
 
 /** Drives the 3D concept visualizer. `subjectId`/`containerId` tell the pure
- *  viz-map which element to read for box-model / flex / grid extraction. */
+ *  viz-map which element to read for box-model / flex / grid extraction; for
+ *  transform-3d the container's children become planes and the subject is the
+ *  plane whose projection onto the screen is drawn. */
 export interface VizConfig {
   readonly concept: ConceptViz;
   readonly subjectId?: string;
