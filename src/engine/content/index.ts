@@ -26,11 +26,18 @@ import { clipMaskTrack } from "./clip-mask.js";
 import { filtersTrack } from "./filters.js";
 import { transforms3dTrack } from "./transforms-3d.js";
 import { mathFunctionsTrack } from "./math-functions.js";
+import { gradientsTrack } from "./gradients.js";
+import { writingModesTrack } from "./writing-modes.js";
+import { stickyTrack } from "./sticky.js";
+import { formsTrack } from "./forms.js";
 
 /**
  * Catalogue order, roughly basics → modern → layout → responsive → polish.
- * The math functions come last: their lessons build on custom properties,
- * transitions and transforms from earlier tracks.
+ * Gradients follow the colour tracks (in oklch builds on oklch()), writing
+ * modes follow logical properties, and sticky comes before scroll snap (whose
+ * scroll-padding lesson uses a sticky header) and after grid (its sidebar
+ * lesson is a grid item). The math functions come last: their lessons build on
+ * custom properties, transitions and transforms from earlier tracks.
  */
 export const TRACKS: readonly Track[] = [
   selectorsTrack,
@@ -39,6 +46,7 @@ export const TRACKS: readonly Track[] = [
   customPropsTrack,
   colorTrack,
   colorFunctionsTrack,
+  gradientsTrack,
   textWrapTrack,
   modernSelectorsTrack,
   nestingTrack,
@@ -47,14 +55,17 @@ export const TRACKS: readonly Track[] = [
   gridTrack,
   subgridTrack,
   logicalPropsTrack,
+  writingModesTrack,
   aspectRatioTrack,
   anchorPositioningTrack,
+  stickyTrack,
   scrollSnapTrack,
   mediaQueriesTrack,
   containerQueriesTrack,
   layersTrack,
   clipMaskTrack,
   filtersTrack,
+  formsTrack,
   transitionsTrack,
   transforms3dTrack,
   entryAnimationsTrack,

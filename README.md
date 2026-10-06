@@ -9,9 +9,10 @@ MDN の CSS ドキュメントを片手に、**解説を読んで → 実際に 
 - **ハイブリッド形式** — 各レッスンは「短い解説 → チャレンジ」。お題のレイアウトになるよう CSS を書くと自動で採点します（Flexbox Froggy / Grid Garden スタイル）。
 - **3D 概念ビジュアライザ** — ボックスモデルを4層に分解、Flexbox の主軸/交差軸を矢印で、Grid のトラックを立体で表示。3D 変形では面の配置（flat で押しつぶされるか、preserve-3d で立体になるか）と、perspective の目の位置から画面への視線を表示。学習者の CSS をライブ反映します。
 - **ライブプレビュー** — 書いた CSS は即座に隔離されたサンドボックスに反映。シンタックスハイライト付きエディタ。
-- **27 トラック・68 レッスン** — セレクタ / ボックスモデル / 単位 / カスタムプロパティ / 色 / 色の合成と派生（color-mix・相対色・light-dark） / 読みやすい改行（text-wrap: balance・pretty） / モダンセレクタ / ネスト / スコープ付きスタイル（@scope） / Flexbox / Grid / サブグリッド / 論理プロパティ / アスペクト比 / アンカーポジショニング / スクロールスナップ / メディアクエリ / コンテナクエリ / カスケードレイヤー / クリップとマスク（clip-path・mask-image） / フィルターと合成（filter・backdrop-filter・mix-blend-mode） / トランジション / 3D 変形（perspective・preserve-3d・backface-visibility） / 出現と退場のアニメーション（@starting-style・allow-discrete） / 型付きカスタムプロパティ（@property） / CSS の数学関数（round()・mod()・sin()/cos()）。
+- **31 トラック・80 レッスン** — セレクタ / ボックスモデル / 単位 / カスタムプロパティ / 色 / 色の合成と派生（color-mix・相対色・light-dark） / グラデーション（repeating-linear-gradient・conic-gradient・in oklch） / 読みやすい改行（text-wrap: balance・pretty） / モダンセレクタ / ネスト / スコープ付きスタイル（@scope） / Flexbox / Grid / サブグリッド / 論理プロパティ / 縦書き（writing-mode・text-orientation・縦中横） / アスペクト比 / アンカーポジショニング / スクロール追従（position: sticky） / スクロールスナップ / メディアクエリ / コンテナクエリ / カスケードレイヤー / クリップとマスク（clip-path・mask-image） / フィルターと合成（filter・backdrop-filter・mix-blend-mode） / フォームの見た目（accent-color・appearance・:user-invalid） / トランジション / 3D 変形（perspective・preserve-3d・backface-visibility） / 出現と退場のアニメーション（@starting-style・allow-discrete） / 型付きカスタムプロパティ（@property） / CSS の数学関数（round()・mod()・sin()/cos()）。
 - **MDN の現在の構成にリンク** — 各レッスンの「MDN でもっと学ぶ」は 2025 年に再編された `Reference/` `Guides/` 配下のページを直接指します。Baseline でない機能・新しめの機能は、レッスン内に対応ブラウザを明記しています。
 - **二状態バリデーション** — メディア/コンテナクエリ等は複数のビューポート幅で採点し、「無条件に書いただけ」では通らないようにしています。
+- **スクロールした状態も採点** — sticky のレッスンは、プレビューがスクロールの終わりから始まる（`column-reverse` / `row-reverse` の仕掛け）ので、スクリプトなしで「貼り付いたか」を位置で判定します。プレビューを動かして確かめても、結果は変わりません。
 - **寛容な採点** — 多くの課題は「どう書いたか」ではなく「正しく表示されたか」（要素の位置・サイズ）で判定するため、複数の正解を許容します。
 - **進捗と下書きの保存** — 完了状況と書きかけの CSS（レッスンごと）は localStorage に保存。カタログの「続きから学ぶ」で最後に完了したレッスンの次へ（SHIG 12, 20）。完了済みのレッスンは見出し横に表示。レッスンは URL ハッシュで共有可能。
 - **取り消せる操作** — 「リセット」「解答を見る」は確認なしで実行し、直後の「元に戻す」で書いた CSS に戻せます（SHIG 57, 54）。
