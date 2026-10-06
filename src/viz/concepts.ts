@@ -4,7 +4,7 @@
 // by the pure viz-map output — these never touch the DOM.
 
 import * as THREE from "three";
-import type { VizBox, VizSignals } from "../engine/viz-map.js";
+import type { Quad, Vec3, VizBox, VizSignals } from "../engine/viz-map.js";
 import { PALETTE } from "./renderer.js";
 
 export interface ConceptViz3D {
@@ -231,10 +231,101 @@ function createBoxModelViz(): ConceptViz3D {
   };
 }
 
-export type ConceptKey = "box-model" | "flexbox" | "grid";
+// ---- 3D transforms ----
+
+const PLANE_COLORS = [PALETTE.blueprint, PALETTE.green, PALETTE.gold, PALETTE.soft] as const;
+
+/** CSS space (px, y down) → world (y up), scaled and shifted back by `dz` world units. */
+function toWorld([x, y, z]: Vec3, s: number, dz = 0): THREE.Vector3 {
+  return new THREE.Vector3(x * s, -y * s, z * s - dz);
+}
+
+function loopOf(points: readonly THREE.Vector3[], color: number): THREE.LineLoop {
+  return new THREE.LineLoop(
+    new THREE.BufferGeometry().setFromPoints([...points]),
+    new THREE.LineBasicMaterial({ color }),
+  );
+}
+
+function segment(a: THREE.Vector3, b: THREE.Vector3, color: number): THREE.Line {
+  return new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([a, b]),
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.75 }),
+  );
+}
+
+/** Unit normal of a quad in CSS space; +z (toward the viewer) for an untransformed box. */
+function normalOf([tl, tr, , bl]: Quad): Vec3 {
+  const a = [tr[0] - tl[0], tr[1] - tl[1], tr[2] - tl[2]];
+  const b = [bl[0] - tl[0], bl[1] - tl[1], bl[2] - tl[2]];
+  const n: Vec3 = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const len = Math.hypot(n[0], n[1], n[2]);
+  return len > 1e-9 ? [n[0] / len, n[1] / len, n[2] / len] : [0, 0, 1];
+}
+
+function createTransform3dViz(): ConceptViz3D {
+  const group = new THREE.Group();
+  return {
+    group,
+    update(sig) {
+      clearGroup(group);
+      const space = sig.space;
+      if (!space) return;
+      const proj = space.projection;
+      const eye = proj ? space.eye : null;
+      const reach = Math.max(
+        1,
+        ...[space.frame, ...space.planes.map((p) => p.corners)].flat().map(([x, y]) => Math.max(Math.abs(x), Math.abs(y))),
+      );
+      // Fit the boxes in about ±2.2 units. With an eye, the screen-to-eye span
+      // also has to fit, so it is centred on the origin the scene sways around.
+      const s = Math.min(2.2 / reach, eye ? 5 / eye : Infinity);
+      const dz = eye ? (eye * s) / 2 : 0;
+      const at = (p: Vec3): THREE.Vector3 => toWorld(p, s, dz);
+
+      // The container's own plane; darker when the children were pressed into it.
+      group.add(loopOf(space.frame.map(at), space.flattened ? PALETTE.ink : PALETTE.soft));
+
+      // Coplanar faces (a card's front and back) are nudged apart along the
+      // container's normal in DOM order, as the later element paints on top.
+      const n = normalOf(space.frame);
+      space.planes.forEach((plane, i) => {
+        const lift = i * 0.8;
+        const pts = plane.corners.map(([x, y, z]) => at([x + n[0] * lift, y + n[1] * lift, z + n[2] * lift]));
+        const geo = new THREE.BufferGeometry().setFromPoints([pts[0], pts[3], pts[2], pts[0], pts[2], pts[1]]);
+        const mat = new THREE.MeshBasicMaterial({
+          color: PLANE_COLORS[i % PLANE_COLORS.length],
+          transparent: true,
+          opacity: 0.8,
+          // backface-visibility: hidden → not drawn from behind, as in the browser.
+          side: plane.hideBackface ? THREE.FrontSide : THREE.DoubleSide,
+        });
+        group.add(new THREE.Mesh(geo, mat), loopOf(pts, PALETTE.blueprint));
+      });
+
+      if (!proj) return;
+      // Where the preview draws the subject: its image on the screen (z = 0).
+      group.add(loopOf(proj.screen.map(at), PALETTE.gold));
+      if (!eye) return;
+      const eyeAt = at([0, 0, eye]);
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), new THREE.MeshBasicMaterial({ color: PALETTE.ink }));
+      ball.position.copy(eyeAt);
+      group.add(ball);
+      // Each sight line runs from the eye through a corner and its image; draw it
+      // to whichever is farther (a corner behind the screen lies beyond its image).
+      proj.corners.forEach((corner, i) => {
+        group.add(segment(eyeAt, at(corner[2] < 0 ? corner : proj.screen[i]), PALETTE.gold));
+      });
+    },
+    dispose: () => clearGroup(group),
+  };
+}
+
+export type ConceptKey = "box-model" | "flexbox" | "grid" | "transform-3d";
 
 export const VIZ_REGISTRY: Record<ConceptKey, () => ConceptViz3D> = {
   "box-model": createBoxModelViz,
   flexbox: createFlexboxViz,
   grid: createGridViz,
+  "transform-3d": createTransform3dViz,
 };

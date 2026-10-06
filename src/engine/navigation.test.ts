@@ -66,6 +66,7 @@ describe("conceptLabel", () => {
     expect(conceptLabel("box-model")).toBe("3D: ボックスモデル");
     expect(conceptLabel("flexbox")).toBe("3D: Flexbox");
     expect(conceptLabel("grid")).toBe("3D: Grid");
+    expect(conceptLabel("transform-3d")).toBe("3D: transform");
     expect(conceptLabel("none")).toBe("プレビュー");
   });
 });

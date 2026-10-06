@@ -4,7 +4,7 @@ import type { ValidatorSpec } from "../validate/primitives.js";
 import type { Challenge } from "./types.js";
 import { normalizeProp, normalizeSelector, normalizeValue, parseCss } from "../validate/css-parse.js";
 
-const CONCEPTS = new Set(["box-model", "flexbox", "grid", "none"]);
+const CONCEPTS = new Set(["box-model", "flexbox", "grid", "transform-3d", "none"]);
 
 /** Every validator a challenge runs: the main set plus all responsive states. */
 function allSpecs(challenge: Challenge): ValidatorSpec[] {

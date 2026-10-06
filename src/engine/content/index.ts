@@ -22,8 +22,16 @@ import { scopeTrack } from "./scope.js";
 import { registeredPropsTrack } from "./registered-props.js";
 import { scrollSnapTrack } from "./scroll-snap.js";
 import { textWrapTrack } from "./text-wrap.js";
+import { clipMaskTrack } from "./clip-mask.js";
+import { filtersTrack } from "./filters.js";
+import { transforms3dTrack } from "./transforms-3d.js";
+import { mathFunctionsTrack } from "./math-functions.js";
 
-/** Catalogue order, roughly basics → modern → layout → responsive → polish. */
+/**
+ * Catalogue order, roughly basics → modern → layout → responsive → polish.
+ * The math functions come last: their lessons build on custom properties,
+ * transitions and transforms from earlier tracks.
+ */
 export const TRACKS: readonly Track[] = [
   selectorsTrack,
   boxModelTrack,
@@ -45,9 +53,13 @@ export const TRACKS: readonly Track[] = [
   mediaQueriesTrack,
   containerQueriesTrack,
   layersTrack,
+  clipMaskTrack,
+  filtersTrack,
   transitionsTrack,
+  transforms3dTrack,
   entryAnimationsTrack,
   registeredPropsTrack,
+  mathFunctionsTrack,
 ];
 
 export const LESSONS: readonly Lesson[] = TRACKS.flatMap((t) => t.lessons);

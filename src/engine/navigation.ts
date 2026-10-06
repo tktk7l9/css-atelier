@@ -40,6 +40,7 @@ const CONCEPT_LABEL: Record<ConceptViz, string> = {
   "box-model": "3D: ボックスモデル",
   flexbox: "3D: Flexbox",
   grid: "3D: Grid",
+  "transform-3d": "3D: transform",
   none: "プレビュー",
 };
 
