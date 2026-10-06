@@ -66,7 +66,7 @@ Vanilla TypeScript · Vite · Three.js · Vitest（フレームワーク・ル�
 
 ## セキュリティ
 
-外部スタイルシートのみ・厳格な CSP（`public/_headers`、`unsafe-inline` / `unsafe-eval` なし）・`frame-ancestors 'none'`・HSTS。サンドボックス iframe は `allow-same-origin` のみ（スクリプト不可、CSS だけを注入）。
+外部スタイルシートのみ・厳格な CSP（`public/_headers`、`unsafe-inline` / `unsafe-eval` なし）・`frame-ancestors 'none'`・HSTS。サンドボックス iframe は `allow-same-origin` のみ（スクリプト不可、CSS だけを注入）。プレビュー内のリンクのクリックやフォームの送信は、親が iframe の document で既定の動作を止めるので、iframe がレッスンから離れてアプリ自身を読み込もうとする（`frame-ancestors 'none'` で拒否される）ことはありません。
 
 ## ホスティング
 
