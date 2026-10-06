@@ -11,7 +11,7 @@ export const logicalPropsTrack: Track = {
       title: "block と inline: padding-block / padding-inline",
       explanation:
         "<p>論理プロパティは物理方向（上下左右）ではなく、<b>書字方向</b>を基準にします。横書きでは <code>block</code>＝上下、<code>inline</code>＝左右です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/CSS_logical_properties_and_values",
+      mdnPath: "/ja/docs/Web/CSS/Guides/Logical_properties_and_values",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box">Logical</div>',
@@ -33,7 +33,7 @@ export const logicalPropsTrack: Track = {
       title: "margin-inline: auto で中央寄せ",
       explanation:
         "<p><code>margin-inline: auto</code> は左右マージンを auto にする論理版。書字方向に依存せず中央寄せできます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/margin-inline",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/margin-inline",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="wrap" class="wrap"><div data-id="box" class="box"></div></div>',

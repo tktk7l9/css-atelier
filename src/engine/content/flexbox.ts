@@ -11,7 +11,7 @@ export const flexboxTrack: Track = {
       title: "主軸でそろえる: justify-content",
       explanation:
         "<p><code>display: flex</code> にすると子要素は<b>主軸</b>（既定では横）に並びます。<code>justify-content</code> は主軸方向の配置を決め、<code>center</code> で中央に集めます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/justify-content",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/justify-content",
       viz: { concept: "flexbox", containerId: "pond" },
       challenge: {
         starterHTML:
@@ -34,7 +34,7 @@ export const flexboxTrack: Track = {
       title: "交差軸でそろえる: align-items",
       explanation:
         "<p><code>align-items</code> は<b>交差軸</b>（主軸が横なら縦）の配置を決めます。<code>center</code> で縦方向の中央にそろえます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/align-items",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/align-items",
       viz: { concept: "flexbox", containerId: "pond" },
       challenge: {
         starterHTML:
@@ -57,7 +57,7 @@ export const flexboxTrack: Track = {
       title: "完全中央: justify-content × align-items",
       explanation:
         "<p>主軸と交差軸の両方を <code>center</code> にすると、要素はコンテナの<b>ど真ん中</b>に配置されます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/CSS_flexible_box_layout",
+      mdnPath: "/ja/docs/Web/CSS/Guides/Flexible_box_layout",
       viz: { concept: "flexbox", containerId: "pond" },
       challenge: {
         starterHTML:
@@ -81,7 +81,7 @@ export const flexboxTrack: Track = {
       title: "横一列に並べる: display: flex",
       explanation:
         "<p>ブロック要素は既定で縦に積まれます。親を <code>display: flex</code> にすると、子要素は<b>横一列</b>に並びます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/flex-direction",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/flex-direction",
       viz: { concept: "flexbox", containerId: "row" },
       challenge: {
         starterHTML:
@@ -105,7 +105,7 @@ export const flexboxTrack: Track = {
       title: "余白を埋める: flex: 1",
       explanation:
         "<p><code>flex: 1</code> を付けた要素は、余ったスペースを伸びて埋めます。他の要素は自分のサイズを保ちます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/flex",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/flex",
       viz: { concept: "flexbox", containerId: "row" },
       challenge: {
         starterHTML:
@@ -129,7 +129,7 @@ export const flexboxTrack: Track = {
       title: "間隔を空ける: gap",
       explanation:
         "<p>flex コンテナでも <code>gap</code> で子要素どうしの間隔をまとめて指定できます。マージンより簡単で端に余白が出ません。</p>",
-      mdnPath: "/ja/docs/Web/CSS/gap",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/gap",
       viz: { concept: "flexbox", containerId: "row" },
       challenge: {
         starterHTML:

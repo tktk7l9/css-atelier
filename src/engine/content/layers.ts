@@ -11,7 +11,7 @@ export const layersTrack: Track = {
       title: "優先順位を決める: @layer",
       explanation:
         "<p><code>@layer base, theme;</code> のように<b>先に順序を宣言</b>すると、後のレイヤー（theme）が前のレイヤー（base）より優先されます。詳細度ではなくレイヤー順で勝敗が決まります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/@layer",
+      mdnPath: "/ja/docs/Web/CSS/Reference/At-rules/@layer",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box">レイヤー</div>',

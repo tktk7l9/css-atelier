@@ -9,7 +9,8 @@ MDN の CSS ドキュメントを片手に、**解説を読んで → 実際に 
 - **ハイブリッド形式** — 各レッスンは「短い解説 → チャレンジ」。お題のレイアウトになるよう CSS を書くと自動で採点します（Flexbox Froggy / Grid Garden スタイル）。
 - **3D 概念ビジュアライザ** — ボックスモデルを4層に分解、Flexbox の主軸/交差軸を矢印で、Grid のトラックを立体で表示。学習者の CSS をライブ反映します。
 - **ライブプレビュー** — 書いた CSS は即座に隔離されたサンドボックスに反映。シンタックスハイライト付きエディタ。
-- **15 トラック・37 レッスン** — セレクタ / ボックスモデル / 単位 / カスタムプロパティ / 色 / モダンセレクタ / ネスト / Flexbox / Grid / 論理プロパティ / アスペクト比 / メディアクエリ / コンテナクエリ / カスケードレイヤー / トランジション。
+- **19 トラック・47 レッスン** — セレクタ / ボックスモデル / 単位 / カスタムプロパティ / 色 / 色の合成と派生（color-mix・相対色・light-dark） / モダンセレクタ / ネスト / Flexbox / Grid / サブグリッド / 論理プロパティ / アスペクト比 / アンカーポジショニング / メディアクエリ / コンテナクエリ / カスケードレイヤー / トランジション / 出現と退場のアニメーション（@starting-style・allow-discrete）。
+- **MDN の現在の構成にリンク** — 各レッスンの「MDN でもっと学ぶ」は 2025 年に再編された `Reference/` `Guides/` 配下のページを直接指します。Baseline でない機能・新しめの機能は、レッスン内に対応ブラウザを明記しています。
 - **二状態バリデーション** — メディア/コンテナクエリ等は複数のビューポート幅で採点し、「無条件に書いただけ」では通らないようにしています。
 - **寛容な採点** — 多くの課題は「どう書いたか」ではなく「正しく表示されたか」（要素の位置・サイズ）で判定するため、複数の正解を許容します。
 - **進捗と下書きの保存** — 完了状況と書きかけの CSS（レッスンごと）は localStorage に保存。カタログの「続きから学ぶ」で最後に完了したレッスンの次へ（SHIG 12, 20）。完了済みのレッスンは見出し横に表示。レッスンは URL ハッシュで共有可能。
@@ -64,7 +65,7 @@ Vanilla TypeScript · Vite · Three.js · Vitest（フレームワーク・ル�
 
 ## セキュリティ
 
-外部スタイルシートのみ・厳格な CSP（`vercel.json`、`unsafe-inline` / `unsafe-eval` なし）・`frame-ancestors 'none'`・HSTS。サンドボックス iframe は `allow-same-origin` のみ（スクリプト不可、CSS だけを注入）。
+外部スタイルシートのみ・厳格な CSP（`public/_headers`、`unsafe-inline` / `unsafe-eval` なし）・`frame-ancestors 'none'`・HSTS。サンドボックス iframe は `allow-same-origin` のみ（スクリプト不可、CSS だけを注入）。
 
 ## ホスティング
 
@@ -73,6 +74,6 @@ Vanilla TypeScript · Vite · Three.js · Vitest（フレームワーク・ル�
 2026-08-11、Vercel 無料枠の超過でアカウントが停止（全プロジェクトが
 `402 DEPLOYMENT_DISABLED`）したため移行した。ビルド成果物は純粋な静的
 ファイルなので Worker スクリプトは無く、`wrangler.jsonc` の `assets` だけで
-配信している。セキュリティヘッダーは `public/_headers`（`vercel.json` の
-`headers` を移植したもの）。`npm run deploy` で build + wrangler deploy。
-Vercel 側の設定も残置してあるので、復旧すれば両方に出せる。
+配信している。セキュリティヘッダーは `public/_headers`（Vercel 時代の
+`vercel.json` から移植したもの。`vercel.json` 自体はその後削除済み）。
+`npm run deploy` で build + wrangler deploy。

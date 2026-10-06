@@ -11,7 +11,7 @@ export const selectorsTrack: Track = {
       title: "クラスで狙う",
       explanation:
         "<p>クラスセレクタ <code>.name</code> は、その class を持つ要素だけにスタイルを当てます。</p>",
-      mdnPath: "/ja/docs/Web/CSS/Class_selectors",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Selectors/Class_selectors",
       viz: { concept: "none" },
       challenge: {
         starterHTML:
@@ -32,7 +32,7 @@ export const selectorsTrack: Track = {
       title: "子孫セレクタで絞り込む",
       explanation:
         "<p><code>.card a</code> のように空白で区切ると、<code>.card</code> の<b>中にある</b> <code>a</code> だけを狙えます。外側のリンクには当たりません。</p>",
-      mdnPath: "/ja/docs/Web/CSS/Descendant_combinator",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Selectors/Descendant_combinator",
       viz: { concept: "none" },
       challenge: {
         starterHTML:
@@ -53,7 +53,7 @@ export const selectorsTrack: Track = {
       title: "擬似クラス: :first-child",
       explanation:
         "<p><code>:first-child</code> は、兄弟の中で<b>最初</b>の要素を狙う擬似クラスです。</p>",
-      mdnPath: "/ja/docs/Web/CSS/:first-child",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Selectors/:first-child",
       viz: { concept: "none" },
       challenge: {
         starterHTML:

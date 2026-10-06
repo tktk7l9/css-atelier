@@ -49,9 +49,21 @@ describe("content integrity", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it("has unique track ids", () => {
+    const ids = TRACKS.map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it("has at least a handful of tracks and lessons", () => {
     expect(TRACKS.length).toBeGreaterThanOrEqual(6);
     expect(LESSONS.length).toBeGreaterThanOrEqual(15);
+  });
+
+  it("links to the current MDN structure (Reference/ or Guides/), not the pre-2025 flat paths", () => {
+    for (const lesson of LESSONS) {
+      if (!lesson.mdnPath) continue;
+      expect(lesson.mdnPath, lesson.id).toMatch(/^\/ja\/docs\/Web\/CSS\/(Reference|Guides)\//);
+    }
   });
 
   for (const lesson of LESSONS) {
@@ -67,6 +79,19 @@ describe("content integrity", () => {
         expect(challenge.validators.length).toBeGreaterThan(0);
         expect(Array.isArray(challenge.snapshot.props)).toBe(true);
         expect(CONCEPTS.has(viz.concept)).toBe(true);
+      });
+
+      it("starts from CSS that still leaves something to do", () => {
+        expect(challenge.starterCSS).not.toBe(challenge.solution);
+      });
+
+      it("measures every computed property its validators read", () => {
+        const props = new Set(challenge.snapshot.props);
+        for (const spec of flatten(allSpecs(challenge))) {
+          if (spec.kind === "computedEquals" || spec.kind === "computedMatches") {
+            expect(props.has(spec.prop), `${lesson.id}: snapshot does not request ${spec.prop}`).toBe(true);
+          }
+        }
       });
 
       it("references only element ids present in the starter HTML", () => {

@@ -22,7 +22,11 @@ export type TrackId =
   | "aspect-ratio"
   | "layers"
   | "color"
-  | "transitions";
+  | "color-functions"
+  | "subgrid"
+  | "anchor-positioning"
+  | "transitions"
+  | "entry-animations";
 
 /** Drives the 3D concept visualizer. `subjectId`/`containerId` tell the pure
  *  viz-map which element to read for box-model / flex / grid extraction. */

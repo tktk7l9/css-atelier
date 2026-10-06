@@ -11,7 +11,7 @@ export const unitsTrack: Track = {
       title: "親に対する割合: %",
       explanation:
         "<p>パーセント幅は<b>親要素の幅</b>を基準にします。<code>width: 50%</code> なら親の半分です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/percentage",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Values/percentage",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="track" class="track"><div data-id="fill" class="fill"></div></div>',
@@ -30,7 +30,7 @@ export const unitsTrack: Track = {
       title: "下限・推奨・上限: clamp()",
       explanation:
         "<p><code>clamp(最小, 推奨, 最大)</code> は値を範囲内に収めます。<code>clamp(100px, 50%, 140px)</code> は、50%が140pxを超えると140pxで頭打ちになります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/clamp",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Values/clamp",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="track" class="track"><div data-id="fill" class="fill"></div></div>',
@@ -52,7 +52,7 @@ export const unitsTrack: Track = {
       title: "小さい方を採用: min()",
       explanation:
         "<p><code>min(300px, 100%)</code> は2つのうち<b>小さい方</b>を採用します。親が狭いときは 100%、広いときは 300px が上限になります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/min",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Values/min",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="track" class="track"><div data-id="fill" class="fill"></div></div>',

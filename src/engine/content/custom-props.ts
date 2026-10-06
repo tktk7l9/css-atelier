@@ -11,7 +11,7 @@ export const customPropsTrack: Track = {
       title: "変数を定義して使う: --x と var()",
       explanation:
         "<p><code>--brand: #2f5fd0;</code> のように <code>--</code> で始まる名前で変数を定義し、<code>var(--brand)</code> で参照します。色やサイズの一元管理に便利です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/--*",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/--*",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box"></div>',
@@ -34,7 +34,7 @@ export const customPropsTrack: Track = {
       title: "フォールバック付き var()",
       explanation:
         "<p><code>var(--accent, #1f9d68)</code> のように2つ目の引数を渡すと、変数が未定義のときの<b>既定値</b>になります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/var",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Values/var",
       viz: { concept: "none" },
       challenge: {
         starterHTML: '<div data-id="box" class="box"></div>',

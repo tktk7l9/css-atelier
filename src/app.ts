@@ -14,7 +14,7 @@ import { loadDraft, saveDraft } from "./engine/drafts.js";
 import { createRevision } from "./engine/revision.js";
 import { conceptLabel, hintButtonLabel, viewportLabel } from "./engine/navigation.js";
 // Three.js lives in viz/index.js — imported dynamically only for 3D lessons so
-// the ~22 non-3D lessons never pull the Three chunk.
+// the (majority of) lessons without a 3D concept never pull the Three chunk.
 import type { Visualizer } from "./viz/index.js";
 
 const store: ProgressStore = {

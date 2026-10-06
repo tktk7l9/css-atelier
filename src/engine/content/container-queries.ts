@@ -11,7 +11,7 @@ export const containerQueriesTrack: Track = {
       title: "コンテナにする: container-type",
       explanation:
         "<p>コンテナクエリの第一歩は、基準にする親に <code>container-type: inline-size</code> を設定することです。これでその要素の<b>幅</b>を問い合わせられるようになります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/container-type",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Properties/container-type",
       viz: { concept: "none" },
       challenge: {
         starterHTML:
@@ -33,8 +33,8 @@ export const containerQueriesTrack: Track = {
       id: "cq-query",
       title: "親の幅で切り替える: @container",
       explanation:
-        "<p><code>@container (min-width: 400px) { … }</code> は、最も近いコンテナの幅が条件を満たすときだけ適用されます。画面幅ではなく<b>親の幅</b>が基準です。</p>",
-      mdnPath: "/ja/docs/Web/CSS/@container",
+        "<p><code>@container (min-width: 400px) { … }</code> は、最も近いコンテナの幅が条件を満たすときだけ適用されます。画面幅ではなく<b>親の幅</b>が基準です。メディアクエリと同じく <code>@container (width >= 400px)</code> の範囲構文も使えます。</p>",
+      mdnPath: "/ja/docs/Web/CSS/Reference/At-rules/@container",
       viz: { concept: "none" },
       challenge: {
         viewport: 500,

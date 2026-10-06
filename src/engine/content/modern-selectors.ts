@@ -11,7 +11,7 @@ export const modernSelectorsTrack: Track = {
       title: "親を狙う: :has()",
       explanation:
         "<p><code>:has()</code> は<b>「中に〜を含む」</b>要素を狙える、待望の“親セレクタ”です。<code>.card:has(.badge)</code> は <code>.badge</code> を含むカードだけにマッチします。</p>",
-      mdnPath: "/ja/docs/Web/CSS/:has",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Selectors/:has",
       viz: { concept: "none" },
       challenge: {
         starterHTML:
@@ -34,7 +34,7 @@ export const modernSelectorsTrack: Track = {
       title: "まとめて狙う: :is()",
       explanation:
         "<p><code>:is(h2, h3)</code> は複数のセレクタを1つにまとめます。繰り返しが減り、読みやすくなります。</p>",
-      mdnPath: "/ja/docs/Web/CSS/:is",
+      mdnPath: "/ja/docs/Web/CSS/Reference/Selectors/:is",
       viz: { concept: "none" },
       challenge: {
         starterHTML:
