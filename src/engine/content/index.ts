@@ -18,6 +18,10 @@ import { transitionsTrack } from "./transitions.js";
 import { entryAnimationsTrack } from "./entry-animations.js";
 import { mediaQueriesTrack } from "./media-queries.js";
 import { containerQueriesTrack } from "./container-queries.js";
+import { scopeTrack } from "./scope.js";
+import { registeredPropsTrack } from "./registered-props.js";
+import { scrollSnapTrack } from "./scroll-snap.js";
+import { textWrapTrack } from "./text-wrap.js";
 
 /** Catalogue order, roughly basics → modern → layout → responsive → polish. */
 export const TRACKS: readonly Track[] = [
@@ -27,19 +31,23 @@ export const TRACKS: readonly Track[] = [
   customPropsTrack,
   colorTrack,
   colorFunctionsTrack,
+  textWrapTrack,
   modernSelectorsTrack,
   nestingTrack,
+  scopeTrack,
   flexboxTrack,
   gridTrack,
   subgridTrack,
   logicalPropsTrack,
   aspectRatioTrack,
   anchorPositioningTrack,
+  scrollSnapTrack,
   mediaQueriesTrack,
   containerQueriesTrack,
   layersTrack,
   transitionsTrack,
   entryAnimationsTrack,
+  registeredPropsTrack,
 ];
 
 export const LESSONS: readonly Lesson[] = TRACKS.flatMap((t) => t.lessons);
