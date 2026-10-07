@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { lessonById } from "./index.js";
+import { TRACKS, loadTrack } from "./index.js";
+import type { Lesson } from "./types.js";
 import { evaluate } from "../validate/run.js";
 import { parseCss } from "../validate/css-parse.js";
 import type { Snapshot } from "../validate/snapshot.js";
+
+// Lessons load with their track on demand; load them all once to replay them.
+const LOADED = new Map<string, Lesson>(
+  (await Promise.all(TRACKS.map((t) => loadTrack(t.id)))).flatMap((t) =>
+    t.lessons.map((l) => [l.id, l] as const),
+  ),
+);
+const lessonById = (id: string): Lesson | undefined => LOADED.get(id);
 
 // Lessons graded only by computed values and the CSS text can be replayed in
 // Node: the computed values below were recorded from the real sandbox (headless

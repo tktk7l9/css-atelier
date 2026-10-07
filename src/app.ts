@@ -1,5 +1,5 @@
 // Heavy lesson runtime (lazy-loaded by main.ts). Builds the lesson view once and
-// reuses it across lessons via open(id). Wires the editor → sandbox (live CSS) →
+// reuses it across lessons via open(lesson). Wires the editor → sandbox (live CSS) →
 // snapshot → validation, and (from the visualizer phase) the 3D concept view.
 
 import { createSandbox, type Sandbox } from "./sandbox/sandbox.js";
@@ -7,7 +7,7 @@ import { createEditor, type Editor } from "./ui/editor.js";
 import { el } from "./ui/dom.js";
 import { evaluate } from "./engine/validate/run.js";
 import { snapshotToSignals } from "./engine/viz-map.js";
-import { lessonById, nextLesson } from "./engine/content/index.js";
+import { nextLesson } from "./engine/content/index.js";
 import type { Lesson } from "./engine/content/types.js";
 import { isComplete, markComplete, type ProgressStore } from "./engine/progress.js";
 import { loadDraft, saveDraft } from "./engine/drafts.js";
@@ -43,7 +43,8 @@ export interface AppCallbacks {
 
 export interface AppController {
   readonly root: HTMLElement;
-  open(lessonId: string): Promise<void>;
+  /** Show a lesson whose track main.ts has already loaded. */
+  open(lesson: Lesson): Promise<void>;
   dispose(): void;
 }
 
@@ -322,9 +323,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
     else callbacks.onBack();
   });
 
-  async function open(lessonId: string): Promise<void> {
-    const lesson = lessonById(lessonId);
-    if (!lesson) return;
+  async function open(lesson: Lesson): Promise<void> {
     current = lesson;
     hintsShown = 0;
     updateHintBtn();

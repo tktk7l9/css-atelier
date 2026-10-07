@@ -368,6 +368,24 @@ main {
   box-shadow: var(--shadow);
 }
 
+/* Shown in place of a lesson whose content could not be fetched. */
+.load-error {
+  max-width: 62ch;
+  padding: 18px;
+}
+.load-error h1 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+}
+.load-error h1:focus {
+  outline: none;
+}
+.load-error p {
+  margin: 0 0 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
 .lesson__doc {
   padding: 18px 18px 16px;
 }

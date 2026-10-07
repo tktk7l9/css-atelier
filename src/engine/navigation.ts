@@ -2,7 +2,7 @@
 // where to resume, and learner-facing labels (no internal ids on screen).
 
 import { LESSONS, trackOf } from "./content/index.js";
-import type { ConceptViz, Lesson } from "./content/types.js";
+import type { ConceptViz, LessonMeta } from "./content/types.js";
 
 export interface LessonPosition {
   /** 1-based index within the track. */
@@ -23,9 +23,9 @@ export function lessonPosition(lessonId: string): LessonPosition | undefined {
  * unfinished lesson in catalogue order. A learner who started mid-catalogue
  * is not sent back to the top (SHIG 12, 20, 77). Undefined when all done.
  */
-export function resumeLesson(completed: readonly string[]): Lesson | undefined {
+export function resumeLesson(completed: readonly string[]): LessonMeta | undefined {
   const done = new Set(completed);
-  const unfinished = (l: Lesson): boolean => !done.has(l.id);
+  const unfinished = (l: LessonMeta): boolean => !done.has(l.id);
   const latest = completed[completed.length - 1];
   const from = latest === undefined ? -1 : LESSONS.findIndex((l) => l.id === latest);
   return LESSONS.slice(from + 1).find(unfinished) ?? LESSONS.find(unfinished);

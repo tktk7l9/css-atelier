@@ -1,11 +1,13 @@
 // Light bootstrap. The catalogue + shell ship in the initial bundle; the
 // Three.js-heavy lesson runtime (app.ts) is dynamically imported and warmed on
-// the first user interaction, keeping the cold load light.
+// the first user interaction, and each track's lessons load with the lesson
+// that needs them, keeping the cold load light.
 
 import "./styles.css";
 import { byId, el } from "./ui/dom.js";
 import { renderCatalogue } from "./ui/catalogue.js";
-import { lessonById, trackOf } from "./engine/content/index.js";
+import { lessonById, loadLesson, trackOf } from "./engine/content/index.js";
+import type { Lesson } from "./engine/content/types.js";
 import { lessonPosition } from "./engine/navigation.js";
 import type { ProgressStore } from "./engine/progress.js";
 import type { AppController } from "./app.js";
@@ -65,11 +67,14 @@ appRoot.append(topbar, main, foot);
 // ---- routing ----
 let app: AppController | null = null;
 let loading: Promise<AppController> | null = null;
+// Bumped on every route, so a lesson that finishes loading after the learner
+// has moved on does not replace the newer screen.
+let routeSeq = 0;
 
 async function ensureApp(): Promise<AppController> {
   if (app) return app;
   if (!loading) {
-    loading = import("./app.js").then((m) =>
+    const attempt = import("./app.js").then((m) =>
       m.createApp({
         onComplete: () => void 0,
         onBack: () => navigateTo(null),
@@ -77,26 +82,69 @@ async function ensureApp(): Promise<AppController> {
         reducedMotion,
       }),
     );
+    // A failed load must not stick: the next attempt imports again.
+    attempt.catch(() => {
+      loading = null;
+    });
+    loading = attempt;
   }
   app = await loading;
   return app;
 }
+
+// Explicit way back: the installed PWA runs standalone with no browser back
+// button (SHIG 59, 60, 82).
+const backLink = (): HTMLElement =>
+  el("a", { class: "crumb__back", text: "← レッスン一覧", attrs: { href: "#" } });
 
 function showCatalogue(): void {
   crumb.textContent = "";
   main.replaceChildren(renderCatalogue(store, (id) => navigateTo(id)));
 }
 
-async function showLesson(id: string): Promise<void> {
-  const controller = await ensureApp();
-  const lesson = lessonById(id);
+/**
+ * The lesson could not be fetched: offline before it was cached, or a page
+ * left open across a deploy. Say so in plain words with the fix (SHIG 55, 11);
+ * the way back stays in the breadcrumb (SHIG 60).
+ */
+function showLoadError(): void {
+  crumb.replaceChildren(backLink());
+  const box = el("div", { class: "panel load-error", attrs: { role: "alert" } });
+  const heading = el("h1", { text: "レッスンを開けませんでした", attrs: { tabindex: "-1" } });
+  box.append(
+    heading,
+    el("p", {
+      text: "通信が切れているか、アプリが更新された可能性があります。ページを読み込み直してください。",
+    }),
+  );
+  const reload = el("button", {
+    class: "btn btn--primary",
+    text: "読み込み直す",
+    attrs: { type: "button" },
+  });
+  reload.addEventListener("click", () => location.reload());
+  box.append(reload);
+  main.replaceChildren(box);
+  // Like a lesson, the new view's heading takes focus (SHIG 94).
+  heading.focus({ preventScroll: true });
+}
+
+async function showLesson(id: string, seq: number): Promise<void> {
+  // The current screen stays until both the runtime and the lesson's track
+  // have arrived (they load in parallel), so it never flashes empty.
+  let controller: AppController;
+  let lesson: Lesson;
+  try {
+    [controller, lesson] = await Promise.all([ensureApp(), loadLesson(id)]);
+  } catch {
+    if (seq === routeSeq) showLoadError();
+    return;
+  }
+  if (seq !== routeSeq) return;
   const track = trackOf(id);
-  crumb.textContent = "";
-  // Explicit way back: the installed PWA runs standalone with no browser back
-  // button (SHIG 59, 60, 82).
-  crumb.append(el("a", { class: "crumb__back", text: "← レッスン一覧", attrs: { href: "#" } }));
+  crumb.replaceChildren(backLink());
   const pos = lessonPosition(id);
-  if (track && lesson && pos) {
+  if (track && pos) {
     const path = el("span", { class: "crumb__path" });
     path.append(document.createTextNode(`${track.title} › `), el("b", { text: lesson.title }));
     crumb.append(
@@ -115,7 +163,7 @@ async function showLesson(id: string): Promise<void> {
     );
   }
   main.replaceChildren(controller.root);
-  await controller.open(id);
+  await controller.open(lesson);
 }
 
 /** Drive routing through the URL hash so lessons are deep-linkable. */
@@ -126,8 +174,9 @@ function navigateTo(lessonId: string | null): void {
 }
 
 async function route(): Promise<void> {
+  const seq = ++routeSeq;
   const id = location.hash.replace(/^#/, "");
-  if (id && lessonById(id)) await showLesson(id);
+  if (id && lessonById(id)) await showLesson(id, seq);
   else showCatalogue();
 }
 
@@ -135,8 +184,9 @@ brand.addEventListener("click", () => navigateTo(null));
 window.addEventListener("hashchange", () => void route());
 void route();
 
-// Warm the heavy chunk on first interaction (keeps the cold load light).
-const warm = (): void => void ensureApp();
+// Warm the heavy chunk on first interaction (keeps the cold load light). A
+// failure here is reported by the navigation that needs the chunk.
+const warm = (): void => void ensureApp().catch(() => undefined);
 window.addEventListener("pointerdown", warm, { once: true });
 window.addEventListener("keydown", warm, { once: true });
 

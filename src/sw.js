@@ -1,15 +1,21 @@
 // Minimal offline support. Navigations are network-first (so deploys are picked
 // up online) with a cached shell fallback; other same-origin GETs are
 // cache-first with runtime caching (build assets are content-hashed).
+//
+// This is a template: the build (lessonChunks() in vite.config.ts) emits it as
+// /sw.js with PRECACHE filled in — the lesson runtime and every track's lesson
+// chunk — so a lesson can be opened offline without having been opened online
+// first, as when all lessons shipped in the initial bundle.
 
 const CACHE = "css-atelier-v1";
 const SHELL = ["/", "/index.html", "/favicon.svg", "/manifest.webmanifest"];
+const PRECACHE = [];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(SHELL))
+      .then((cache) => cache.addAll([...SHELL, ...PRECACHE]))
       .then(() => self.skipWaiting()),
   );
 });
