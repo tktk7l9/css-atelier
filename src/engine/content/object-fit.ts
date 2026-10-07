@@ -1,4 +1,5 @@
 import type { ValidatorSpec } from "../validate/primitives.js";
+import { svgUri } from "./svg-uri.js";
 import type { Track } from "./types.js";
 
 // object-fit and object-position change how the picture is drawn inside the
@@ -7,12 +8,6 @@ import type { Track } from "./types.js";
 // distortion or the crop without object-fit). The pictures are small SVG
 // drawings in data: URIs, which the CSP allows (img-src data:), so the preview
 // requests no image.
-
-/** An SVG drawing as a data: URI (`#` would start a fragment, so it is escaped). */
-function svgUri(w: number, h: number, body: string, attrs = ""): string {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'${attrs}>${body}</svg>`;
-  return `data:image/svg+xml,${svg.replace(/</g, "%3C").replace(/>/g, "%3E").replace(/#/g, "%23")}`;
-}
 
 // preserveAspectRatio='none' makes the drawing stretch like a photo would: an
 // SVG keeps its own proportions inside any box by default, so `fill` would not
