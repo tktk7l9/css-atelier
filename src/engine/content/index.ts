@@ -34,6 +34,10 @@ import { textOverflowTrack } from "./text-overflow.js";
 import { hasPatternsTrack } from "./has-patterns.js";
 import { objectFitTrack } from "./object-fit.js";
 import { supportsTrack } from "./supports.js";
+import { gridAlignmentTrack } from "./grid-alignment.js";
+import { intrinsicSizingTrack } from "./intrinsic-sizing.js";
+import { positioningTrack } from "./positioning.js";
+import { transforms2dTrack } from "./transforms-2d.js";
 
 /**
  * Catalogue order, roughly basics → modern → layout → responsive → polish.
@@ -43,8 +47,14 @@ import { supportsTrack } from "./supports.js";
  * lesson is a grid item). Text overflow follows text wrapping, the :has()
  * patterns follow the :has() basics in modern selectors, object-fit follows
  * aspect ratio, and feature queries join the other conditional rules after
- * container queries. The math functions come last: their lessons build on
- * custom properties, transitions and transforms from earlier tracks.
+ * container queries. Grid alignment follows grid; intrinsic sizes come after
+ * subgrid (their label column is a grid track); absolute positioning follows
+ * logical properties and writing modes (its last lesson uses the logical
+ * insets) and precedes anchor positioning and sticky, which build on it. The
+ * 2D transform track sits between transitions and 3D transforms, and comes
+ * after positioning (its needle and labels are absolutely positioned). The
+ * math functions come last: their lessons build on custom properties,
+ * transitions and transforms from earlier tracks.
  */
 export const TRACKS: readonly Track[] = [
   selectorsTrack,
@@ -62,9 +72,12 @@ export const TRACKS: readonly Track[] = [
   scopeTrack,
   flexboxTrack,
   gridTrack,
+  gridAlignmentTrack,
   subgridTrack,
+  intrinsicSizingTrack,
   logicalPropsTrack,
   writingModesTrack,
+  positioningTrack,
   aspectRatioTrack,
   objectFitTrack,
   anchorPositioningTrack,
@@ -78,6 +91,7 @@ export const TRACKS: readonly Track[] = [
   filtersTrack,
   formsTrack,
   transitionsTrack,
+  transforms2dTrack,
   transforms3dTrack,
   entryAnimationsTrack,
   registeredPropsTrack,

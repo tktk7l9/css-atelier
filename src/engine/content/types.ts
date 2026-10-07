@@ -20,6 +20,9 @@ export type TrackId =
   | "scope"
   | "flexbox"
   | "grid"
+  | "grid-alignment"
+  | "intrinsic-sizing"
+  | "positioning"
   | "media-queries"
   | "container-queries"
   | "supports"
@@ -41,6 +44,7 @@ export type TrackId =
   | "filters"
   | "forms"
   | "transitions"
+  | "transforms-2d"
   | "transforms-3d"
   | "entry-animations";
 

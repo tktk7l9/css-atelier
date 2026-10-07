@@ -6,8 +6,9 @@ import type { Snapshot } from "../validate/snapshot.js";
 
 // Lessons graded only by computed values and the CSS text can be replayed in
 // Node: the computed values below were recorded from the real sandbox (headless
-// Chrome 154) for the starter CSS and for the reference solution. Each lesson
-// must fail on its starter and pass on its solution.
+// Chrome 154; 155 for the lessons added since) for the starter CSS and for the
+// reference solution. Each lesson must fail on its starter and pass on its
+// solution.
 
 type Computed = Record<string, Record<string, string>>;
 
@@ -248,6 +249,79 @@ const chat = (wrap: string, bubbleW: number, rowH: number, url: Box, urlWrap = w
   url: { rect: url, computed: { "overflow-wrap": urlWrap } },
 });
 
+/** The first label cell of the profile and the span holding its text. */
+const labelCell = (w: number, h: number, textW = 109.61, textH = 18): Recorded => ({
+  l1: { rect: [17, 13, w, h] },
+  "l1-text": { rect: [17, 16, textW, textH] },
+});
+
+/** The two photo frames, stacked 12px apart. */
+const frames = (w1: number, h1: number, w2: number, h2: number): Recorded => ({
+  f1: { rect: [0, 0, w1, h1] },
+  f2: { rect: [0, h1 + 12, w2, h2] },
+});
+
+/** The 280px column, the short heading with its text, and the long heading. */
+const headings = (colH: number, short: Box, text: Box, long: Box): Recorded => ({
+  col: { rect: [0, 0, 280, colH] },
+  short: { rect: short },
+  "short-text": { rect: text },
+  long: { rect: long },
+});
+
+/** The 300 × 170 thumbnail with its 56px play button and, when given, the running time. */
+const thumbnail = (play: Box, time?: Box): Recorded => ({
+  thumb: { rect: [0, 0, 300, 170] },
+  play: { rect: play },
+  ...(time ? { time: { rect: time } } : {}),
+});
+
+/** The middle stamp of the wide card (300 × 160) and of the square one (180 × 180). */
+const stampCards = (w5: Box, s5: Box): Recorded => ({
+  wide: { rect: [0, 0, 300, 160] },
+  w5: { rect: w5 },
+  square: { rect: [312, 0, 180, 180] },
+  s5: { rect: s5 },
+});
+
+/** The two product cards with their ribbons, and the first card's position. */
+const ribbonCards = (position: string, r1: Box, r2: Box, cardH = 80.78): Recorded => ({
+  card1: { rect: [0, 0, 180, cardH], computed: { position } },
+  r1: { rect: r1 },
+  card2: { rect: [196, 0, 180, cardH] },
+  r2: { rect: r2 },
+});
+
+/** The left-to-right note and the right-to-left note (320 × 48), each with its close button. */
+const notes = (closeJa: Box, closeAr: Box): Recorded => ({
+  ja: { rect: [0, 0, 320, 48] },
+  "close-ja": { rect: closeJa },
+  ar: { rect: [0, 60, 320, 48] },
+  "close-ar": { rect: closeAr },
+});
+
+/** The gauge, its needle and the hub at the needle's foot. */
+const gauge = (needle: Box): Recorded => ({
+  gauge: { rect: [16, 16, 200, 100] },
+  needle: { rect: needle },
+  hub: { rect: [108, 108, 16, 16] },
+});
+
+/** The three stickers; the first and third tilted by -6deg and -3deg as in the starter. */
+const stickers = (s2: Box, scale: string, s1: Box = [21.14, 18.94, 105.72, 70.12], s3: Box = [270.5, 21.42, 103, 65.15]): Recorded => ({
+  s1: { rect: s1 },
+  s2: { rect: s2, computed: { scale } },
+  s3: { rect: s3 },
+});
+
+/** The two 200 × 130 photos and the labels laid over them. */
+const labelled = (b1: Box, b2: Box): Recorded => ({
+  p1: { rect: [0, 0, 200, 130] },
+  b1: { rect: b1 },
+  p2: { rect: [216, 0, 200, 130] },
+  b2: { rect: b2 },
+});
+
 const GEOMETRY_RECORDINGS: Record<string, { readonly starter: Recorded; readonly solution: Recorded }> = {
   "math-round": {
     starter: { "wide-tiles": { rect: [0, 6, 230, 80] }, "narrow-tiles": { rect: [0, 110, 170, 80] } },
@@ -411,7 +485,78 @@ const GEOMETRY_RECORDINGS: Record<string, { readonly starter: Recorded; readonly
       b3: { rect: [390.66, 22.19, 69.34, 52] },
     },
   },
+  // A 6em column wraps the longest label onto two lines; max-content ends the column where the label ends.
+  "size-max-content": {
+    starter: labelCell(96, 48, 94.56, 42),
+    solution: labelCell(109.61, 24),
+  },
+  // The frames span the preview until min-content fits them to the 160px and 120px photos (+ 8px padding each side).
+  "size-min-content": {
+    starter: frames(596, 142, 596, 162),
+    solution: frames(176, 182, 136, 222),
+  },
+  "size-fit-content": {
+    starter: headings(165.19, [0, 0, 280, 31], [0, 3, 72, 21], [0, 78.59, 280, 59]),
+    solution: headings(165.19, [0, 0, 72, 31], [0, 3, 72, 21], [0, 78.59, 280, 59]),
+  },
+  "grid-place-items": {
+    starter: thumbnail([0, 0, 56, 56]),
+    solution: thumbnail([122, 57, 56, 56]),
+  },
+  // The parent's place-items: center puts the running time over the play button.
+  "grid-place-self": {
+    starter: thumbnail([122, 57, 56, 56], [125.09, 73, 49.81, 24]),
+    solution: thumbnail([122, 57, 56, 56], [250.19, 146, 49.81, 24]),
+  },
+  "grid-place-content": {
+    starter: stampCards([48, 48, 40, 40], [360, 48, 40, 40]),
+    solution: stampCards([130, 60, 40, 40], [382, 70, 40, 40]),
+  },
+  // Without a positioned card, both ribbons go to the top-right corner of the preview.
+  "position-relative": {
+    starter: ribbonCards("static", [547.2, 0, 48.8, 24], [547.2, 0, 48.8, 24]),
+    solution: ribbonCards("relative", [131.2, 0, 48.8, 24], [327.2, 0, 48.8, 24]),
+  },
+  // top: 0 and left: 0 alone shrink the cover to its text.
+  "position-inset": {
+    starter: { item: { rect: [0, 0, 220, 178.78] }, cover: { rect: [0, 0, 80, 28] } },
+    solution: { item: { rect: [0, 0, 220, 178.78] }, cover: { rect: [0, 0, 220, 178.78] } },
+  },
+  "position-logical": {
+    starter: notes([288, 0, 32, 32], [288, 60, 32, 32]),
+    solution: notes([288, 0, 32, 32], [0, 60, 32, 32]),
+  },
+  // Turned about its middle, the needle floats 50px above the hub; turned about its foot, it reaches MAX.
+  "transform-origin": {
+    starter: gauge([66, 63, 100, 6]),
+    solution: gauge([116, 113, 100, 6]),
+  },
+  // transform: scale(1.25) replaces the tilt (125 × 75); tilted by 4deg and enlarged, the box is 129.93 × 83.54.
+  "transform-individual": {
+    starter: stickers([135.5, 16.5, 125, 75], "none"),
+    solution: stickers([133.04, 12.23, 129.93, 83.54], "1.25"),
+  },
+  "transform-translate-percent": {
+    starter: labelled([100, 65, 86.05, 28], [316, 65, 149.63, 28]),
+    solution: labelled([56.98, 51, 86.05, 28], [241.19, 51, 149.63, 28]),
+  },
 };
+
+/** The lessons added with the intrinsic sizing, grid alignment, positioning and 2D transform tracks. */
+const NEW_GEOMETRY_LESSONS = [
+  "size-max-content",
+  "size-min-content",
+  "size-fit-content",
+  "grid-place-items",
+  "grid-place-self",
+  "grid-place-content",
+  "position-relative",
+  "position-inset",
+  "position-logical",
+  "transform-origin",
+  "transform-individual",
+  "transform-translate-percent",
+];
 
 function geometrySnapshot(css: string, rec: Recorded): Snapshot {
   return {
@@ -1058,5 +1203,228 @@ describe("lessons replayed from recorded sandbox geometry", () => {
       ":has() と :nth-child() で、子の数を数えましょう",
     ]);
     expect(run(challenge.solution.replace(":nth-child(5)", ":nth-last-child(5)"), solution)).toEqual([]);
+  });
+
+  it("shows a fresh starter of the new lessons one message, the first unmet step", () => {
+    for (const id of NEW_GEOMETRY_LESSONS) {
+      const { challenge } = lessonById(id)!;
+      const res = evaluate(challenge.validators, geometrySnapshot(challenge.starterCSS, GEOMETRY_RECORDINGS[id].starter));
+      expect(res.failures, id).toHaveLength(1);
+    }
+  });
+
+  it("ends the label column where the longest label ends, with max-content", () => {
+    const { challenge } = lessonById("size-max-content")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const column = (cols: string): string => challenge.solution.replace("max-content 1fr", cols);
+    const mismatch = "ラベルの列の幅が、いちばん長いラベルの長さと合っていません（固定の幅だと、列が余ったり、ラベルがはみ出したりします）";
+    // Recorded for each column below.
+    expect(run(column("8em 1fr"), labelCell(128, 24))).toEqual([mismatch]);
+    expect(run(challenge.starterCSS + ".profile dt { white-space: nowrap; }\n", labelCell(96, 24))).toEqual([mismatch]);
+    expect(run(column("min-content 1fr"), labelCell(16, 168, 16, 162))).toEqual(["長いラベル「メールアドレス」が折り返して、2 行以上になっています"]);
+    // Recorded: auto and fit-content(10em) lay the column out the same here, but are not max-content.
+    expect(run(column("auto 1fr"), labelCell(109.61, 24))).toEqual(["列の幅に max-content を使いましょう"]);
+    expect(run(column("fit-content(10em) 1fr"), labelCell(109.61, 24))).toEqual(["列の幅に max-content を使いましょう"]);
+    expect(run(column("minmax(0, max-content) 1fr"), labelCell(109.61, 24))).toEqual([]);
+  });
+
+  it("fits each frame to its own photo with min-content", () => {
+    const { challenge } = lessonById("size-min-content")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const width = (to: string): string => challenge.solution.replace("width: min-content", to);
+    const tooWide = "枠（.figure）が写真より横に広がっています。2 枚とも、枠を写真の幅に合わせて、キャプションを写真の幅で折り返しましょう";
+    // Recorded: fit-content and max-content both keep each caption on one line.
+    expect(run(width("width: fit-content"), frames(392.09, 142, 402.89, 162))).toEqual([tooWide]);
+    expect(run(width("width: max-content"), frames(392.09, 142, 402.89, 162))).toEqual([tooWide]);
+    // Recorded: a width fixed for the first photo is too wide for the second.
+    expect(run(width("width: 176px"), frames(176, 182, 176, 202))).toEqual([tooWide]);
+    // Recorded: the old table trick draws the same frames, but is not min-content.
+    const solved = GEOMETRY_RECORDINGS["size-min-content"].solution;
+    expect(run(width("display: table; width: 1px"), solved)).toEqual(["width: min-content で、いちばん狭くできる幅（写真の幅）にしましょう"]);
+    expect(run(width("inline-size: min-content"), solved)).toEqual([]);
+  });
+
+  it("hugs the short heading and wraps the long one with fit-content", () => {
+    const { challenge } = lessonById("size-fit-content")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const width = (to: string): string => challenge.solution.replace("width: fit-content;", to);
+    const solved = GEOMETRY_RECORDINGS["size-fit-content"].solution;
+    // Recorded: max-content keeps the long heading on one line, wider than the column.
+    expect(run(width("width: max-content;"), headings(137.19, [0, 0, 72, 31], [0, 3, 72, 21], [0, 78.59, 512.53, 31]))).toEqual([
+      "長い見出しが列の右へはみ出しています（max-content は折り返さないので、列より広くなります）",
+    ]);
+    // Recorded: min-content breaks the short heading after every character.
+    expect(run(width("width: min-content;"), headings(613.19, [0, 0, 18, 115], [0, 3, 18, 105], [0, 162.59, 36.22, 423]))).toEqual([
+      "短い見出し「お知らせ」が 1 文字ずつ折り返しています（min-content は、折り返せるところですべて折り返します）",
+    ]);
+    // Recorded: inline-block and max-content with max-width: 100% draw the same headings, but are not fit-content.
+    expect(run(width("display: inline-block;"), solved)).toEqual(["width: fit-content を使いましょう"]);
+    expect(run(width("width: max-content;\n  max-width: 100%;"), solved)).toEqual(["width: fit-content を使いましょう"]);
+    expect(run(width("inline-size: fit-content;"), solved)).toEqual([]);
+  });
+
+  it("centres the play button with place-items, the vertical value first", () => {
+    const { challenge } = lessonById("grid-place-items")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const items = (to: string): string => challenge.solution.replace("place-items: center;", to);
+    const notDown = "再生ボタンが、写真の縦の中央にありません（place-items は「縦 横」の順で、値を 1 つだけ書くと両方に効きます）";
+    // Recorded: justify-items alone, and place-items: start center, centre the button across only.
+    expect(run(items("justify-items: center;"), thumbnail([122, 0, 56, 56]))).toEqual([notDown]);
+    expect(run(items("place-items: start center;"), thumbnail([122, 0, 56, 56]))).toEqual([notDown]);
+    // Recorded: the longhands and place-self on the button centre it too, but the lesson is place-items.
+    const centred = thumbnail([122, 57, 56, 56]);
+    expect(run(items("justify-items: center;\n  align-items: center;"), centred)).toEqual(["place-items で、縦と横をまとめてそろえましょう"]);
+    expect(run(challenge.starterCSS + ".play { place-self: center; }\n", centred)).toEqual(["place-items で、縦と横をまとめてそろえましょう"]);
+    expect(run(items("place-items: center center;"), centred)).toEqual([]);
+  });
+
+  it("moves only the running time to the corner, with place-self", () => {
+    const { challenge } = lessonById("grid-place-self")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const self = (to: string): string => challenge.solution.replace("place-self: end;", to);
+    const centre: Box = [122, 57, 56, 56];
+    const corner: Box = [250.19, 146, 49.81, 24];
+    // Recorded: place-items: end on the parent takes the play button to the corner as well.
+    expect(run(challenge.starterCSS.replace("place-items: center", "place-items: end"), thumbnail([244, 114, 56, 56], corner))).toEqual([
+      "再生ボタンは、写真の中央のままにしておきましょう（親の place-items: center は変えずに）",
+    ]);
+    // Recorded: start end is the top-right corner.
+    expect(run(self("place-self: start end;"), thumbnail(centre, [250.19, 0, 49.81, 24]))).toEqual(["再生時間（.time）が、写真の右下の角にありません"]);
+    // Recorded: auto margins reach the corner too, but the lesson is place-self.
+    expect(run(self("margin: auto 0 0 auto;"), thumbnail(centre, corner))).toEqual(["place-self で、再生時間だけ位置を変えましょう"]);
+    expect(run(self("place-self: end end;"), thumbnail(centre, corner))).toEqual([]);
+  });
+
+  it("centres the tracks with place-content, keeping the stamps their size", () => {
+    const { challenge } = lessonById("grid-place-content")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const content = (to: string): string => challenge.solution.replace("place-content: center;", to);
+    const centred = GEOMETRY_RECORDINGS["grid-place-content"].solution;
+    // Recorded: place-items moves each stamp inside its cell instead, and shrinks it to its content.
+    expect(run(content("place-items: center;"), stampCards([57.8, 48, 20.41, 40], [369.8, 48, 20.41, 40]))).toEqual([
+      "スタンプの並びが、カードの横の中央にありません",
+    ]);
+    expect(run(content("place-content: center;\n  place-items: center;"), stampCards([139.8, 60, 20.41, 40], [391.8, 70, 20.41, 40]))).toEqual([
+      "スタンプの大きさ（40px）が変わっています（place-items はセルの中の位置を決めるので、スタンプが中身の大きさに縮みます）",
+    ]);
+    // Recorded: justify-content alone centres the tracks across only.
+    expect(run(content("justify-content: center;"), stampCards([130, 48, 40, 40], [382, 48, 40, 40]))).toEqual([
+      "スタンプの並びが、カードの縦の中央にありません（place-content は「縦 横」の順で、値を 1 つだけ書くと両方に効きます）",
+    ]);
+    // Recorded: padding tuned to each card centres both, but the lesson is place-content.
+    expect(run(challenge.starterCSS + ".wide { padding: 12px 82px; }\n.square { padding: 22px; }\n", centred)).toEqual([
+      "place-content で、トラック全体の位置をそろえましょう",
+    ]);
+    expect(run(content("place-content: space-evenly;"), centred)).toEqual([]);
+  });
+
+  it("makes the card the containing block with position: relative", () => {
+    const { challenge } = lessonById("position-relative")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const inCorners = (position: string): Recorded => ribbonCards(position, [131.2, 0, 48.8, 24], [327.2, 0, 48.8, 24]);
+    const notRelative = "カード（.card）に position: relative を指定して、リボンの基準の箱にしましょう";
+    // Recorded: position: relative on the ribbon keeps it in the flow, at the top-left of the card's content.
+    expect(run(challenge.starterCSS + ".ribbon { position: relative; }\n", ribbonCards("static", [16, 19, 48.8, 19], [212, 19, 48.8, 19], 103.78))).toEqual([
+      "リボン（.ribbon）が、それぞれのカードの右上の角にありません（基準の箱が、カードではなくプレビューの画面になっています）",
+    ]);
+    // Recorded: a transform, or sticky, also makes the card the containing block, but the lesson is position: relative.
+    expect(run(challenge.starterCSS + ".card { transform: translate(0); }\n", inCorners("static"))).toEqual([notRelative]);
+    expect(run(challenge.starterCSS + ".card { position: sticky; }\n", inCorners("sticky"))).toEqual([notRelative]);
+  });
+
+  it("covers the whole card with inset", () => {
+    const { challenge } = lessonById("position-inset")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const place = (to: string): string => challenge.starterCSS.replace("  top: 0;\n  left: 0;\n", to);
+    const covered = GEOMETRY_RECORDINGS["position-inset"].solution;
+    const useInset = "inset で、四辺をまとめて指定しましょう（top・right・bottom・left を 1 行で）";
+    // Recorded: the four sides, or width and height of 100%, cover the card the same way.
+    expect(run(place("  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n"), covered)).toEqual([useInset]);
+    expect(run(place("  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n"), covered)).toEqual([useInset]);
+    // Recorded: inset: 8px leaves a margin around the cover.
+    expect(run(place("  inset: 8px;\n"), { item: covered.item, cover: { rect: [8, 8, 204, 162.78] } })).toEqual([
+      "売り切れの覆い（.cover）が、カード全体を覆っていません（top と left だけでは中身の大きさになります。四辺すべてを 0 にしましょう）",
+    ]);
+    expect(run(place("  top: 0;\n  left: 0;\n  inset: 0;\n"), covered)).toEqual([]);
+  });
+
+  it("puts the close button at the end of the line with inset-inline-end, whichever way the text runs", () => {
+    const { challenge } = lessonById("position-logical")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const place = (to: string): string => challenge.starterCSS.replace("  right: 0;\n", to);
+    const right: Box = [288, 0, 32, 32];
+    // Recorded: with right: 0 still there, the right-to-left note keeps its button on the right.
+    expect(run(place("  right: 0;\n  inset-inline-end: 0;\n"), notes(right, [288, 60, 32, 32]))).toEqual([
+      "右から左へ書くお知らせ（下）で、閉じるボタンが左上の角にありません（right: 0 が残っていると、こちらでも右に置かれます）",
+    ]);
+    // Recorded: inset-inline-start is the start of the line.
+    expect(run(place("  inset-inline-start: 0;\n"), notes([0, 0, 32, 32], [288, 60, 32, 32]))).toEqual([
+      "日本語のお知らせで、閉じるボタンが右上の角にありません",
+    ]);
+    // Recorded: a [dir="rtl"] rule gives the same picture, but is not the logical inset.
+    const ends = notes(right, [0, 60, 32, 32]);
+    expect(run(challenge.starterCSS + '[dir="rtl"] .close { right: auto; left: 0; }\n', ends)).toEqual(["inset-inline-end で、行の終わり側に置きましょう"]);
+    expect(run(place("  inset-inline-end: 0;\n"), ends)).toEqual([]);
+    expect(run(place("  inset-inline: auto 0;\n"), ends)).toEqual([]);
+  });
+
+  it("turns the needle about its foot, however the origin is written", () => {
+    const { challenge } = lessonById("transform-origin")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const origin = (to: string): string => challenge.solution.replace("bottom center", to);
+    const foot: Box = [116, 113, 100, 6];
+    const floating = "針の根元が中心の丸（.hub）から離れて、宙に浮いています（回転の中心が、針の下端の中央になっていません）";
+    // Recorded: each of these turns the needle about its foot.
+    for (const to of ["50% 100%", "bottom", "center bottom"]) expect(run(origin(to), gauge(foot)), to).toEqual([]);
+    expect(run(challenge.solution.replace("transform: rotate(90deg);", "rotate: 90deg;"), gauge(foot))).toEqual([]);
+    // Recorded: about the bottom-left corner the needle lies 3px below the hub's centre; about the top end it swings left.
+    expect(run(origin("bottom left"), gauge([113, 116, 100, 6]))).toEqual([floating]);
+    expect(run(origin("top center"), gauge([16, 13, 100, 6]))).toEqual([floating]);
+    // Recorded: laying the needle flat without turning it lands in the same place, but is not transform-origin.
+    const flat = challenge.starterCSS.replace("  transform: rotate(90deg);\n", "  left: 100px;\n  bottom: -3px;\n  width: 100px;\n  height: 6px;\n");
+    expect(run(flat, gauge(foot))).toEqual(["transform-origin で、回転の中心を決めましょう"]);
+  });
+
+  it("enlarges the picked sticker with the scale property, keeping its tilt", () => {
+    const { challenge } = lessonById("transform-individual")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const tiltedAndEnlarged: Box = [133.04, 12.23, 129.93, 83.54];
+    const notBoth = "選んだシール（.picked）が、傾いたまま 1.25 倍になっていません（transform: scale() が、先に書いた transform: rotate() を上書きしています）";
+    // Recorded: rotate and scale both as properties.
+    expect(run(challenge.solution.replace("transform: rotate(var(--r));", "rotate: var(--r);"), stickers(tiltedAndEnlarged, "1.25"))).toEqual([]);
+    // Recorded: writing both into transform again draws the same, but the lesson is the scale property.
+    expect(run(challenge.solution.replace("scale: 1.25;", "transform: rotate(var(--r)) scale(1.25);"), stickers(tiltedAndEnlarged, "none"))).toEqual([
+      "拡大には scale プロパティを使いましょう（transform に書くと、rotate() まで書き直すことになります）",
+    ]);
+    // Recorded: without the scale the sticker keeps its tilt at 100 × 60; scale: 1.2 is too small.
+    expect(run(challenge.solution.replace("  scale: 1.25;\n", ""), stickers([146.03, 20.59, 103.94, 66.83], "none"))).toEqual([notBoth]);
+    expect(run(challenge.solution.replace("scale: 1.25", "scale: 1.2"), stickers([135.63, 13.9, 124.73, 80.2], "1.2"))).toEqual([notBoth]);
+    // Recorded: scale on every sticker enlarges the other two as well.
+    const everyone = challenge.solution.replace("  transform: rotate(var(--r));\n", "  transform: rotate(var(--r));\n  scale: 1.25;\n");
+    expect(run(everyone, stickers(tiltedAndEnlarged, "1.25", [7.92, 10.17, 132.15, 87.66], [257.62, 13.28, 128.75, 81.44]))).toEqual([
+      "ほかのシールの大きさと傾きは、そのままにしておきましょう",
+    ]);
+  });
+
+  it("centres labels of any length with translate: -50% -50%", () => {
+    const { challenge } = lessonById("transform-translate-percent")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const pull = (to: string): string => challenge.solution.replace("translate: -50% -50%;", to);
+    const centred = GEOMETRY_RECORDINGS["transform-translate-percent"].solution;
+    const offAcross = "ラベルが、写真の横の中央からずれています（left: 50% だけでは、ラベルの左端が中央に来ます）";
+    // Recorded: transform: translate() moves them the same way.
+    expect(run(pull("transform: translate(-50%, -50%);"), centred)).toEqual([]);
+    // Recorded: translate: -50% moves them across only.
+    expect(run(pull("translate: -50%;"), labelled([56.98, 65, 86.05, 28], [241.19, 65, 149.63, 28]))).toEqual([
+      "ラベルが、写真の縦の中央からずれています（top: 50% だけでは、ラベルの上端が中央に来ます）",
+    ]);
+    // Recorded: a margin tuned for the short label is wrong for the long one; -100% goes too far.
+    expect(run(pull("margin: -14px 0 0 -40px;"), labelled([60, 51, 86.05, 28], [276, 51, 149.63, 28]))).toEqual([offAcross]);
+    expect(run(pull("translate: -100% -100%;"), labelled([13.95, 37, 86.05, 28], [166.38, 37, 149.63, 28]))).toEqual([offAcross]);
+    // Recorded: inset: 0 with auto margins centres them too, but the lesson is translate.
+    const auto = challenge.starterCSS.replace("  top: 50%;\n  left: 50%;\n", "  inset: 0;\n  margin: auto;\n  width: fit-content;\n  height: fit-content;\n");
+    expect(run(auto, labelled([56.97, 51, 86.05, 28], [241.19, 51, 149.63, 28]))).toEqual([
+      "translate で、ラベル自身の幅と高さの半分だけ戻しましょう",
+    ]);
   });
 });
