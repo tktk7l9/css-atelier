@@ -30,13 +30,20 @@ import { gradientsTrack } from "./gradients.js";
 import { writingModesTrack } from "./writing-modes.js";
 import { stickyTrack } from "./sticky.js";
 import { formsTrack } from "./forms.js";
+import { textOverflowTrack } from "./text-overflow.js";
+import { hasPatternsTrack } from "./has-patterns.js";
+import { objectFitTrack } from "./object-fit.js";
+import { supportsTrack } from "./supports.js";
 
 /**
  * Catalogue order, roughly basics → modern → layout → responsive → polish.
  * Gradients follow the colour tracks (in oklch builds on oklch()), writing
  * modes follow logical properties, and sticky comes before scroll snap (whose
  * scroll-padding lesson uses a sticky header) and after grid (its sidebar
- * lesson is a grid item). The math functions come last: their lessons build on
+ * lesson is a grid item). Text overflow follows text wrapping, the :has()
+ * patterns follow the :has() basics in modern selectors, object-fit follows
+ * aspect ratio, and feature queries join the other conditional rules after
+ * container queries. The math functions come last: their lessons build on
  * custom properties, transitions and transforms from earlier tracks.
  */
 export const TRACKS: readonly Track[] = [
@@ -48,7 +55,9 @@ export const TRACKS: readonly Track[] = [
   colorFunctionsTrack,
   gradientsTrack,
   textWrapTrack,
+  textOverflowTrack,
   modernSelectorsTrack,
+  hasPatternsTrack,
   nestingTrack,
   scopeTrack,
   flexboxTrack,
@@ -57,11 +66,13 @@ export const TRACKS: readonly Track[] = [
   logicalPropsTrack,
   writingModesTrack,
   aspectRatioTrack,
+  objectFitTrack,
   anchorPositioningTrack,
   stickyTrack,
   scrollSnapTrack,
   mediaQueriesTrack,
   containerQueriesTrack,
+  supportsTrack,
   layersTrack,
   clipMaskTrack,
   filtersTrack,
