@@ -19,16 +19,26 @@ class FakeSheet {
   }
 }
 
-function mountFrame(): HTMLIFrameElement {
+/**
+ * `freshDocuments` makes every srcdoc load bring a new document, as a real
+ * browser does; by default the harness reuses the frame's one document.
+ */
+function mountFrame({ freshDocuments = false } = {}): HTMLIFrameElement {
   const iframe = document.createElement("iframe");
   document.body.append(iframe);
   const win = iframe.contentWindow as unknown as { CSSStyleSheet: typeof FakeSheet };
   win.CSSStyleSheet = FakeSheet;
+  if (freshDocuments) {
+    let current = document.implementation.createHTMLDocument("");
+    Object.defineProperty(iframe, "contentDocument", { get: () => current });
+    iframe.addEventListener("srcdoc-set", () => (current = document.implementation.createHTMLDocument("")));
+  }
   let srcdoc = "";
   Object.defineProperty(iframe, "srcdoc", {
     get: () => srcdoc,
     set: (v: string) => {
       srcdoc = v;
+      iframe.dispatchEvent(new Event("srcdoc-set"));
       const doc = iframe.contentDocument;
       const body = /<body>([\s\S]*)<\/body>/.exec(v)?.[1] ?? "";
       if (doc) doc.body.innerHTML = body;
@@ -37,6 +47,22 @@ function mountFrame(): HTMLIFrameElement {
   });
   return iframe;
 }
+
+/** The frame document's element with this data-id. */
+function frameEl(iframe: HTMLIFrameElement, id: string): HTMLElement {
+  const node = iframe.contentDocument?.querySelector<HTMLElement>(`[data-id="${id}"]`);
+  if (!node) throw new Error(`no [data-id="${id}"] in the frame`);
+  return node;
+}
+
+/** Dispatch a cancelable event; true when the default action was cancelled. */
+function cancelled(node: Element, event: Event): boolean {
+  return !node.dispatchEvent(event);
+}
+
+const mouse = (type = "click"): MouseEvent => new MouseEvent(type, { bubbles: true, cancelable: true });
+const key = (init: KeyboardEventInit): KeyboardEvent =>
+  new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init });
 
 afterEach(() => {
   document.body.innerHTML = "";
@@ -144,6 +170,70 @@ describe("createSandbox", () => {
     expect(iframe.srcdoc).toBe("");
     sandbox.setUserCSS("p { color: red }");
     expect(user.calls).toEqual(["p {}"]);
+  });
+
+  it("keeps links in the preview from taking the frame away from the lesson", async () => {
+    const iframe = mountFrame();
+    await createSandbox(iframe).load(
+      '<a data-id="hash" href="#">続きを読む</a><a href="/next"><b data-id="inside">中の文字</b></a>' +
+        '<map name="m"><area data-id="area" href="#" alt="領域"></map>' +
+        '<a data-id="plain">href なし</a><p data-id="text">本文</p>',
+      "",
+    );
+    expect(cancelled(frameEl(iframe, "hash"), mouse())).toBe(true);
+    // A click on the link's text still follows the link, so it is cancelled too.
+    expect(cancelled(frameEl(iframe, "inside"), mouse())).toBe(true);
+    expect(cancelled(frameEl(iframe, "area"), mouse())).toBe(true);
+    // A middle click would open the link in a new tab.
+    expect(cancelled(frameEl(iframe, "hash"), mouse("auxclick"))).toBe(true);
+    // Nothing else is touched: an anchor without href goes nowhere.
+    expect(cancelled(frameEl(iframe, "plain"), mouse())).toBe(false);
+    expect(cancelled(frameEl(iframe, "text"), mouse())).toBe(false);
+    // Events aimed at the document itself have no element to look at.
+    const doc = iframe.contentDocument!;
+    expect(!doc.dispatchEvent(mouse())).toBe(false);
+    expect(!doc.dispatchEvent(key({ key: "Enter" }))).toBe(false);
+  });
+
+  it("keeps forms in the preview from submitting, and leaves the other controls working", async () => {
+    const iframe = mountFrame();
+    await createSandbox(iframe).load(
+      '<form data-id="form"><input data-id="field"><textarea data-id="notes"></textarea>' +
+        '<input data-id="check" type="checkbox"><button data-id="submit">送る</button>' +
+        '<input data-id="image" type="image" alt="送る"><input data-id="send" type="submit">' +
+        '<button data-id="plain" type="button">ただのボタン</button></form>' +
+        '<input data-id="lone"><button data-id="lone-button">フォームの外</button>',
+      "",
+    );
+    expect(cancelled(frameEl(iframe, "submit"), mouse())).toBe(true);
+    expect(cancelled(frameEl(iframe, "image"), mouse())).toBe(true);
+    expect(cancelled(frameEl(iframe, "send"), mouse())).toBe(true);
+    expect(cancelled(frameEl(iframe, "form"), new Event("submit", { bubbles: true, cancelable: true }))).toBe(true);
+    // Enter in a form's field submits it (implicit submission).
+    expect(cancelled(frameEl(iframe, "field"), key({ key: "Enter" }))).toBe(true);
+
+    // Typing, confirming an IME conversion and new lines in a textarea stay as they are.
+    expect(cancelled(frameEl(iframe, "field"), key({ key: "a" }))).toBe(false);
+    expect(cancelled(frameEl(iframe, "field"), key({ key: "Enter", isComposing: true }))).toBe(false);
+    expect(cancelled(frameEl(iframe, "notes"), key({ key: "Enter" }))).toBe(false);
+    // Controls that submit nothing keep working: the checkbox still toggles.
+    const check = frameEl(iframe, "check") as HTMLInputElement;
+    expect(cancelled(check, mouse())).toBe(false);
+    expect(check.checked).toBe(true);
+    expect(cancelled(frameEl(iframe, "plain"), mouse())).toBe(false);
+    // Outside a form there is nothing to submit.
+    expect(cancelled(frameEl(iframe, "lone"), key({ key: "Enter" }))).toBe(false);
+    expect(cancelled(frameEl(iframe, "lone-button"), mouse())).toBe(false);
+  });
+
+  it("guards the new document that every srcdoc load brings", async () => {
+    const iframe = mountFrame({ freshDocuments: true });
+    const sandbox = createSandbox(iframe);
+    await sandbox.load('<a data-id="first" href="#">1</a>', "");
+    const firstDoc = iframe.contentDocument;
+    await sandbox.load('<a data-id="second" href="#">2</a>', "");
+    expect(iframe.contentDocument).not.toBe(firstDoc);
+    expect(cancelled(frameEl(iframe, "second"), mouse())).toBe(true);
   });
 
   it("creates fresh sheets per load so a new lesson never inherits old rules", async () => {

@@ -25,6 +25,7 @@ const YELLOW = "rgb(245, 196, 0)";
 const RED = "rgb(217, 54, 54)";
 const FIELD = "rgb(197, 205, 224)";
 const SRGB_BAR = `linear-gradient(to right, ${BRAND}, ${YELLOW})`;
+const GLASS = "rgba(255, 255, 255, 0.4)";
 
 const RECORDINGS: Record<string, Recording> = {
   "scope-root": {
@@ -188,12 +189,64 @@ const RECORDINGS: Record<string, Recording> = {
       untouched: { "border-top-color": FIELD },
     },
   },
+  "supports-selector": {
+    // The first plan starts selected; the fallback opens every detail.
+    starter: { d1: { display: "block" }, d2: { display: "block" } },
+    solution: { d1: { display: "block" }, d2: { display: "none" } },
+  },
+  "supports-or": {
+    starter: { caption: { "background-color": "rgba(255, 255, 255, 0.9)" } },
+    solution: { caption: { "background-color": GLASS } },
+  },
+  "has-sibling": {
+    starter: { title1: { "margin-bottom": "16px" }, title2: { "margin-bottom": "16px" } },
+    solution: { title1: { "margin-bottom": "4px" }, title2: { "margin-bottom": "16px" } },
+  },
+  "has-empty": {
+    starter: { none1: { display: "none" }, none2: { display: "none" } },
+    solution: { none1: { display: "none" }, none2: { display: "block" } },
+  },
 };
 
 // Lessons graded by geometry as well: the rects ([x, y, w, h], from
 // getBoundingClientRect) were recorded from the same real sandbox.
 type Box = readonly [number, number, number, number];
 type Recorded = Record<string, { readonly rect?: Box; readonly computed?: Record<string, string> }>;
+
+/** The three 120px thumbnails, with their recorded object-fit. */
+const thumbs = (fit: string, h = 120): Recorded => ({
+  t1: { rect: [0, 0, 120, h], computed: { "object-fit": fit } },
+  t2: { rect: [132, 0, 120, h], computed: { "object-fit": fit } },
+  t3: { rect: [264, 0, 120, h], computed: { "object-fit": fit } },
+});
+
+/** The two 140 × 80 logo boxes, with their recorded object-fit. */
+const logos = (fit: string, h = 80): Recorded => ({
+  wide: { rect: [0, 24.19, 140, h], computed: { "object-fit": fit } },
+  tall: { rect: [152, 24.19, 140, h], computed: { "object-fit": fit } },
+});
+
+/** Cards filling their grid cells: the fallback no longer applies. */
+const GRID_CARDS: Recorded = {
+  cards: { rect: [0, 0, 596, 104.78] },
+  c1: { rect: [0, 0, 190.66, 46.39] },
+  c2: { rect: [202.66, 0, 190.67, 46.39] },
+  c3: { rect: [405.33, 0, 190.67, 46.39] },
+};
+
+/** The three titles kept on one 41px line, with the recorded overflow-x. */
+const oneLineTitles = (overflow: string): Recorded => ({
+  t1: { rect: [1, 1, 238, 41], computed: { "overflow-x": overflow, "text-overflow": "ellipsis" } },
+  t2: { rect: [1, 42, 238, 41], computed: { "overflow-x": overflow, "text-overflow": "ellipsis" } },
+  t3: { rect: [1, 83, 238, 41], computed: { "overflow-x": overflow, "text-overflow": "ellipsis" } },
+});
+
+/** The chat row (280px wide), its bubble and the URL inside, with overflow-wrap as recorded on each. */
+const chat = (wrap: string, bubbleW: number, rowH: number, url: Box, urlWrap = wrap): Recorded => ({
+  msg: { rect: [0, 0, 280, rowH], computed: { "overflow-wrap": "normal" } },
+  bubble: { rect: [53, 9, bubbleW, rowH - 18], computed: { "overflow-wrap": wrap } },
+  url: { rect: url, computed: { "overflow-wrap": urlWrap } },
+});
 
 const GEOMETRY_RECORDINGS: Record<string, { readonly starter: Recorded; readonly solution: Recorded }> = {
   "math-round": {
@@ -302,6 +355,60 @@ const GEOMETRY_RECORDINGS: Record<string, { readonly starter: Recorded; readonly
     solution: {
       off: { rect: [0, 1.19, 20, 20], computed: { appearance: "none" } },
       on: { rect: [0, 33.58, 20, 20], computed: { appearance: "none" } },
+    },
+  },
+  "fit-cover": {
+    starter: thumbs("fill"),
+    solution: thumbs("cover"),
+  },
+  "fit-position": {
+    starter: { hero: { rect: [0, 0, 300, 120], computed: { "object-fit": "cover", "object-position": "50% 50%" } } },
+    solution: { hero: { rect: [0, 0, 300, 120], computed: { "object-fit": "cover", "object-position": "50% 0%" } } },
+  },
+  "fit-contain": {
+    starter: logos("cover"),
+    solution: logos("contain"),
+  },
+  // The float fallback's width: 31% is taken of the grid cell, so the cards shrink to 59px.
+  "supports-not": {
+    starter: {
+      cards: { rect: [0, 0, 596, 171.95] },
+      c1: { rect: [0, 0, 59.09, 68.78] },
+      c2: { rect: [202.66, 0, 59.09, 68.78] },
+      c3: { rect: [405.33, 0, 59.09, 68.78] },
+    },
+    solution: GRID_CARDS,
+  },
+  // One line is 24px plus 8px padding above and below and the 1px border.
+  "overflow-ellipsis": {
+    starter: {
+      t1: { rect: [1, 1, 238, 89], computed: { "overflow-x": "visible", "text-overflow": "ellipsis" } },
+      t2: { rect: [1, 90, 238, 65], computed: { "overflow-x": "visible", "text-overflow": "ellipsis" } },
+      t3: { rect: [1, 155, 238, 89], computed: { "overflow-x": "visible", "text-overflow": "ellipsis" } },
+    },
+    solution: oneLineTitles("hidden"),
+  },
+  "overflow-line-clamp": {
+    starter: { summary: { rect: [17, 41.39, 246, 168], computed: { "-webkit-line-clamp": "none", "overflow-y": "visible" } } },
+    solution: { summary: { rect: [17, 41.39, 246, 72], computed: { "-webkit-line-clamp": "3", "overflow-y": "hidden" } } },
+  },
+  // Unwrapped, the bubble is as wide as the URL (a flex item never shrinks below its min-content width).
+  "overflow-wrap-anywhere": {
+    starter: chat("normal", 548.73, 85.19, [65, 45.59, 524.73, 18]),
+    solution: chat("anywhere", 218, 136.38, [65, 45.59, 192.05, 69.19]),
+  },
+  "has-quantity": {
+    starter: {
+      a1: { rect: [0, 22.19, 107, 80.25] },
+      a3: { rect: [0, 108.44, 107, 80.25] },
+      b1: { rect: [240, 22.19, 107, 80.25] },
+      b3: { rect: [240, 108.44, 107, 80.25] },
+    },
+    solution: {
+      a1: { rect: [0, 22.19, 107, 80.25] },
+      a3: { rect: [0, 108.44, 107, 80.25] },
+      b1: { rect: [240, 22.19, 69.33, 51.98] },
+      b3: { rect: [390.66, 22.19, 69.34, 52] },
     },
   },
 };
@@ -545,6 +652,79 @@ describe("lessons replayed from recorded sandbox values", () => {
     );
     expect(deleted.failures).toEqual([":invalid の代わりに :user-invalid を使いましょう"]);
   });
+
+  it("keeps one plan's detail open whichever plan is picked, and wants the fallback moved, not deleted", () => {
+    const { challenge } = lessonById("supports-selector")!;
+    const run = (css: string, d1: string, d2: string): readonly string[] =>
+      evaluate(challenge.validators, snapshotOf(css, { d1: { display: d1 }, d2: { display: d2 } })).failures;
+    // Recorded: picking the second plan in the preview swaps which detail is open.
+    expect(run(challenge.solution, "none", "block")).toEqual([]);
+    expect(run(challenge.starterCSS, "block", "block")).toEqual([
+      "選んでいないプランの説明まで開いています（:has() に対応したブラウザでも、最後のルールが効いています）",
+    ]);
+    // Recorded: in a current browser, deleting the fallback looks the same as the answer.
+    const deleted = challenge.starterCSS.replace(/\/\* :has\(\) に対応していない[\s\S]*$/, "");
+    expect(run(deleted, "block", "none")).toEqual(["最後のルールを @supports not selector(:has(*)) { … } で囲みましょう"]);
+    // Recorded: a positive query keeps the fallback in a current browser.
+    expect(run(challenge.solution.replace("@supports not selector", "@supports selector"), "block", "block")).toHaveLength(1);
+    // Recorded: `not (selector(…))` and another selector inside :has() mean the same.
+    expect(run(challenge.solution.replace("not selector(:has(*))", "not (selector(:has(a, b)))"), "block", "none")).toEqual([]);
+    // Recorded: without the :has() rule, no detail opens at all.
+    const noHas = challenge.solution.replace(/\/\* 選んだプラン[^}]*\}\n/, "");
+    expect(run(noHas, "none", "none")).toEqual(["選んだプランの説明が開いていません（.plan:has(:checked) .detail のルールは残しておきましょう）"]);
+  });
+
+  it("wants the solid fallback behind `not ((…) or (…))`, kept, and with the parentheses right", () => {
+    const { challenge } = lessonById("supports-or")!;
+    const condition = "not ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)))";
+    const run = (css: string, background = GLASS): readonly string[] =>
+      evaluate(challenge.validators, snapshotOf(css, { caption: { "background-color": background } })).failures;
+    const solid = ".caption {\n  background: rgb(255 255 255 / 0.9);\n}\n";
+    // Recorded: every one of these leaves the caption see-through in a current browser.
+    expect(run(challenge.solution.replace(condition, "not (backdrop-filter: blur(8px))"))).toEqual([
+      "条件には backdrop-filter と -webkit-backdrop-filter の両方を入れて、or でつなぎましょう（Safari 17 以前は -webkit- 付きだけに対応）",
+    ]);
+    // An invalid condition drops the whole rule, so the fallback never applies anywhere.
+    expect(run(challenge.solution.replace(condition, "not (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))"))).toEqual([
+      "not と or を一緒に使うときは、or でつないだ全体をかっこで囲みます: not ((…) or (…))",
+    ]);
+    expect(run(challenge.solution.replace(condition, "not ((-webkit-backdrop-filter: blur(8px)) or (backdrop-filter: blur(8px)))"))).toEqual([]);
+    expect(run(challenge.starterCSS.replace(solid, ""))).toEqual([
+      "最後のルールを @supports not (…) { … } で囲みましょう（消してしまうと、すりガラスにできないブラウザで文字が読みにくくなります）",
+    ]);
+    expect(run(challenge.starterCSS.replace(solid, `@supports ${condition} {\n}\n`))).toEqual([
+      "濃い背景のルール（.caption { background: … }）は消さずに、@supports の中へ移しましょう",
+    ]);
+    // Recorded: the positive query keeps the solid background in a current browser.
+    expect(run(challenge.solution.replace("@supports not ((", "@supports (("), "rgba(255, 255, 255, 0.9)")).toEqual([
+      "すりガラスにできるブラウザでも、最後のルールの濃い背景が上書きしています。@supports not (…) で囲みましょう",
+    ]);
+  });
+
+  it("selects the heading followed by a lead, and the results box without any li, with :has()", () => {
+    const sibling = lessonById("has-sibling")!.challenge;
+    const margins = (a: string, b: string): Computed => ({ title1: { "margin-bottom": a }, title2: { "margin-bottom": b } });
+    const run = (css: string, computed: Computed): readonly string[] => evaluate(sibling.validators, snapshotOf(css, computed)).failures;
+    // Recorded for each selector below.
+    expect(run(sibling.solution.replace(":has(+ .lead)", ":has(~ .lead)"), margins("4px", "16px"))).toEqual([]);
+    expect(run(sibling.solution.replace(".title:has(+ .lead)", ".post:first-child .title"), margins("4px", "16px"))).toEqual([
+      ":has(+ .lead) で「直後に .lead が続く見出し」を選びましょう",
+    ]);
+    expect(run(sibling.solution.replace(".title:has(+ .lead)", ".title"), margins("4px", "4px"))).toEqual([
+      "リード文のない見出し（2 つ目の記事）の余白は 16px のままにしましょう",
+    ]);
+
+    const empty = lessonById("has-empty")!.challenge;
+    const shown = (a: string, b: string): Computed => ({ none1: { display: a }, none2: { display: b } });
+    const runEmpty = (css: string, computed: Computed): readonly string[] => evaluate(empty.validators, snapshotOf(css, computed)).failures;
+    expect(runEmpty(empty.solution.replace(".results:not(:has(li)) .none", ".none:has(+ .list:empty)"), shown("none", "block"))).toEqual([]);
+    expect(runEmpty(empty.solution.replace(".results:not(:has(li)) .none", ".none"), shown("block", "block"))).toEqual([
+      "結果がある欄にまで「見つかりませんでした」が表示されています",
+    ]);
+    expect(runEmpty(empty.solution.replace(".results:not(:has(li)) .none", ".results:last-child .none"), shown("none", "block"))).toEqual([
+      ":has() で「li がないこと」を調べましょう（:not(:has(li))）",
+    ]);
+  });
 });
 
 describe("lessons replayed from recorded sandbox geometry", () => {
@@ -735,5 +915,148 @@ describe("lessons replayed from recorded sandbox geometry", () => {
       }),
     );
     expect(tiny.failures).toEqual(["チェックボックスの大きさ（20px × 20px）は変えないでおきましょう"]);
+  });
+
+  it("wants every thumbnail cropped with cover, at its own size", () => {
+    const { challenge } = lessonById("fit-cover")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    // Recorded for each CSS below.
+    expect(run(challenge.solution.replace("cover", "contain"), thumbs("contain"))).toEqual([
+      "枠いっぱいに切り抜くのは cover です（contain は余白が残り、none は元の大きさのまま切り取ります）",
+    ]);
+    const firstOnly = thumbs("fill");
+    expect(
+      run(challenge.starterCSS + ".thumb:first-child { object-fit: cover; }\n", {
+        ...firstOnly,
+        t1: { ...firstOnly.t1, computed: { "object-fit": "cover" } },
+      }),
+    ).toEqual(["3 枚すべての写真（.thumb）に指定しましょう"]);
+    // Recorded: height: auto keeps the photo's proportions by shrinking the box to 120 × 80.
+    expect(run(challenge.starterCSS.replace("height: 120px;", "height: auto;"), thumbs("fill", 80))).toEqual([
+      "写真が縦横に引き伸ばされてゆがんでいます。.thumb に object-fit を指定しましょう",
+      "サムネイルの大きさ（120px × 120px）は変えないでおきましょう",
+    ]);
+  });
+
+  it("accepts any position at the top edge for the face, and keeps cover", () => {
+    const { challenge } = lessonById("fit-position")!;
+    const hero = (position: string, fit = "cover", h = 120): Recorded => ({
+      hero: { rect: [0, 0, 300, h], computed: { "object-fit": fit, "object-position": position } },
+    });
+    const passes = (position: string): boolean => evaluate(challenge.validators, geometrySnapshot(challenge.solution, hero(position))).passed;
+    // Recorded serializations: top / center top / top center → 50% 0%, left top → 0% 0%, 50% 0 → 50% 0px.
+    for (const position of ["50% 0%", "0% 0%", "50% 0px"]) expect(passes(position), position).toBe(true);
+    for (const position of ["50% 100%", "50% 10%", "50% 50%"]) expect(passes(position), position).toBe(false);
+    const contain = evaluate(challenge.validators, geometrySnapshot(challenge.solution.replace("cover", "contain"), hero("50% 0%", "contain")));
+    expect(contain.failures).toEqual(["object-fit: cover は残しておきましょう（外すと写真が引き伸ばされます）"]);
+    // Recorded: height: auto shows the whole portrait, 450px tall.
+    const tall = evaluate(challenge.validators, geometrySnapshot(challenge.starterCSS.replace("height: 120px;", "height: auto;"), hero("50% 50%", "cover", 450)));
+    expect(tall.failures).toEqual([
+      "顔のある写真の上端が見えていません。object-position で上（top）に寄せましょう",
+      "バナーの大きさ（300px × 120px）は変えないでおきましょう",
+    ]);
+  });
+
+  it("accepts contain or scale-down for the logos, nothing that crops or stretches them", () => {
+    const { challenge } = lessonById("fit-contain")!;
+    const passes = (fit: string, h = 80): boolean => evaluate(challenge.validators, geometrySnapshot(challenge.solution, logos(fit, h))).passed;
+    expect(passes("scale-down")).toBe(true);
+    for (const fit of ["none", "fill", "cover"]) expect(passes(fit), fit).toBe(false);
+    // Recorded: height: auto lets the cropped logos grow to 186px.
+    expect(passes("contain", 186)).toBe(false);
+  });
+
+  it("wants the float fallback moved into @supports not (display: grid), not deleted", () => {
+    const { challenge } = lessonById("supports-not")!;
+    const floats = ".card {\n  float: left;\n  width: 31%;\n  margin-right: 2%;\n}\n";
+    const run = (css: string): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, GRID_CARDS)).failures;
+    // Recorded: each of these lets the cards fill their cells in a current browser.
+    expect(run(challenge.starterCSS.replace(floats, ""))).toEqual(["古いブラウザ向けのルールを @supports not (display: grid) { … } で囲みましょう"]);
+    expect(run(challenge.starterCSS.replace(floats, "@supports not (display: grid) {\n}\n"))).toEqual([
+      "float のルールは消さずに、@supports not (display: grid) の中へ移しましょう（グリッドに対応していないブラウザでは、今もそれが頼りです）",
+    ]);
+    expect(run(challenge.starterCSS + "@supports (display: grid) {\n  .card { width: auto; margin: 0; }\n}\n")).toEqual([
+      "古いブラウザ向けのルールを @supports not (display: grid) { … } で囲みましょう",
+    ]);
+    expect(run(challenge.solution.replace("not (display: grid)", "not (display:grid)"))).toEqual([]);
+    expect(run(challenge.solution.replace("@supports not (display: grid) {\n", "@supports not (display: grid) {\n  .cards { overflow: hidden; }\n"))).toEqual([]);
+  });
+
+  it("needs nowrap, a hidden overflow and the ellipsis together for one-line titles", () => {
+    const { challenge } = lessonById("overflow-ellipsis")!;
+    const wrapped = GEOMETRY_RECORDINGS["overflow-ellipsis"].starter;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    // Recorded for each CSS below.
+    expect(run(challenge.solution.replace("  overflow: hidden;\n", ""), oneLineTitles("visible"))).toEqual([
+      "1 行に収まらない部分が、枠の右へはみ出しています。overflow: hidden で隠しましょう",
+    ]);
+    const hiddenButWrapped: Recorded = Object.fromEntries(
+      Object.entries(wrapped).map(([id, r]) => [id, { ...r, computed: { "overflow-x": "hidden", "text-overflow": "ellipsis" } }]),
+    );
+    expect(run(challenge.solution.replace("  white-space: nowrap;\n", ""), hiddenButWrapped)).toEqual([
+      "タイトルが折り返して 2 行以上になっています。white-space: nowrap で 1 行に収めましょう",
+    ]);
+    expect(run(challenge.solution.replace("white-space: nowrap", "text-wrap: nowrap"), oneLineTitles("hidden"))).toEqual([]);
+    expect(run(challenge.solution.replace("overflow: hidden", "overflow: clip"), oneLineTitles("clip"))).toEqual([]);
+    expect(run(challenge.solution.replace("overflow: hidden", "overflow: auto"), oneLineTitles("auto"))).toHaveLength(1);
+  });
+
+  it("clamps the summary with -webkit-line-clamp, not a fixed height, and hides the rest", () => {
+    const { challenge } = lessonById("overflow-line-clamp")!;
+    const summary = (h: number, clamp: string, overflow: string): Recorded => ({
+      summary: { rect: [17, 41.39, 246, h], computed: { "-webkit-line-clamp": clamp, "overflow-y": overflow } },
+    });
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    // Recorded: without overflow: hidden the box is clamped but the rest of the text still shows below it.
+    expect(run(challenge.solution.replace("  overflow: hidden;\n", ""), summary(72, "3", "visible"))).toEqual([
+      "4 行目からの文字が下にはみ出して見えています。overflow: hidden で隠しましょう",
+    ]);
+    expect(run(challenge.starterCSS.replace("  line-height: 24px;\n", "  line-height: 24px;\n  max-height: 72px;\n  overflow: hidden;\n"), summary(72, "none", "hidden"))).toEqual([
+      "最後の行に「…」を付けるには、高さではなく -webkit-line-clamp: 3 で行数を指定します",
+    ]);
+    // Recorded: without display: -webkit-box the clamp does nothing (7 lines); a clamp of 2 is 48px.
+    const tooTall = "要約が 3 行分（72px）の高さになっていません。display: -webkit-box・-webkit-box-orient: vertical・-webkit-line-clamp: 3 の 3 つをそろえましょう";
+    expect(run(challenge.solution.replace("  display: -webkit-box;\n", ""), summary(168, "3", "hidden"))).toEqual([tooTall]);
+    expect(run(challenge.solution.replace("-webkit-line-clamp: 3", "-webkit-line-clamp: 2"), summary(48, "2", "hidden"))).toEqual([tooTall]);
+  });
+
+  it("needs overflow-wrap: anywhere (or break-word with min-width: 0) for the bubble to shrink", () => {
+    const { challenge } = lessonById("overflow-wrap-anywhere")!;
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    const wrapped: Box = [65, 45.59, 192.05, 69.19];
+    // Recorded: break-word leaves the bubble's minimum width at the URL's length.
+    expect(run(challenge.solution.replace("anywhere", "break-word"), chat("break-word", 548.73, 85.19, [65, 45.59, 524.73, 18]))).toEqual([
+      "吹き出しが、長い URL に引っぱられて枠の右へはみ出しています（flex の子は、中身の最小の幅より縮みません）",
+    ]);
+    expect(run(challenge.solution.replace("  overflow-wrap: anywhere;\n", "  overflow-wrap: break-word;\n  min-width: 0;\n"), chat("break-word", 218, 136.38, wrapped))).toEqual([]);
+    // Recorded: min-width: 0 alone shrinks the bubble, but the URL still sticks out of it.
+    expect(run(challenge.solution.replace("  overflow-wrap: anywhere;\n", "  min-width: 0;\n"), chat("normal", 218, 85.19, [65, 45.59, 524.73, 18]))).toEqual([
+      "URL が吹き出しの右端からはみ出しています。単語の途中でも折り返せるようにしましょう",
+    ]);
+    // Recorded: word-break: break-all fits too, but breaks every word.
+    expect(run(challenge.solution.replace("overflow-wrap: anywhere", "word-break: break-all"), chat("normal", 218, 136.38, [65, 20, 187.34, 94.78]))).toEqual([
+      "URL の途中で折り返すには overflow-wrap を使いましょう（word-break: break-all だと、ふつうの英単語まで途中で切れます）",
+    ]);
+    // Recorded: overflow-wrap on the URL alone works the same.
+    expect(run(challenge.starterCSS + ".url { overflow-wrap: anywhere; }\n", chat("normal", 218, 136.38, wrapped, "anywhere"))).toEqual([]);
+  });
+
+  it("switches to three columns from the fifth photo, counted with :has()", () => {
+    const { challenge } = lessonById("has-quantity")!;
+    const { starter, solution } = GEOMETRY_RECORDINGS["has-quantity"];
+    const run = (css: string, rec: Recorded): readonly string[] => evaluate(challenge.validators, geometrySnapshot(css, rec)).failures;
+    // Recorded: :nth-child(4) turns the four-photo gallery into three columns as well.
+    const bothNarrow: Recorded = { ...solution, a1: { rect: [0, 22.19, 69.33, 51.98] }, a3: { rect: [150.66, 22.19, 69.34, 52] } };
+    expect(run(challenge.solution.replace(":nth-child(5)", ":nth-child(4)"), bothNarrow)).toEqual([
+      "4 枚のギャラリーまで 3 列になっています。5 枚以上のときだけにしましょう",
+    ]);
+    // Recorded: :nth-child(6) matches neither gallery.
+    expect(run(challenge.solution.replace(":nth-child(5)", ":nth-child(6)"), starter)).toEqual([
+      "5 枚のギャラリーが 3 列になっていません（3 枚目の写真が 1 段目に並びます）",
+    ]);
+    expect(run(challenge.solution.replace(".gallery:has(> :nth-child(5))", ".pair > div:last-child .gallery"), solution)).toEqual([
+      ":has() と :nth-child() で、子の数を数えましょう",
+    ]);
+    expect(run(challenge.solution.replace(":nth-child(5)", ":nth-last-child(5)"), solution)).toEqual([]);
   });
 });
