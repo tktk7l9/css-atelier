@@ -1842,3 +1842,744 @@ describe("multi-column, float / shape and table lessons: alternatives and wrong 
     expect(solution.c3!.rect).toEqual([0, 136, 128, 72]);
   });
 });
+
+// The flex and grid pattern, keyframe and generated-content lessons, recorded in
+// the real sandbox (headless Chrome 155) the way the app checks them: at the
+// lesson viewport and, for the two gallery lessons, again at 320px. Each entry
+// is one CSS a learner might write (the lesson's own starter or solution when
+// `css` is left out) with every message the app shows for it, in order.
+interface RecordedCase {
+  readonly lesson: string;
+  readonly name: string;
+  readonly css?: string;
+  readonly messages: readonly string[];
+  readonly elements: Recorded;
+  readonly states?: Readonly<Record<number, Recorded>>;
+}
+
+const PATTERN_LESSONS = [
+  "flex-wrap",
+  "flex-shrink",
+  "flex-auto-margin",
+  "grid-auto-fill",
+  "grid-full-row",
+  "grid-minmax-zero",
+  "keyframes-define",
+  "keyframes-steps",
+  "keyframes-fill-mode",
+  "before-content",
+  "after-attribute",
+  "counter-chapters",
+];
+
+const PATTERN_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "flex-wrap",
+    name: "starter",
+    messages: ["カードが 120px より細く縮んでいます（1 行に詰め込まれています）"],
+    elements: { shelf: { rect: [0, 0, 280, 90.78], computed: {"flex-wrap":"nowrap"} }, c1: { rect: [8, 8, 59, 74.78], computed: {"flex-wrap":"nowrap"} }, c2: { rect: [79, 8, 57.94, 74.78], computed: {"flex-wrap":"nowrap"} }, c3: { rect: [148.94, 8, 56.45, 74.78], computed: {"flex-wrap":"nowrap"} }, c4: { rect: [217.39, 8, 58.73, 74.78], computed: {"flex-wrap":"nowrap"} }, c5: { rect: [288.13, 8, 55.98, 74.78], computed: {"flex-wrap":"nowrap"} } },
+  },
+  {
+    lesson: "flex-wrap",
+    name: "solution",
+    messages: [],
+    elements: { shelf: { rect: [0, 0, 280, 205.56], computed: {"flex-wrap":"wrap"} }, c1: { rect: [8, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c2: { rect: [140, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c3: { rect: [8, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c4: { rect: [140, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c5: { rect: [8, 142.38, 120, 55.19], computed: {"flex-wrap":"nowrap"} } },
+  },
+  {
+    lesson: "flex-wrap",
+    name: "flex-flow row wrap",
+    css: ".shelf {\n  display: flex;\n  gap: 12px;\n  width: 280px;\n  padding: 8px;\n  border-radius: 12px;\n  background: #eef1f8;\n  flex-flow: row wrap;\n}\n.card {\n  display: grid;\n  width: 120px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n",
+    messages: [],
+    elements: { shelf: { rect: [0, 0, 280, 205.56], computed: {"flex-wrap":"wrap"} }, c1: { rect: [8, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c2: { rect: [140, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c3: { rect: [8, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c4: { rect: [140, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c5: { rect: [8, 142.38, 120, 55.19], computed: {"flex-wrap":"nowrap"} } },
+  },
+  {
+    lesson: "flex-wrap",
+    name: "wrap-reverse",
+    css: ".shelf {\n  display: flex;\n  gap: 12px;\n  width: 280px;\n  padding: 8px;\n  border-radius: 12px;\n  background: #eef1f8;\n  flex-wrap: wrap-reverse;\n}\n.card {\n  display: grid;\n  width: 120px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n",
+    messages: ["カードが棚の中で折り返していません（2 枚目は 1 枚目の横に、3 枚目は 2 行目の先頭に来るはずです）"],
+    elements: { shelf: { rect: [0, 0, 280, 205.56], computed: {"flex-wrap":"wrap-reverse"} }, c1: { rect: [8, 142.38, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c2: { rect: [140, 142.38, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c3: { rect: [8, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c4: { rect: [140, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c5: { rect: [8, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} } },
+  },
+  {
+    lesson: "flex-wrap",
+    name: "flex-shrink 0 on the cards",
+    css: ".shelf {\n  display: flex;\n  gap: 12px;\n  width: 280px;\n  padding: 8px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card {\n  display: grid;\n  width: 120px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n.card {\n  flex-shrink: 0;\n}\n",
+    messages: ["カードが棚の中で折り返していません（2 枚目は 1 枚目の横に、3 枚目は 2 行目の先頭に来るはずです）"],
+    elements: { shelf: { rect: [0, 0, 280, 71.19], computed: {"flex-wrap":"nowrap"} }, c1: { rect: [8, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c2: { rect: [140, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c3: { rect: [272, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c4: { rect: [404, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c5: { rect: [536, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} } },
+  },
+  {
+    lesson: "flex-wrap",
+    name: "column direction",
+    css: ".shelf {\n  display: flex;\n  gap: 12px;\n  width: 280px;\n  padding: 8px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card {\n  display: grid;\n  width: 120px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n.shelf {\n  flex-direction: column;\n}\n",
+    messages: ["カードが棚の中で折り返していません（2 枚目は 1 枚目の横に、3 枚目は 2 行目の先頭に来るはずです）"],
+    elements: { shelf: { rect: [0, 0, 280, 339.94], computed: {"flex-wrap":"nowrap"} }, c1: { rect: [8, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c2: { rect: [8, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c3: { rect: [8, 142.38, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c4: { rect: [8, 209.56, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c5: { rect: [8, 276.75, 120, 55.19], computed: {"flex-wrap":"nowrap"} } },
+  },
+  {
+    lesson: "flex-wrap",
+    name: "two-column grid",
+    css: ".shelf {\n  display: flex;\n  gap: 12px;\n  width: 280px;\n  padding: 8px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card {\n  display: grid;\n  width: 120px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n.shelf {\n  display: grid;\n  grid-template-columns: repeat(2, 120px);\n}\n",
+    messages: ["grid で 2 列にしても見た目は同じですが、ここでは flex-wrap: wrap で折り返しましょう（カードの数や幅が変わっても、入るだけ並びます）"],
+    elements: { shelf: { rect: [0, 0, 280, 205.56], computed: {"flex-wrap":"nowrap"} }, c1: { rect: [8, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c2: { rect: [140, 8, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c3: { rect: [8, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c4: { rect: [140, 75.19, 120, 55.19], computed: {"flex-wrap":"nowrap"} }, c5: { rect: [8, 142.38, 120, 55.19], computed: {"flex-wrap":"nowrap"} } },
+  },
+  {
+    lesson: "flex-shrink",
+    name: "starter",
+    messages: ["アイコンが横につぶれています（幅が 48px より狭く、円になっていません）"],
+    elements: { row: { rect: [0, 0, 280, 87], computed: {"flex-shrink":"1"} }, avatar: { rect: [12, 12, 18.02, 48], computed: {"flex-shrink":"1"} }, text: { rect: [42.02, 12, 225.98, 63], computed: {"flex-shrink":"1"} } },
+  },
+  {
+    lesson: "flex-shrink",
+    name: "solution",
+    messages: [],
+    elements: { row: { rect: [0, 0, 280, 108], computed: {"flex-shrink":"1"} }, avatar: { rect: [12, 12, 48, 48], computed: {"flex-shrink":"0"} }, text: { rect: [72, 12, 196, 84], computed: {"flex-shrink":"1"} } },
+  },
+  {
+    lesson: "flex-shrink",
+    name: "flex none",
+    css: ".row {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.avatar {\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #2f5fd0, #2f9d5b);\n  flex: none;\n}\n.text {\n  margin: 0;\n  font-size: 14px;\n  line-height: 1.5;\n}\n",
+    messages: [],
+    elements: { row: { rect: [0, 0, 280, 108], computed: {"flex-shrink":"1"} }, avatar: { rect: [12, 12, 48, 48], computed: {"flex-shrink":"0"} }, text: { rect: [72, 12, 196, 84], computed: {"flex-shrink":"1"} } },
+  },
+  {
+    lesson: "flex-shrink",
+    name: "flex 0 0 48px",
+    css: ".row {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.avatar {\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #2f5fd0, #2f9d5b);\n  flex: 0 0 48px;\n}\n.text {\n  margin: 0;\n  font-size: 14px;\n  line-height: 1.5;\n}\n",
+    messages: [],
+    elements: { row: { rect: [0, 0, 280, 108], computed: {"flex-shrink":"1"} }, avatar: { rect: [12, 12, 48, 48], computed: {"flex-shrink":"0"} }, text: { rect: [72, 12, 196, 84], computed: {"flex-shrink":"1"} } },
+  },
+  {
+    lesson: "flex-shrink",
+    name: "min-width 48px",
+    css: ".row {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.avatar {\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #2f5fd0, #2f9d5b);\n  min-width: 48px;\n}\n.text {\n  margin: 0;\n  font-size: 14px;\n  line-height: 1.5;\n}\n",
+    messages: ["幅は守れていますが、アイコン自身に flex-shrink: 0 を指定しましょう（「この要素は縮めない」と書くのがいちばん直接的で、アイコンの大きさを変えても書き直しが要りません）"],
+    elements: { row: { rect: [0, 0, 280, 108], computed: {"flex-shrink":"1"} }, avatar: { rect: [12, 12, 48, 48], computed: {"flex-shrink":"1"} }, text: { rect: [72, 12, 196, 84], computed: {"flex-shrink":"1"} } },
+  },
+  {
+    lesson: "flex-shrink",
+    name: "flex 1 on the text",
+    css: ".row {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.avatar {\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #2f5fd0, #2f9d5b);\n}\n.text {\n  margin: 0;\n  font-size: 14px;\n  line-height: 1.5;\n}\n.text {\n  flex: 1;\n}\n",
+    messages: ["幅は守れていますが、アイコン自身に flex-shrink: 0 を指定しましょう（「この要素は縮めない」と書くのがいちばん直接的で、アイコンの大きさを変えても書き直しが要りません）"],
+    elements: { row: { rect: [0, 0, 280, 108], computed: {"flex-shrink":"1"} }, avatar: { rect: [12, 12, 48, 48], computed: {"flex-shrink":"1"} }, text: { rect: [72, 12, 196, 84], computed: {"flex-shrink":"1"} } },
+  },
+  {
+    lesson: "flex-shrink",
+    name: "flex-shrink 0 on the text",
+    css: ".row {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.avatar {\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #2f5fd0, #2f9d5b);\n}\n.text {\n  margin: 0;\n  font-size: 14px;\n  line-height: 1.5;\n}\n.text {\n  flex-shrink: 0;\n}\n",
+    messages: ["アイコンが横につぶれています（幅が 48px より狭く、円になっていません）"],
+    elements: { row: { rect: [0, 0, 280, 72], computed: {"flex-shrink":"1"} }, avatar: { rect: [12, 12, 0, 48], computed: {"flex-shrink":"1"} }, text: { rect: [24, 12, 601.86, 21], computed: {"flex-shrink":"0"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "starter",
+    messages: ["ログインボタンが右端（余白 12px の位置）にありません"],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [79.13, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [123.13, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [181.13, 8, 78.61, 31.59], computed: {"margin-left":"0px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "solution",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [79.13, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [123.13, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"324.266px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "margin-inline-start auto",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n  margin-inline-start: auto;\n}\n",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [79.13, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [123.13, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"324.266px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "margin shorthand",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n  margin: 0 0 0 auto;\n}\n",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [79.13, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [123.13, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"324.266px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "auto margin after the last link",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n}\n.link + .link {\n  margin-right: auto;\n}\n",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [79.13, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [123.13, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"324.266px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"0px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "space-between",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n}\n",
+    messages: ["リンクがロゴから離れています（余りはログインボタンの手前にだけ入れて、ロゴとリンクは左に詰めたままにします）"],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [187.22, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [339.3, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"0px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "flex-end",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n}\n",
+    messages: ["ボタンの左のマージンを auto にして、余ったスペースを吸収させましょう（margin-left: auto）"],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [336.27, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [403.39, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [447.39, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"0px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "auto margin after the logo",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n}\n.logo {\n  margin-right: auto;\n}\n",
+    messages: ["リンクがロゴから離れています（余りはログインボタンの手前にだけ入れて、ロゴとリンクは左に詰めたままにします）"],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"324.266px"} }, l1: { rect: [403.39, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [447.39, 14, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"0px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "absolute button",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n}\n.login {\n  position: absolute;\n  right: 12px;\n}\n",
+    messages: ["ボタンの左のマージンを auto にして、余ったスペースを吸収させましょう（margin-left: auto）"],
+    elements: { nav: { rect: [0, 0, 596, 38.39], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 8, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [79.13, 9.39, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [123.13, 9.39, 42, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 3.39, 78.61, 31.59], computed: {"margin-left":"0px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "flex-auto-margin",
+    name: "growing last link",
+    css: ".nav {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  padding: 8px 12px;\n  background: #eef1f8;\n}\n.logo {\n  color: #2f5fd0;\n}\n.link {\n  color: #18203a;\n  font-size: 14px;\n}\n.login {\n  padding: 6px 12px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n  text-decoration: none;\n}\n.link + .link {\n  flex-grow: 1;\n}\n",
+    messages: ["ボタンの左のマージンを auto にして、余ったスペースを吸収させましょう（margin-left: auto）"],
+    elements: { nav: { rect: [0, 0, 596, 47.59], computed: {"margin-left":"0px","margin-right":"0px"} }, logo: { rect: [12, 12.59, 51.13, 22.39], computed: {"margin-left":"0px","margin-right":"0px"} }, l1: { rect: [79.13, 14, 28, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, l2: { rect: [123.13, 14, 366.27, 19.59], computed: {"margin-left":"0px","margin-right":"0px"} }, login: { rect: [505.39, 8, 78.61, 31.59], computed: {"margin-left":"0px","margin-right":"0px"} } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "starter",
+    messages: ["grid-template-columns を repeat(auto-fill, minmax(120px, 1fr)) にして、列の数をブラウザに任せましょう（列の数を決め打ちしたり、メディアクエリで切り替えたりせずに）","幅 320px で 2 列になっていません（タイルが 120px より細くならないよう、入るだけの列にします）"],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 131, 56] }, t2: { rect: [143, 0, 131, 56] }, t3: { rect: [286, 0, 131, 56] }, t4: { rect: [429, 0, 131, 56] }, t5: { rect: [0, 68, 131, 56] }, t6: { rect: [143, 68, 131, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 124] }, t1: { rect: [0, 0, 71, 56] }, t2: { rect: [83, 0, 71, 56] }, t3: { rect: [166, 0, 71, 56] }, t4: { rect: [249, 0, 71, 56] }, t5: { rect: [0, 68, 71, 56] }, t6: { rect: [83, 68, 71, 56] } } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "solution",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 131, 56] }, t2: { rect: [143, 0, 131, 56] }, t3: { rect: [286, 0, 131, 56] }, t4: { rect: [429, 0, 131, 56] }, t5: { rect: [0, 68, 131, 56] }, t6: { rect: [143, 68, 131, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 192] }, t1: { rect: [0, 0, 154, 56] }, t2: { rect: [166, 0, 154, 56] }, t3: { rect: [0, 68, 154, 56] }, t4: { rect: [166, 68, 154, 56] }, t5: { rect: [0, 136, 154, 56] }, t6: { rect: [166, 136, 154, 56] } } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "auto-fit",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));\n  gap: 12px;\n}\n.tile {\n  height: 56px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 131, 56] }, t2: { rect: [143, 0, 131, 56] }, t3: { rect: [286, 0, 131, 56] }, t4: { rect: [429, 0, 131, 56] }, t5: { rect: [0, 68, 131, 56] }, t6: { rect: [143, 68, 131, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 192] }, t1: { rect: [0, 0, 154, 56] }, t2: { rect: [166, 0, 154, 56] }, t3: { rect: [0, 68, 154, 56] }, t4: { rect: [166, 68, 154, 56] }, t5: { rect: [0, 136, 154, 56] }, t6: { rect: [166, 136, 154, 56] } } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "minmax 110px",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));\n  gap: 12px;\n}\n.tile {\n  height: 56px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 131, 56] }, t2: { rect: [143, 0, 131, 56] }, t3: { rect: [286, 0, 131, 56] }, t4: { rect: [429, 0, 131, 56] }, t5: { rect: [0, 68, 131, 56] }, t6: { rect: [143, 68, 131, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 192] }, t1: { rect: [0, 0, 154, 56] }, t2: { rect: [166, 0, 154, 56] }, t3: { rect: [0, 68, 154, 56] }, t4: { rect: [166, 68, 154, 56] }, t5: { rect: [0, 136, 154, 56] }, t6: { rect: [166, 136, 154, 56] } } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "minmax 100px (five columns)",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));\n  gap: 12px;\n}\n.tile {\n  height: 56px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: ["幅 560px で 4 列になっていません（1 段目に 4 枚、5 枚目は 2 段目の先頭に来るはずです）"],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 102.39, 56] }, t2: { rect: [114.39, 0, 102.41, 56] }, t3: { rect: [228.8, 0, 102.39, 56] }, t4: { rect: [343.19, 0, 102.41, 56] }, t5: { rect: [457.59, 0, 102.41, 56] }, t6: { rect: [0, 68, 102.39, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 192] }, t1: { rect: [0, 0, 154, 56] }, t2: { rect: [166, 0, 154, 56] }, t3: { rect: [0, 68, 154, 56] }, t4: { rect: [166, 68, 154, 56] }, t5: { rect: [0, 136, 154, 56] }, t6: { rect: [166, 136, 154, 56] } } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "fixed 120px tracks",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, 120px);\n  gap: 12px;\n}\n.tile {\n  height: 56px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: ["タイルが行の幅いっぱいに広がっていません（120px 以上の列を、余りを分け合って広げます）","幅 320px で 2 列になっていません（タイルが 120px より細くならないよう、入るだけの列にします）"],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 120, 56] }, t2: { rect: [132, 0, 120, 56] }, t3: { rect: [264, 0, 120, 56] }, t4: { rect: [396, 0, 120, 56] }, t5: { rect: [0, 68, 120, 56] }, t6: { rect: [132, 68, 120, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 192] }, t1: { rect: [0, 0, 120, 56] }, t2: { rect: [132, 0, 120, 56] }, t3: { rect: [0, 68, 120, 56] }, t4: { rect: [132, 68, 120, 56] }, t5: { rect: [0, 136, 120, 56] }, t6: { rect: [132, 136, 120, 56] } } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "media query",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(4, 1fr);\n  gap: 12px;\n}\n.tile {\n  height: 56px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n@media (max-width: 400px) {\n  .gallery {\n    grid-template-columns: repeat(2, 1fr);\n  }\n}\n",
+    messages: ["grid-template-columns を repeat(auto-fill, minmax(120px, 1fr)) にして、列の数をブラウザに任せましょう（列の数を決め打ちしたり、メディアクエリで切り替えたりせずに）"],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 131, 56] }, t2: { rect: [143, 0, 131, 56] }, t3: { rect: [286, 0, 131, 56] }, t4: { rect: [429, 0, 131, 56] }, t5: { rect: [0, 68, 131, 56] }, t6: { rect: [143, 68, 131, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 192] }, t1: { rect: [0, 0, 154, 56] }, t2: { rect: [166, 0, 154, 56] }, t3: { rect: [0, 68, 154, 56] }, t4: { rect: [166, 68, 154, 56] }, t5: { rect: [0, 136, 154, 56] }, t6: { rect: [166, 136, 154, 56] } } },
+  },
+  {
+    lesson: "grid-auto-fill",
+    name: "flex wrap",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(4, 1fr);\n  gap: 12px;\n}\n.tile {\n  height: 56px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n}\n.tile {\n  flex: 1 1 120px;\n}\n",
+    messages: ["2 段目のタイルが 1 段目と同じ列の幅になっていません（グリッドの列にそろえましょう）"],
+    elements: { gallery: { rect: [0, 0, 560, 124] }, t1: { rect: [0, 0, 131, 56] }, t2: { rect: [143, 0, 131, 56] }, t3: { rect: [286, 0, 131, 56] }, t4: { rect: [429, 0, 131, 56] }, t5: { rect: [0, 68, 274, 56] }, t6: { rect: [286, 68, 274, 56] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 192] }, t1: { rect: [0, 0, 154, 56] }, t2: { rect: [166, 0, 154, 56] }, t3: { rect: [0, 68, 154, 56] }, t4: { rect: [166, 68, 154, 56] }, t5: { rect: [0, 136, 154, 56] }, t6: { rect: [166, 136, 154, 56] } } },
+  },
+  {
+    lesson: "grid-full-row",
+    name: "starter",
+    messages: ["見出し（10 月・9 月）が行の幅いっぱいに広がっていません","幅 320px で、見出しが行の幅いっぱいに広がっていません"],
+    elements: { gallery: { rect: [0, 0, 560, 104] }, oct: { rect: [0, 0, 131, 48] }, t1: { rect: [143, 0, 131, 48] }, t2: { rect: [286, 0, 131, 48] }, t3: { rect: [429, 0, 131, 48] }, sep: { rect: [0, 56, 131, 48] }, t4: { rect: [143, 56, 131, 48] }, t5: { rect: [286, 56, 131, 48] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 216] }, oct: { rect: [0, 0, 154, 48] }, t1: { rect: [166, 0, 154, 48] }, t2: { rect: [0, 56, 154, 48] }, t3: { rect: [166, 56, 154, 48] }, sep: { rect: [0, 112, 154, 48] }, t4: { rect: [166, 112, 154, 48] }, t5: { rect: [0, 168, 154, 48] } } },
+  },
+  {
+    lesson: "grid-full-row",
+    name: "solution",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 560, 159.19] }, oct: { rect: [0, 0, 560, 19.59] }, t1: { rect: [0, 27.59, 131, 48] }, t2: { rect: [143, 27.59, 131, 48] }, t3: { rect: [286, 27.59, 131, 48] }, sep: { rect: [0, 83.59, 560, 19.59] }, t4: { rect: [0, 111.19, 131, 48] }, t5: { rect: [143, 111.19, 131, 48] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 215.19] }, oct: { rect: [0, 0, 320, 19.59] }, t1: { rect: [0, 27.59, 154, 48] }, t2: { rect: [166, 27.59, 154, 48] }, t3: { rect: [0, 83.59, 154, 48] }, sep: { rect: [0, 139.59, 320, 19.59] }, t4: { rect: [0, 167.19, 154, 48] }, t5: { rect: [166, 167.19, 154, 48] } } },
+  },
+  {
+    lesson: "grid-full-row",
+    name: "-1 / 1",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));\n  gap: 8px 12px;\n}\n.month {\n  margin: 0;\n  font-size: 14px;\n  grid-column: -1 / 1;\n}\n.tile {\n  height: 48px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 560, 159.19] }, oct: { rect: [0, 0, 560, 19.59] }, t1: { rect: [0, 27.59, 131, 48] }, t2: { rect: [143, 27.59, 131, 48] }, t3: { rect: [286, 27.59, 131, 48] }, sep: { rect: [0, 83.59, 560, 19.59] }, t4: { rect: [0, 111.19, 131, 48] }, t5: { rect: [143, 111.19, 131, 48] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 215.19] }, oct: { rect: [0, 0, 320, 19.59] }, t1: { rect: [0, 27.59, 154, 48] }, t2: { rect: [166, 27.59, 154, 48] }, t3: { rect: [0, 83.59, 154, 48] }, sep: { rect: [0, 139.59, 320, 19.59] }, t4: { rect: [0, 167.19, 154, 48] }, t5: { rect: [166, 167.19, 154, 48] } } },
+  },
+  {
+    lesson: "grid-full-row",
+    name: "longhands",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));\n  gap: 8px 12px;\n}\n.month {\n  margin: 0;\n  font-size: 14px;\n  grid-column-start: 1;\n  grid-column-end: -1;\n}\n.tile {\n  height: 48px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 560, 159.19] }, oct: { rect: [0, 0, 560, 19.59] }, t1: { rect: [0, 27.59, 131, 48] }, t2: { rect: [143, 27.59, 131, 48] }, t3: { rect: [286, 27.59, 131, 48] }, sep: { rect: [0, 83.59, 560, 19.59] }, t4: { rect: [0, 111.19, 131, 48] }, t5: { rect: [143, 111.19, 131, 48] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 215.19] }, oct: { rect: [0, 0, 320, 19.59] }, t1: { rect: [0, 27.59, 154, 48] }, t2: { rect: [166, 27.59, 154, 48] }, t3: { rect: [0, 83.59, 154, 48] }, sep: { rect: [0, 139.59, 320, 19.59] }, t4: { rect: [0, 167.19, 154, 48] }, t5: { rect: [166, 167.19, 154, 48] } } },
+  },
+  {
+    lesson: "grid-full-row",
+    name: "span 4",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));\n  gap: 8px 12px;\n}\n.month {\n  margin: 0;\n  font-size: 14px;\n  grid-column: span 4;\n}\n.tile {\n  height: 48px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: ["幅 320px で、写真が 2 列に並んでいません（span 4 のように列の数を決め打ちすると、列が足りない幅では空の列が足されます）"],
+    elements: { gallery: { rect: [0, 0, 560, 159.19] }, oct: { rect: [0, 0, 560, 19.59] }, t1: { rect: [0, 27.59, 131, 48] }, t2: { rect: [143, 27.59, 131, 48] }, t3: { rect: [286, 27.59, 131, 48] }, sep: { rect: [0, 83.59, 560, 19.59] }, t4: { rect: [0, 111.19, 131, 48] }, t5: { rect: [143, 111.19, 131, 48] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 159.19] }, oct: { rect: [0, 0, 320, 19.59] }, t1: { rect: [0, 27.59, 142, 48] }, t2: { rect: [154, 27.59, 142, 48] }, t3: { rect: [308, 27.59, 0, 48] }, sep: { rect: [0, 83.59, 320, 19.59] }, t4: { rect: [0, 111.19, 142, 48] }, t5: { rect: [154, 111.19, 142, 48] } } },
+  },
+  {
+    lesson: "grid-full-row",
+    name: "1 / 5",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));\n  gap: 8px 12px;\n}\n.month {\n  margin: 0;\n  font-size: 14px;\n  grid-column: 1 / 5;\n}\n.tile {\n  height: 48px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: ["幅 320px で、写真が 2 列に並んでいません（span 4 のように列の数を決め打ちすると、列が足りない幅では空の列が足されます）"],
+    elements: { gallery: { rect: [0, 0, 560, 159.19] }, oct: { rect: [0, 0, 560, 19.59] }, t1: { rect: [0, 27.59, 131, 48] }, t2: { rect: [143, 27.59, 131, 48] }, t3: { rect: [286, 27.59, 131, 48] }, sep: { rect: [0, 83.59, 560, 19.59] }, t4: { rect: [0, 111.19, 131, 48] }, t5: { rect: [143, 111.19, 131, 48] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 159.19] }, oct: { rect: [0, 0, 320, 19.59] }, t1: { rect: [0, 27.59, 142, 48] }, t2: { rect: [154, 27.59, 142, 48] }, t3: { rect: [308, 27.59, 0, 48] }, sep: { rect: [0, 83.59, 320, 19.59] }, t4: { rect: [0, 111.19, 142, 48] }, t5: { rect: [154, 111.19, 142, 48] } } },
+  },
+  {
+    lesson: "grid-full-row",
+    name: "span 2",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));\n  gap: 8px 12px;\n}\n.month {\n  margin: 0;\n  font-size: 14px;\n  grid-column: span 2;\n}\n.tile {\n  height: 48px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n",
+    messages: ["見出し（10 月・9 月）が行の幅いっぱいに広がっていません"],
+    elements: { gallery: { rect: [0, 0, 560, 160] }, oct: { rect: [0, 0, 274, 48] }, t1: { rect: [286, 0, 131, 48] }, t2: { rect: [429, 0, 131, 48] }, t3: { rect: [0, 56, 131, 48] }, sep: { rect: [143, 56, 274, 48] }, t4: { rect: [429, 56, 131, 48] }, t5: { rect: [0, 112, 131, 48] } },
+    states: { 320: { gallery: { rect: [0, 0, 320, 215.19] }, oct: { rect: [0, 0, 320, 19.59] }, t1: { rect: [0, 27.59, 154, 48] }, t2: { rect: [166, 27.59, 154, 48] }, t3: { rect: [0, 83.59, 154, 48] }, sep: { rect: [0, 139.59, 320, 19.59] }, t4: { rect: [0, 167.19, 154, 48] }, t5: { rect: [166, 167.19, 154, 48] } } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "starter",
+    messages: ["説明とコードの列の幅がそろっていません（長いコマンドの行のぶん、コードの列が広がっています）"],
+    elements: { docs: { rect: [0, 0, 596, 103.38], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 145.5, 103.38], computed: {"min-width":"auto","overflow-x":"visible"} }, code: { rect: [157.5, 0, 438.5, 103.38], computed: {"min-width":"auto","overflow-x":"visible"} }, pre: { rect: [165.5, 8, 422.5, 18.19], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "solution",
+    messages: [],
+    elements: { docs: { rect: [0, 0, 596, 64.19], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, code: { rect: [304, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, pre: { rect: [312, 8, 276, 33.19], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "two minmax tracks",
+    css: ".docs {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);\n  gap: 12px;\n}\n.note h3 {\n  margin: 0 0 4px;\n  font-size: 15px;\n}\n.note p {\n  margin: 0;\n  font-size: 14px;\n}\n.code {\n  padding: 8px;\n  border-radius: 8px;\n  background: #18203a;\n}\n.code pre {\n  margin: 0;\n  overflow-x: auto;\n  color: #fff;\n  font-size: 13px;\n}\n",
+    messages: [],
+    elements: { docs: { rect: [0, 0, 596, 64.19], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, code: { rect: [304, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, pre: { rect: [312, 8, 276, 33.19], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "min-width 0 on the code",
+    css: ".docs {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.note h3 {\n  margin: 0 0 4px;\n  font-size: 15px;\n}\n.note p {\n  margin: 0;\n  font-size: 14px;\n}\n.code {\n  padding: 8px;\n  border-radius: 8px;\n  background: #18203a;\n}\n.code pre {\n  margin: 0;\n  overflow-x: auto;\n  color: #fff;\n  font-size: 13px;\n}\n.code {\n  min-width: 0;\n}\n",
+    messages: [],
+    elements: { docs: { rect: [0, 0, 596, 64.19], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, code: { rect: [304, 0, 292, 64.19], computed: {"min-width":"0px","overflow-x":"visible"} }, pre: { rect: [312, 8, 276, 33.19], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "overflow hidden on the code",
+    css: ".docs {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.note h3 {\n  margin: 0 0 4px;\n  font-size: 15px;\n}\n.note p {\n  margin: 0;\n  font-size: 14px;\n}\n.code {\n  padding: 8px;\n  border-radius: 8px;\n  background: #18203a;\n}\n.code pre {\n  margin: 0;\n  overflow-x: auto;\n  color: #fff;\n  font-size: 13px;\n}\n.code {\n  overflow: hidden;\n}\n",
+    messages: [],
+    elements: { docs: { rect: [0, 0, 596, 64.19], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, code: { rect: [304, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"hidden"} }, pre: { rect: [312, 8, 276, 33.19], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "min-width 0 on the note",
+    css: ".docs {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.note h3 {\n  margin: 0 0 4px;\n  font-size: 15px;\n}\n.note p {\n  margin: 0;\n  font-size: 14px;\n}\n.code {\n  padding: 8px;\n  border-radius: 8px;\n  background: #18203a;\n}\n.code pre {\n  margin: 0;\n  overflow-x: auto;\n  color: #fff;\n  font-size: 13px;\n}\n.note {\n  min-width: 0;\n}\n",
+    messages: ["説明とコードの列の幅がそろっていません（長いコマンドの行のぶん、コードの列が広がっています）"],
+    elements: { docs: { rect: [0, 0, 596, 103.38], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 145.5, 103.38], computed: {"min-width":"0px","overflow-x":"visible"} }, code: { rect: [157.5, 0, 438.5, 103.38], computed: {"min-width":"auto","overflow-x":"visible"} }, pre: { rect: [165.5, 8, 422.5, 18.19], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "percentage tracks",
+    css: ".docs {\n  display: grid;\n  grid-template-columns: calc(50% - 6px) calc(50% - 6px);\n  gap: 12px;\n}\n.note h3 {\n  margin: 0 0 4px;\n  font-size: 15px;\n}\n.note p {\n  margin: 0;\n  font-size: 14px;\n}\n.code {\n  padding: 8px;\n  border-radius: 8px;\n  background: #18203a;\n}\n.code pre {\n  margin: 0;\n  overflow-x: auto;\n  color: #fff;\n  font-size: 13px;\n}\n",
+    messages: ["1fr のまま、列の最小の幅を 0 にしましょう（grid-template-columns: repeat(2, minmax(0, 1fr))。50% などの固定の幅や、コードの折り返しでそろえるのではなく）"],
+    elements: { docs: { rect: [0, 0, 596, 64.19], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, code: { rect: [304, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, pre: { rect: [312, 8, 276, 33.19], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "grid-minmax-zero",
+    name: "wrapped code",
+    css: ".docs {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.note h3 {\n  margin: 0 0 4px;\n  font-size: 15px;\n}\n.note p {\n  margin: 0;\n  font-size: 14px;\n}\n.code {\n  padding: 8px;\n  border-radius: 8px;\n  background: #18203a;\n}\n.code pre {\n  margin: 0;\n  overflow-x: auto;\n  color: #fff;\n  font-size: 13px;\n}\n.code pre {\n  white-space: pre-wrap;\n}\n",
+    messages: ["1fr のまま、列の最小の幅を 0 にしましょう（grid-template-columns: repeat(2, minmax(0, 1fr))。50% などの固定の幅や、コードの折り返しでそろえるのではなく）"],
+    elements: { docs: { rect: [0, 0, 596, 64.19], computed: {"min-width":"0px","overflow-x":"visible"} }, note: { rect: [0, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, code: { rect: [304, 0, 292, 64.19], computed: {"min-width":"auto","overflow-x":"visible"} }, pre: { rect: [312, 8, 276, 36.38], computed: {"min-width":"0px","overflow-x":"auto"} } },
+  },
+  {
+    lesson: "keyframes-define",
+    name: "starter",
+    messages: ["ボールが動いていません（@keyframes slide を書きましょう。名前は animation の slide とそろえます）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32] }, b1: { rect: [60, 70.39, 32, 32] }, l2: { rect: [60, 110.39, 232, 32] }, b2: { rect: [60, 110.39, 32, 32] }, l3: { rect: [60, 150.39, 232, 32] }, b3: { rect: [60, 150.39, 32, 32] } },
+  },
+  {
+    lesson: "keyframes-define",
+    name: "solution",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32] }, b1: { rect: [110, 70.39, 32, 32] }, l2: { rect: [60, 110.39, 232, 32] }, b2: { rect: [160, 110.39, 32, 32] }, l3: { rect: [60, 150.39, 232, 32] }, b3: { rect: [210, 150.39, 32, 32] } },
+  },
+  {
+    lesson: "keyframes-define",
+    name: "to only",
+    css: ".ball {\n  animation: slide 4s linear infinite;\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -1s;\n}\n.f2 .ball {\n  animation-delay: -2s;\n}\n.f3 .ball {\n  animation-delay: -3s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n@keyframes slide {\n  to {\n    translate: 200px;\n  }\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32] }, b1: { rect: [110, 70.39, 32, 32] }, l2: { rect: [60, 110.39, 232, 32] }, b2: { rect: [160, 110.39, 32, 32] }, l3: { rect: [60, 150.39, 232, 32] }, b3: { rect: [210, 150.39, 32, 32] } },
+  },
+  {
+    lesson: "keyframes-define",
+    name: "percentages and transform",
+    css: ".ball {\n  animation: slide 4s linear infinite;\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -1s;\n}\n.f2 .ball {\n  animation-delay: -2s;\n}\n.f3 .ball {\n  animation-delay: -3s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n@keyframes slide {\n  0% {\n    transform: translateX(0);\n  }\n  100% {\n    transform: translateX(200px);\n  }\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32] }, b1: { rect: [110, 70.39, 32, 32] }, l2: { rect: [60, 110.39, 232, 32] }, b2: { rect: [160, 110.39, 32, 32] }, l3: { rect: [60, 150.39, 232, 32] }, b3: { rect: [210, 150.39, 32, 32] } },
+  },
+  {
+    lesson: "keyframes-define",
+    name: "margin-left",
+    css: ".ball {\n  animation: slide 4s linear infinite;\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -1s;\n}\n.f2 .ball {\n  animation-delay: -2s;\n}\n.f3 .ball {\n  animation-delay: -3s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n@keyframes slide {\n  from {\n    margin-left: 0;\n  }\n  to {\n    margin-left: 200px;\n  }\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32] }, b1: { rect: [110, 70.39, 32, 32] }, l2: { rect: [60, 110.39, 232, 32] }, b2: { rect: [160, 110.39, 32, 32] }, l3: { rect: [60, 150.39, 232, 32] }, b3: { rect: [210, 150.39, 32, 32] } },
+  },
+  {
+    lesson: "keyframes-define",
+    name: "only halfway (100px)",
+    css: ".ball {\n  animation: slide 4s linear infinite;\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -1s;\n}\n.f2 .ball {\n  animation-delay: -2s;\n}\n.f3 .ball {\n  animation-delay: -3s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n@keyframes slide {\n  to {\n    translate: 100px;\n  }\n}\n",
+    messages: ["コマの位置が合っていません（1 秒で 50px、2 秒で 100px、3 秒で 150px。from で 0、to で 200px まで動かしましょう）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32] }, b1: { rect: [85, 70.39, 32, 32] }, l2: { rect: [60, 110.39, 232, 32] }, b2: { rect: [110, 110.39, 32, 32] }, l3: { rect: [60, 150.39, 232, 32] }, b3: { rect: [135, 150.39, 32, 32] } },
+  },
+  {
+    lesson: "keyframes-define",
+    name: "different name",
+    css: ".ball {\n  animation: slide 4s linear infinite;\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -1s;\n}\n.f2 .ball {\n  animation-delay: -2s;\n}\n.f3 .ball {\n  animation-delay: -3s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n@keyframes move {\n  to {\n    translate: 200px;\n  }\n}\n",
+    messages: ["ボールが動いていません（@keyframes slide を書きましょう。名前は animation の slide とそろえます）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32] }, b1: { rect: [60, 70.39, 32, 32] }, l2: { rect: [60, 110.39, 232, 32] }, b2: { rect: [60, 110.39, 32, 32] }, l3: { rect: [60, 150.39, 232, 32] }, b3: { rect: [60, 150.39, 32, 32] } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "starter",
+    messages: ["50px ずつのコマ送りになっていません（途中の位置でも止まっています。steps(4) で 4 段階にしましょう）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [85, 70.39, 32, 32], computed: {"animation-timing-function":"linear"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [135, 110.39, 32, 32], computed: {"animation-timing-function":"linear"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [185, 150.39, 32, 32], computed: {"animation-timing-function":"linear"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "solution",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [60, 70.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [110, 110.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [160, 150.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "steps(4, end)",
+    css: ".ball {\n  animation: slide 4s steps(4, end) infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [60, 70.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [110, 110.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [160, 150.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "steps(4, jump-end)",
+    css: ".ball {\n  animation: slide 4s steps(4, jump-end) infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [60, 70.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [110, 110.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [160, 150.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "longhand",
+    css: ".ball {\n  animation: slide 4s linear infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n.ball {\n  animation-timing-function: steps(4);\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [60, 70.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [110, 110.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [160, 150.39, 32, 32], computed: {"animation-timing-function":"steps(4)"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "steps(4, start)",
+    css: ".ball {\n  animation: slide 4s steps(4, start) infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: ["最初の一歩が早すぎます（steps(4, start) は区間の始めで進みます。区間の終わりで進む steps(4) にしましょう）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-timing-function":"steps(4, start)"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [160, 110.39, 32, 32], computed: {"animation-timing-function":"steps(4, start)"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [210, 150.39, 32, 32], computed: {"animation-timing-function":"steps(4, start)"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "steps(2)",
+    css: ".ball {\n  animation: slide 4s steps(2) infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: ["4 段階になっていません（0.5 秒・1.5 秒・2.5 秒のコマで、0px・50px・100px に止まるはずです）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [60, 70.39, 32, 32], computed: {"animation-timing-function":"steps(2)"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [60, 110.39, 32, 32], computed: {"animation-timing-function":"steps(2)"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [160, 150.39, 32, 32], computed: {"animation-timing-function":"steps(2)"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "ease",
+    css: ".ball {\n  animation: slide 4s ease infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: ["50px ずつのコマ送りになっていません（途中の位置でも止まっています。steps(4) で 4 段階にしましょう）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [87.38, 70.39, 32, 32], computed: {"animation-timing-function":"ease"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [189.06, 110.39, 32, 32], computed: {"animation-timing-function":"ease"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [240.27, 150.39, 32, 32], computed: {"animation-timing-function":"ease"} } },
+  },
+  {
+    lesson: "keyframes-steps",
+    name: "stepped keyframes",
+    css: ".ball {\n  animation: slide 4s linear infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n@keyframes slide {\n  0%, 24.9% {\n    translate: 0;\n  }\n  25%, 49.9% {\n    translate: 50px;\n  }\n  50%, 74.9% {\n    translate: 100px;\n  }\n  75%, 100% {\n    translate: 150px;\n  }\n}\n",
+    messages: ["キーフレームを細かく刻んでも作れますが、ここでは timing function の steps(4) でコマ送りにしましょう"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b1: { rect: [60, 70.39, 32, 32], computed: {"animation-timing-function":"linear"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b2: { rect: [110, 110.39, 32, 32], computed: {"animation-timing-function":"linear"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-timing-function":"ease"} }, b3: { rect: [160, 150.39, 32, 32], computed: {"animation-timing-function":"linear"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "starter",
+    messages: ["終わったあと、ボールが右端に残っていません（いまは終わった瞬間に、アニメーションの前の位置＝左端に戻っています）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [210, 110.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [60, 150.39, 32, 32], computed: {"animation-fill-mode":"none"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "solution",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-fill-mode":"forwards"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [210, 110.39, 32, 32], computed: {"animation-fill-mode":"forwards"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [260, 150.39, 32, 32], computed: {"animation-fill-mode":"forwards"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "both",
+    css: ".ball {\n  animation: slide 2s linear both;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-fill-mode":"both"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [210, 110.39, 32, 32], computed: {"animation-fill-mode":"both"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [260, 150.39, 32, 32], computed: {"animation-fill-mode":"both"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "longhand",
+    css: ".ball {\n  animation: slide 2s linear;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n.ball {\n  animation-fill-mode: forwards;\n}\n",
+    messages: [],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-fill-mode":"forwards"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [210, 110.39, 32, 32], computed: {"animation-fill-mode":"forwards"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [260, 150.39, 32, 32], computed: {"animation-fill-mode":"forwards"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "backwards",
+    css: ".ball {\n  animation: slide 2s linear backwards;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: ["終わったあと、ボールが右端に残っていません（いまは終わった瞬間に、アニメーションの前の位置＝左端に戻っています）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-fill-mode":"backwards"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [210, 110.39, 32, 32], computed: {"animation-fill-mode":"backwards"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [60, 150.39, 32, 32], computed: {"animation-fill-mode":"backwards"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "infinite",
+    css: ".ball {\n  animation: slide 2s linear infinite;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: ["終わったあと、ボールが右端に残っていません（いまは終わった瞬間に、アニメーションの前の位置＝左端に戻っています）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [210, 110.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [110, 150.39, 32, 32], computed: {"animation-fill-mode":"none"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "end state as the ball's own style",
+    css: ".ball {\n  animation: slide 2s linear;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n.ball {\n  translate: 200px;\n}\n",
+    messages: ["ボールの位置そのものを 200px にしておいても残せますが、ここでは animation-fill-mode: forwards で最後のキーフレームを保ちましょう"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [110, 70.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [210, 110.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [260, 150.39, 32, 32], computed: {"animation-fill-mode":"none"} } },
+  },
+  {
+    lesson: "keyframes-fill-mode",
+    name: "no animation, ball at 200px",
+    css: ".ball {\n  translate: 200px;\n}\n@keyframes slide {\n  from {\n    translate: 0;\n  }\n  to {\n    translate: 200px;\n  }\n}\n.frame {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n}\n.time {\n  width: 52px;\n  font-size: 12px;\n  text-align: right;\n}\n.lane {\n  width: 232px;\n  border-radius: 16px;\n  background: #eef1f8;\n}\n.ball {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #2f5fd0;\n}\n/* プレビュー用: 下の 3 つは、同じアニメーションを決まった時刻で止めたコマ */\n.f1 .ball,\n.f2 .ball,\n.f3 .ball {\n  animation-play-state: paused;\n}\n.f1 .ball {\n  animation-delay: -0.5s;\n}\n.f2 .ball {\n  animation-delay: -1.5s;\n}\n.f3 .ball {\n  animation-delay: -2.5s;\n}\n/* プレビュー用: チェックを入れると、いちばん上のボールが動く */\n.demo .ball {\n  animation-name: none;\n  background: #2f9d5b;\n}\n.toggle:has(:checked) ~ .demo .ball {\n  animation-name: slide;\n}\n",
+    messages: ["途中のコマの位置が変わっています（0.5 秒で 50px、1.5 秒で 150px のまま、終わったあとだけ右端に残しましょう）"],
+    elements: { l1: { rect: [60, 70.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b1: { rect: [260, 70.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l2: { rect: [60, 110.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b2: { rect: [260, 110.39, 32, 32], computed: {"animation-fill-mode":"none"} }, l3: { rect: [60, 150.39, 232, 32], computed: {"animation-fill-mode":"none"} }, b3: { rect: [260, 150.39, 32, 32], computed: {"animation-fill-mode":"none"} } },
+  },
+  {
+    lesson: "before-content",
+    name: "starter",
+    messages: ["丸が表示されていません（::before は content がないと作られません。文字のない飾りなら content: \"\" を足します）"],
+    elements: { s1: { rect: [0, 0, 596, 19.59] }, "s1-text": { rect: [0, 1, 42, 17] }, s2: { rect: [0, 27.59, 596, 19.59] }, "s2-text": { rect: [0, 28.59, 42, 17] }, s3: { rect: [0, 55.19, 596, 19.59] }, "s3-text": { rect: [0, 56.19, 42, 17] } },
+  },
+  {
+    lesson: "before-content",
+    name: "solution",
+    messages: [],
+    elements: { s1: { rect: [0, 0, 596, 19.59] }, "s1-text": { rect: [18, 1, 42, 17] }, s2: { rect: [0, 27.59, 596, 19.59] }, "s2-text": { rect: [18, 28.59, 42, 17] }, s3: { rect: [0, 55.19, 596, 19.59] }, "s3-text": { rect: [18, 56.19, 42, 17] } },
+  },
+  {
+    lesson: "before-content",
+    name: "space content",
+    css: ".statuses {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.status {\n  margin-bottom: 8px;\n  font-size: 14px;\n}\n.live {\n  color: #2f9d5b;\n}\n.draft {\n  color: #b9791b;\n}\n.stopped {\n  color: #d93636;\n}\n.status::before {\n  content: \" \";\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  margin-right: 8px;\n  border-radius: 50%;\n  background: currentColor;\n}\n",
+    messages: [],
+    elements: { s1: { rect: [0, 0, 596, 19.59] }, "s1-text": { rect: [18, 1, 42, 17] }, s2: { rect: [0, 27.59, 596, 19.59] }, "s2-text": { rect: [18, 28.59, 42, 17] }, s3: { rect: [0, 55.19, 596, 19.59] }, "s3-text": { rect: [18, 56.19, 42, 17] } },
+  },
+  {
+    lesson: "before-content",
+    name: "flex item",
+    css: ".statuses {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.status {\n  margin-bottom: 8px;\n  font-size: 14px;\n}\n.live {\n  color: #2f9d5b;\n}\n.draft {\n  color: #b9791b;\n}\n.stopped {\n  color: #d93636;\n}\n.status::before {\n  width: 10px;\n  height: 10px;\n  margin-right: 8px;\n  border-radius: 50%;\n  background: currentColor;\n}\n.status {\n  display: flex;\n  align-items: center;\n}\n.status::before {\n  content: \"\";\n}\n",
+    messages: [],
+    elements: { s1: { rect: [0, 0, 596, 19.59] }, "s1-text": { rect: [18, 0, 42, 19.59] }, s2: { rect: [0, 27.59, 596, 19.59] }, "s2-text": { rect: [18, 27.59, 42, 19.59] }, s3: { rect: [0, 55.19, 596, 19.59] }, "s3-text": { rect: [18, 55.19, 42, 19.59] } },
+  },
+  {
+    lesson: "before-content",
+    name: "vertical-align middle",
+    css: ".statuses {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.status {\n  margin-bottom: 8px;\n  font-size: 14px;\n}\n.live {\n  color: #2f9d5b;\n}\n.draft {\n  color: #b9791b;\n}\n.stopped {\n  color: #d93636;\n}\n.status::before {\n  content: \"\";\n  display: inline-block;\n  vertical-align: middle;\n  width: 10px;\n  height: 10px;\n  margin-right: 8px;\n  border-radius: 50%;\n  background: currentColor;\n}\n",
+    messages: [],
+    elements: { s1: { rect: [0, 0, 596, 19.59] }, "s1-text": { rect: [18, 1, 42, 17] }, s2: { rect: [0, 27.59, 596, 19.59] }, "s2-text": { rect: [18, 28.59, 42, 17] }, s3: { rect: [0, 55.19, 596, 19.59] }, "s3-text": { rect: [18, 56.19, 42, 17] } },
+  },
+  {
+    lesson: "before-content",
+    name: "content only",
+    css: ".statuses {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.status {\n  margin-bottom: 8px;\n  font-size: 14px;\n}\n.live {\n  color: #2f9d5b;\n}\n.draft {\n  color: #b9791b;\n}\n.stopped {\n  color: #d93636;\n}\n.status::before {\n  content: \"\";\n  width: 10px;\n  height: 10px;\n  margin-right: 8px;\n  border-radius: 50%;\n  background: currentColor;\n}\n",
+    messages: ["丸の大きさ（10px）が反映されていません（擬似要素は既定でインラインなので、width と height が効きません。display: inline-block を足しましょう）"],
+    elements: { s1: { rect: [0, 0, 596, 19.59] }, "s1-text": { rect: [8, 1, 42, 17] }, s2: { rect: [0, 27.59, 596, 19.59] }, "s2-text": { rect: [8, 28.59, 42, 17] }, s3: { rect: [0, 55.19, 596, 19.59] }, "s3-text": { rect: [8, 56.19, 42, 17] } },
+  },
+  {
+    lesson: "before-content",
+    name: "display block",
+    css: ".statuses {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.status {\n  margin-bottom: 8px;\n  font-size: 14px;\n}\n.live {\n  color: #2f9d5b;\n}\n.draft {\n  color: #b9791b;\n}\n.stopped {\n  color: #d93636;\n}\n.status::before {\n  content: \"\";\n  display: block;\n  width: 10px;\n  height: 10px;\n  margin-right: 8px;\n  border-radius: 50%;\n  background: currentColor;\n}\n",
+    messages: ["丸と文字が別の行に分かれています（display: block ではなく inline-block にして、文字と同じ行に並べましょう）"],
+    elements: { s1: { rect: [0, 0, 596, 29.59] }, "s1-text": { rect: [0, 11, 42, 17] }, s2: { rect: [0, 37.59, 596, 29.59] }, "s2-text": { rect: [0, 48.59, 42, 17] }, s3: { rect: [0, 75.19, 596, 29.59] }, "s3-text": { rect: [0, 86.19, 42, 17] } },
+  },
+  {
+    lesson: "before-content",
+    name: "glyph",
+    css: ".statuses {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.status {\n  margin-bottom: 8px;\n  font-size: 14px;\n}\n.live {\n  color: #2f9d5b;\n}\n.draft {\n  color: #b9791b;\n}\n.stopped {\n  color: #d93636;\n}\n.status::before {\n  content: \"●\";\n  width: 10px;\n  height: 10px;\n  margin-right: 8px;\n  border-radius: 50%;\n  background: currentColor;\n}\n",
+    messages: ["丸の大きさ（10px）が反映されていません（擬似要素は既定でインラインなので、width と height が効きません。display: inline-block を足しましょう）"],
+    elements: { s1: { rect: [0, 0, 596, 19.59] }, "s1-text": { rect: [20.81, 1, 42, 17] }, s2: { rect: [0, 27.59, 596, 19.59] }, "s2-text": { rect: [20.81, 28.59, 42, 17] }, s3: { rect: [0, 55.19, 596, 19.59] }, "s3-text": { rect: [20.81, 56.19, 42, 17] } },
+  },
+  {
+    lesson: "after-attribute",
+    name: "starter",
+    messages: ["外部サイトへのリンク（https:// で始まるもの）の後ろに、印が付いていません"],
+    elements: { in1: { rect: [20, 4, 84, 17] }, "in1-text": { rect: [20, 4, 84, 17] }, ext1: { rect: [20, 29.19, 101.94, 17] }, "ext1-text": { rect: [20, 29.19, 101.94, 17] }, in2: { rect: [20, 54.38, 84, 17] }, "in2-text": { rect: [20, 54.38, 84, 17] }, ext2: { rect: [20, 79.56, 133.05, 17] }, "ext2-text": { rect: [20, 79.56, 133.05, 17] } },
+  },
+  {
+    lesson: "after-attribute",
+    name: "solution",
+    messages: [],
+    elements: { in1: { rect: [20, 4, 84, 17] }, "in1-text": { rect: [20, 4, 84, 17] }, ext1: { rect: [20, 29.19, 116.28, 17] }, "ext1-text": { rect: [20, 29.19, 101.94, 17] }, in2: { rect: [20, 54.38, 84, 17] }, "in2-text": { rect: [20, 54.38, 84, 17] }, ext2: { rect: [20, 79.56, 147.39, 17] }, "ext2-text": { rect: [20, 79.56, 133.05, 17] } },
+  },
+  {
+    lesson: "after-attribute",
+    name: "href^=http",
+    css: ".links {\n  margin: 0;\n  padding-left: 20px;\n  font-size: 14px;\n  line-height: 1.8;\n}\n.links a {\n  color: #2f5fd0;\n}\n.links a[href^=\"http\"]::after {\n  content: \" ↗\";\n}\n",
+    messages: [],
+    elements: { in1: { rect: [20, 4, 84, 17] }, "in1-text": { rect: [20, 4, 84, 17] }, ext1: { rect: [20, 29.19, 116.28, 17] }, "ext1-text": { rect: [20, 29.19, 101.94, 17] }, in2: { rect: [20, 54.38, 84, 17] }, "in2-text": { rect: [20, 54.38, 84, 17] }, ext2: { rect: [20, 79.56, 147.39, 17] }, "ext2-text": { rect: [20, 79.56, 133.05, 17] } },
+  },
+  {
+    lesson: "after-attribute",
+    name: "href*=://",
+    css: ".links {\n  margin: 0;\n  padding-left: 20px;\n  font-size: 14px;\n  line-height: 1.8;\n}\n.links a {\n  color: #2f5fd0;\n}\n.links a[href*=\"://\"]::after {\n  content: \" ↗\";\n}\n",
+    messages: [],
+    elements: { in1: { rect: [20, 4, 84, 17] }, "in1-text": { rect: [20, 4, 84, 17] }, ext1: { rect: [20, 29.19, 116.28, 17] }, "ext1-text": { rect: [20, 29.19, 101.94, 17] }, in2: { rect: [20, 54.38, 84, 17] }, "in2-text": { rect: [20, 54.38, 84, 17] }, ext2: { rect: [20, 79.56, 147.39, 17] }, "ext2-text": { rect: [20, 79.56, 133.05, 17] } },
+  },
+  {
+    lesson: "after-attribute",
+    name: "alt text only",
+    css: ".links {\n  margin: 0;\n  padding-left: 20px;\n  font-size: 14px;\n  line-height: 1.8;\n}\n.links a {\n  color: #2f5fd0;\n}\n.links a[href^=\"https://\"]::after {\n  content: \" ↗\" / \"（外部サイト）\";\n}\n",
+    messages: [],
+    elements: { in1: { rect: [20, 4, 84, 17] }, "in1-text": { rect: [20, 4, 84, 17] }, ext1: { rect: [20, 29.19, 116.28, 17] }, "ext1-text": { rect: [20, 29.19, 101.94, 17] }, in2: { rect: [20, 54.38, 84, 17] }, "in2-text": { rect: [20, 54.38, 84, 17] }, ext2: { rect: [20, 79.56, 147.39, 17] }, "ext2-text": { rect: [20, 79.56, 133.05, 17] } },
+  },
+  {
+    lesson: "after-attribute",
+    name: "every link",
+    css: ".links {\n  margin: 0;\n  padding-left: 20px;\n  font-size: 14px;\n  line-height: 1.8;\n}\n.links a {\n  color: #2f5fd0;\n}\n.links a::after {\n  content: \" ↗\";\n}\n",
+    messages: ["サイト内のリンクにまで印が付いています（属性セレクタ [href^=\"https://\"] で、https:// で始まるものだけを選びましょう）"],
+    elements: { in1: { rect: [20, 4, 98.34, 17] }, "in1-text": { rect: [20, 4, 84, 17] }, ext1: { rect: [20, 29.19, 116.28, 17] }, "ext1-text": { rect: [20, 29.19, 101.94, 17] }, in2: { rect: [20, 54.38, 98.34, 17] }, "in2-text": { rect: [20, 54.38, 84, 17] }, ext2: { rect: [20, 79.56, 147.39, 17] }, "ext2-text": { rect: [20, 79.56, 133.05, 17] } },
+  },
+  {
+    lesson: "after-attribute",
+    name: "before instead of after",
+    css: ".links {\n  margin: 0;\n  padding-left: 20px;\n  font-size: 14px;\n  line-height: 1.8;\n}\n.links a {\n  color: #2f5fd0;\n}\n.links a[href^=\"https://\"]::before {\n  content: \"↗ \";\n}\n",
+    messages: ["外部サイトへのリンク（https:// で始まるもの）の後ろに、印が付いていません"],
+    elements: { in1: { rect: [20, 4, 84, 17] }, "in1-text": { rect: [20, 4, 84, 17] }, ext1: { rect: [20, 29.19, 116.28, 17] }, "ext1-text": { rect: [34.34, 29.19, 101.94, 17] }, in2: { rect: [20, 54.38, 84, 17] }, "in2-text": { rect: [20, 54.38, 84, 17] }, ext2: { rect: [20, 79.56, 147.39, 17] }, "ext2-text": { rect: [34.34, 79.56, 133.05, 17] } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "starter",
+    messages: ["章の前に番号が表示されていません（::before の content に counter(chapter, upper-roman) を書きます）"],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"none"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [0, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [0, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [0, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "solution",
+    messages: [],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"chapter 0"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [18.03, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [22.81, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [27.59, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "increment in ::before",
+    css: ".toc {\n  counter-reset: chapter;\n}\n.chapter {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.chapter::before {\n  counter-increment: chapter;\n  content: counter(chapter, upper-roman) \".\";\n  margin-right: 8px;\n  color: #2f5fd0;\n}\n",
+    messages: [],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"chapter 0"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [18.03, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [22.81, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [27.59, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "lower-roman",
+    css: ".toc {\n  counter-reset: chapter;\n}\n.chapter {\n  margin: 0 0 8px;\n  font-size: 16px;\n  counter-increment: chapter;\n}\n.chapter::before {\n  content: counter(chapter, lower-roman) \".\";\n  margin-right: 8px;\n  color: #2f5fd0;\n}\n",
+    messages: [],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"chapter 0"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [17.53, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [21.81, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [26.09, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "dot and space",
+    css: ".toc {\n  counter-reset: chapter;\n}\n.chapter {\n  margin: 0 0 8px;\n  font-size: 16px;\n  counter-increment: chapter;\n}\n.chapter::before {\n  content: counter(chapter, upper-roman) \". \";\n  margin-right: 8px;\n  color: #2f5fd0;\n}\n",
+    messages: [],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"chapter 0"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [21.84, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [26.63, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [31.41, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "decimal",
+    css: ".toc {\n  counter-reset: chapter;\n}\n.chapter {\n  margin: 0 0 8px;\n  font-size: 16px;\n  counter-increment: chapter;\n}\n.chapter::before {\n  content: counter(chapter) \".\";\n  margin-right: 8px;\n  color: #2f5fd0;\n}\n",
+    messages: ["番号が I・II・III と 1 つずつ増えるローマ数字になっていません（どの章も同じ番号なら、.chapter に counter-increment: chapter を書きます）"],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"chapter 0"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [20.7, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [23.11, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [23.02, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "no counter-increment",
+    css: ".toc {\n  counter-reset: chapter;\n}\n.chapter {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.chapter::before {\n  content: counter(chapter, upper-roman) \".\";\n  margin-right: 8px;\n  color: #2f5fd0;\n}\n",
+    messages: ["番号が I・II・III と 1 つずつ増えるローマ数字になっていません（どの章も同じ番号なら、.chapter に counter-increment: chapter を書きます）"],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"chapter 0"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [23.08, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [23.08, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [23.08, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "increment in ::before without reset",
+    css: ".chapter {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.chapter::before {\n  counter-increment: chapter;\n  content: counter(chapter, upper-roman) \".\";\n  margin-right: 8px;\n  color: #2f5fd0;\n}\n",
+    messages: ["番号が I・II・III と 1 つずつ増えるローマ数字になっていません（どの章も同じ番号なら、.chapter に counter-increment: chapter を書きます）"],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"none"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [18.03, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [18.03, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [18.03, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+  {
+    lesson: "counter-chapters",
+    name: "no counter-reset",
+    css: ".chapter {\n  margin: 0 0 8px;\n  font-size: 16px;\n  counter-increment: chapter;\n}\n.chapter::before {\n  content: counter(chapter, upper-roman) \".\";\n  margin-right: 8px;\n  color: #2f5fd0;\n}\n",
+    messages: ["番号は振れていますが、目次（.toc）に counter-reset: chapter を書いて、カウンターを用意しましょう（別の目次や入れ子の中でも、1 から数え直せます）"],
+    elements: { toc: { rect: [0, 0, 596, 83.17], computed: {"counter-reset":"none"} }, c1: { rect: [0, 0, 596, 22.39], computed: {"counter-reset":"none"} }, "c1-text": { rect: [18.03, 2, 64, 18], computed: {"counter-reset":"none"} }, c2: { rect: [0, 30.39, 596, 22.39], computed: {"counter-reset":"none"} }, "c2-text": { rect: [22.81, 32.39, 48, 18], computed: {"counter-reset":"none"} }, c3: { rect: [0, 60.78, 596, 22.39], computed: {"counter-reset":"none"} }, "c3-text": { rect: [27.59, 62.78, 96, 18], computed: {"counter-reset":"none"} } },
+  },
+];
+
+/** Every message the app would show for a recorded case: the lesson viewport first, then each extra state. */
+function messagesFor(c: RecordedCase): string[] {
+  const { challenge } = lessonById(c.lesson)!;
+  const css = c.css ?? (c.name === "starter" ? challenge.starterCSS : challenge.solution);
+  const messages = [...evaluate(challenge.validators, geometrySnapshot(css, c.elements)).failures];
+  for (const state of challenge.states ?? []) {
+    const recorded = c.states?.[state.viewport];
+    if (!recorded) throw new Error(`${c.lesson} / ${c.name}: nothing recorded at ${state.viewport}px`);
+    messages.push(...evaluate(state.validators, geometrySnapshot(css, recorded)).failures);
+  }
+  return messages;
+}
+
+describe("flex and grid patterns, keyframes and generated content: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 12 lessons", () => {
+    expect([...new Set(PATTERN_CASES.map((c) => c.lesson))].sort()).toEqual([...PATTERN_LESSONS].sort());
+    for (const id of PATTERN_LESSONS) {
+      const names = PATTERN_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of PATTERN_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message per checked width, and passes each solution", () => {
+    for (const id of PATTERN_LESSONS) {
+      const { challenge } = lessonById(id)!;
+      const starter = PATTERN_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = PATTERN_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1 + (challenge.states?.length ?? 0));
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("reads the motion from frames paused at fixed times: linear, stepped, and after the end", () => {
+    const x = (c: RecordedCase, n: number): number => c.elements[`b${n}`]!.rect![0] - c.elements[`l${n}`]!.rect![0];
+    const frames = (id: string, name: string): number[] => {
+      const c = PATTERN_CASES.find((k) => k.lesson === id && k.name === name)!;
+      return [1, 2, 3].map((n) => x(c, n));
+    };
+    expect(frames("keyframes-define", "solution")).toEqual([50, 100, 150]);
+    expect(frames("keyframes-steps", "starter")).toEqual([25, 75, 125]);
+    expect(frames("keyframes-steps", "solution")).toEqual([0, 50, 100]);
+    expect(frames("keyframes-fill-mode", "starter")).toEqual([50, 150, 0]);
+    expect(frames("keyframes-fill-mode", "solution")).toEqual([50, 150, 200]);
+  });
+});

@@ -174,7 +174,7 @@ export const flexPatternsTrack: Track = {
               {
                 kind: "allOf",
                 of: [spacing("logo", "right", "l1", "left", 16), spacing("l1", "right", "l2", "left", 16)],
-                message: "リンクがロゴから離れています（justify-content: space-between は、すべてのアイテムの間に余りを配ります）",
+                message: "リンクがロゴから離れています（余りはログインボタンの手前にだけ入れて、ロゴとリンクは左に詰めたままにします）",
               },
               {
                 // The free space sits in an auto margin: before the button, or after the last link.

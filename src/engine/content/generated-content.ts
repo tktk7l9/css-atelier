@@ -126,7 +126,7 @@ export const generatedContentTrack: Track = {
               {
                 kind: "allOf",
                 of: [textStart("s1", 16, 20), textStart("s2", 16, 20), textStart("s3", 16, 20)],
-                message: "丸の大きさが反映されていません（擬似要素は既定でインラインなので width と height が効きません。display: inline-block を足しましょう）",
+                message: "丸の大きさ（10px）が反映されていません（擬似要素は既定でインラインなので、width と height が効きません。display: inline-block を足しましょう）",
               },
             ],
           },
