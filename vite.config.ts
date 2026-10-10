@@ -5,6 +5,7 @@ import { defineConfig, type Plugin } from "vite";
 /** Content modules other than the catalogue (src/engine/content/index.ts). */
 const LESSON_MODULE = /\/src\/engine\/content\/(?!index\.ts$)[^/]+\.ts$/;
 const PRECACHE_SLOT = "const PRECACHE = [];";
+const ASSETS_SLOT = "const ASSETS = [];";
 
 /**
  * Lesson content is split per track: src/engine/content/index.ts loads each
@@ -13,8 +14,9 @@ const PRECACHE_SLOT = "const PRECACHE = [];";
  * - the build fails if a track module lands in the initial bundle;
  * - sw.js is emitted from src/sw.js with the chunks to precache filled in:
  *   the lesson runtime and every track (not the Three.js visualizer, which
- *   only the 3D lessons load). The list changes with each build, which is
- *   also what makes browsers install the new worker.
+ *   only the 3D lessons load), plus the list of all hashed assets so the
+ *   worker can drop an earlier build's. The lists change with each build,
+ *   which is also what makes browsers install the new worker.
  */
 function lessonChunks(): Plugin {
   let root = ".";
@@ -50,12 +52,18 @@ function lessonChunks(): Plugin {
       }
 
       const template = readFileSync(resolve(root, "src/sw.js"), "utf8");
-      if (!template.includes(PRECACHE_SLOT)) this.error(`src/sw.js has no "${PRECACHE_SLOT}" line`);
-      const list = [...precache].sort().map((f) => `/${f}`);
+      for (const slot of [PRECACHE_SLOT, ASSETS_SLOT]) {
+        if (!template.includes(slot)) this.error(`src/sw.js has no "${slot}" line`);
+      }
+      const paths = (names: Iterable<string>): string =>
+        JSON.stringify([...names].sort().map((f) => `/${f}`), null, 2);
+      const assets = Object.keys(bundle).filter((f) => f.startsWith("assets/"));
       this.emitFile({
         type: "asset",
         fileName: "sw.js",
-        source: template.replace(PRECACHE_SLOT, `const PRECACHE = ${JSON.stringify(list, null, 2)};`),
+        source: template
+          .replace(PRECACHE_SLOT, `const PRECACHE = ${paths(precache)};`)
+          .replace(ASSETS_SLOT, `const ASSETS = ${paths(assets)};`),
       });
     },
   };
