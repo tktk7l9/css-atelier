@@ -1,8 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { LESSONS, TRACKS, lessonById, nextLesson, trackOf } from "./index.js";
+import { LESSONS, TRACKS, lessonById, loadLesson, loadTrack, nextLesson, trackOf } from "./index.js";
 import type { ValidatorSpec } from "../validate/primitives.js";
-import type { Challenge } from "./types.js";
+import type { Challenge, Lesson, Track } from "./types.js";
 import { normalizeProp, normalizeSelector, normalizeValue, parseCss } from "../validate/css-parse.js";
+
+// Only the catalogue ships in the initial bundle; each track's lessons load on
+// demand. Load every track once so all lessons can be checked below.
+const LOADED: readonly Track[] = await Promise.all(TRACKS.map((t) => loadTrack(t.id)));
+const FULL: readonly Lesson[] = LOADED.flatMap((t) => t.lessons);
+
+// Every module in this directory except the catalogue, the types and tests.
+const MODULES = import.meta.glob<Record<string, unknown>>(
+  ["./*.ts", "!./index.ts", "!./types.ts", "!./*.test.ts"],
+  { eager: true },
+);
+
+const isTrack = (value: unknown): value is Track =>
+  typeof value === "object" && value !== null && Array.isArray((value as Track).lessons);
 
 const CONCEPTS = new Set(["box-model", "flexbox", "grid", "transform-3d", "none"]);
 
@@ -43,6 +57,34 @@ function referencedIds(spec: ValidatorSpec): string[] {
   }
 }
 
+describe("catalogue and the tracks loaded on demand", () => {
+  it("each catalogue entry loads a track with the same id, title, summary, emoji and lessons", () => {
+    TRACKS.forEach((meta, i) => {
+      const track = LOADED[i];
+      const { id, title, summary, emoji } = track;
+      expect({ id, title, summary, emoji }, meta.id).toEqual({
+        id: meta.id,
+        title: meta.title,
+        summary: meta.summary,
+        emoji: meta.emoji,
+      });
+      expect(track.lessons.map((l) => ({ id: l.id, title: l.title })), meta.id).toEqual(meta.lessons);
+    });
+  });
+
+  it("lists every track module in the catalogue", () => {
+    const tracks = Object.values(MODULES).flatMap((m) => Object.values(m)).filter(isTrack);
+    expect(tracks.length).toBe(TRACKS.length);
+    for (const track of tracks) expect(LOADED, track.id).toContain(track);
+  });
+
+  it("loads one lesson with its challenge and rejects an id not in the catalogue", async () => {
+    const id = LESSONS[5].id;
+    expect(await loadLesson(id)).toBe(FULL.find((l) => l.id === id));
+    await expect(loadLesson("nope")).rejects.toThrow("unknown lesson: nope");
+  });
+});
+
 describe("content integrity", () => {
   it("has unique lesson ids", () => {
     const ids = LESSONS.map((l) => l.id);
@@ -60,13 +102,13 @@ describe("content integrity", () => {
   });
 
   it("links to the current MDN structure (Reference/ or Guides/), not the pre-2025 flat paths", () => {
-    for (const lesson of LESSONS) {
+    for (const lesson of FULL) {
       if (!lesson.mdnPath) continue;
       expect(lesson.mdnPath, lesson.id).toMatch(/^\/ja\/docs\/Web\/CSS\/(Reference|Guides)\//);
     }
   });
 
-  for (const lesson of LESSONS) {
+  for (const lesson of FULL) {
     describe(`lesson: ${lesson.id}`, () => {
       const { challenge, viz } = lesson;
 

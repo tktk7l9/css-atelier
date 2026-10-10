@@ -2,7 +2,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getByRole, getByText, queryByText, within } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
-import { LESSONS, lessonById, nextLesson } from "./engine/content/index.js";
+import { LESSONS, TRACKS, loadTrack, nextLesson } from "./engine/content/index.js";
+import type { Lesson } from "./engine/content/types.js";
 import type { Snapshot } from "./engine/validate/snapshot.js";
 import { parseCss } from "./engine/validate/css-parse.js";
 import type { VizSignals } from "./engine/viz-map.js";
@@ -88,6 +89,20 @@ vi.mock("./viz/index.js", () => ({
 
 import { createApp, type AppCallbacks, type AppController } from "./app.js";
 
+// main.ts loads a lesson's track before handing the lesson to the runtime;
+// load every track once so lessons can be opened by id here.
+const FULL = new Map<string, Lesson>(
+  (await Promise.all(TRACKS.map((t) => loadTrack(t.id)))).flatMap((t) =>
+    t.lessons.map((l) => [l.id, l] as const),
+  ),
+);
+const lessonById = (id: string): Lesson | undefined => FULL.get(id);
+const loaded = (id: string): Lesson => {
+  const lesson = FULL.get(id);
+  if (!lesson) throw new Error(`no lesson ${id}`);
+  return lesson;
+};
+
 const PADDING = "box-model-padding"; // 3D lesson with 2 hints
 const CLASS = "selectors-class"; // first lesson, no 3D
 const CQ = "cq-query"; // viewport 500 + an extra 360px state
@@ -155,7 +170,7 @@ describe("createApp: opening a lesson", () => {
   it("renders the lesson text, task, MDN link, starter CSS and preview labels", async () => {
     const { app, root } = mount();
     const lesson = lessonById(PADDING)!;
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     expect(getByRole(root, "heading", { level: 1 }).textContent).toBe(lesson.title);
     expect(root.querySelector(".explain")?.innerHTML).toBe(lesson.explanation);
     expect(getByText(root, "課題")).toBeTruthy();
@@ -178,15 +193,9 @@ describe("createApp: opening a lesson", () => {
     expect(document.activeElement).toBe(getByRole(root, "heading", { level: 1 }));
   });
 
-  it("ignores an unknown lesson id", async () => {
-    const { app } = mount();
-    await app.open("nope");
-    expect(fakes.state.loaded).toEqual([]);
-  });
-
   it("shows the preview width for a fixed-viewport lesson and restores it afterwards", async () => {
     const { app, root } = mount();
-    await app.open(CQ);
+    await app.open(loaded(CQ));
     expect(getByText(root, "幅 500px に固定")).toBeTruthy();
     expect(root.querySelector(".preview__viewport")?.textContent).toBe("幅 500px に固定");
     expect(fakes.state.viewports.at(-1)).toBe(500);
@@ -197,13 +206,13 @@ describe("createApp: opening a lesson", () => {
     const { app, root } = mount();
     const last = lessonById(LAST)!;
     expect(last.mdnPath).toBeDefined();
-    await app.open(LAST);
+    await app.open(loaded(LAST));
     expect(button(root, "レッスン一覧へ")).toBeTruthy();
     // A lesson without an MDN path hides the link.
-    await app.open(PADDING);
-    const noMdn = LESSONS.find((l) => !l.mdnPath);
+    await app.open(loaded(PADDING));
+    const noMdn = [...FULL.values()].find((l) => !l.mdnPath);
     if (noMdn) {
-      await app.open(noMdn.id);
+      await app.open(loaded(noMdn.id));
       expect(root.querySelector(".mdn-link")?.classList.contains("hidden")).toBe(true);
     }
   });
@@ -211,23 +220,23 @@ describe("createApp: opening a lesson", () => {
   it("loads the 3D visualizer only for 3D lessons and tears the scene down for 2D ones", async () => {
     const { app, root } = mount({ reducedMotion: true });
     const stage = root.querySelector(".viz__stage") as HTMLElement;
-    await app.open(CLASS);
+    await app.open(loaded(CLASS));
     expect(fakes.state.viz.created).toBe(0);
     expect(stage.classList.contains("hidden")).toBe(true);
     expect(getByText(root, "プレビュー", { selector: ".viz__badge" })).toBeTruthy();
 
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     expect(fakes.state.viz.created).toBe(1);
     expect(fakes.state.viz.reducedMotion).toBe(true);
     expect(fakes.state.viz.concepts).toEqual(["box-model"]);
     expect(stage.classList.contains("hidden")).toBe(false);
 
-    await app.open(CLASS);
+    await app.open(loaded(CLASS));
     expect(stage.classList.contains("hidden")).toBe(true);
     expect(fakes.state.viz.concepts).toEqual(["box-model", "none"]);
     expect(fakes.state.viz.created).toBe(1);
 
-    await app.open("flexbox-justify-center");
+    await app.open(loaded("flexbox-justify-center"));
     expect(fakes.state.viz.concepts).toEqual(["box-model", "none", "flexbox"]);
     await settle();
     expect(fakes.state.viz.updates.at(-1)).toBe("flexbox");
@@ -239,7 +248,7 @@ describe("createApp: opening a lesson", () => {
       JSON.stringify({ [PADDING]: ".card { padding: 1px }" }),
     );
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     expect(editorOf(root).value).toBe(".card { padding: 1px }");
     expect(fakes.state.loaded[0].css).toBe(".card { padding: 1px }");
   });
@@ -247,7 +256,7 @@ describe("createApp: opening a lesson", () => {
   it("resets per-lesson state (hints, banner, undo, Next emphasis) when moving between lessons", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     await user.click(button(root, /ヒント/));
     await user.click(button(root, "解答を見る"));
     expect(getByText(root, "解答を表示しました。")).toBeTruthy();
@@ -258,7 +267,7 @@ describe("createApp: opening a lesson", () => {
     expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(true);
     expect(doneTag(root).classList.contains("hidden")).toBe(false);
 
-    await app.open(CLASS);
+    await app.open(loaded(CLASS));
     // The pass banner, the promoted Next button and the "done" tag belong to the old lesson.
     expect(banner(root).textContent).toBe("");
     expect(button(root, "次のレッスン →").classList.contains("btn--primary")).toBe(false);
@@ -275,7 +284,7 @@ describe("createApp: checking", () => {
   it("passes when the computed styles satisfy the validators, marks completion and promotes Next", async () => {
     const user = userEvent.setup();
     const { app, root, callbacks } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     fakes.state.computed = { card: { "padding-top": "20px", "padding-left": "20px" } };
     await user.click(button(root, "チェック"));
     await settle();
@@ -291,7 +300,7 @@ describe("createApp: checking", () => {
   it("lists every failure when the check does not pass", async () => {
     const user = userEvent.setup();
     const { app, root, callbacks } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     fakes.state.computed = { card: { "padding-top": "0px", "padding-left": "0px" } };
     await user.click(button(root, "チェック"));
     await settle();
@@ -312,7 +321,7 @@ describe("createApp: checking", () => {
   it("sends the editor CSS to the sandbox before measuring", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     const ta = editorOf(root);
     ta.value = ".card { padding: 20px }";
     fakes.state.computed = { card: { "padding-top": "20px", "padding-left": "20px" } };
@@ -324,7 +333,7 @@ describe("createApp: checking", () => {
   it("checks every extra viewport state and restores the lesson viewport", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(CQ);
+    await app.open(loaded(CQ));
     fakes.state.viewports = [];
     editorOf(root).value = "@container (min-width: 400px) { .card { font-size: 24px } }";
     fakes.state.computed = { card: { "font-size": "24px" } };
@@ -345,7 +354,7 @@ describe("createApp: checking", () => {
   it("Cmd/Ctrl+Enter in the editor runs the check", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     fakes.state.computed = { card: { "padding-top": "20px", "padding-left": "20px" } };
     await user.click(editorOf(root));
     await user.keyboard("{Control>}{Enter}{/Control}");
@@ -366,7 +375,7 @@ describe("createApp: the result always describes the current CSS", () => {
   it("shows the lesson's own completion state on open and after a pass", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     expect(doneTag(root).textContent).toBe("完了済み");
     expect(doneTag(root).classList.contains("hidden")).toBe(true);
     fakes.state.computed = PASSING;
@@ -374,10 +383,10 @@ describe("createApp: the result always describes the current CSS", () => {
     await settle();
     expect(doneTag(root).classList.contains("hidden")).toBe(false);
 
-    await app.open(CLASS);
+    await app.open(loaded(CLASS));
     expect(doneTag(root).classList.contains("hidden")).toBe(true);
     // A revisit reads the stored progress.
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     expect(doneTag(root).classList.contains("hidden")).toBe(false);
     expect(doneTag(root).parentElement).toBe(getByRole(root, "heading", { level: 1 }).parentElement);
   });
@@ -385,7 +394,7 @@ describe("createApp: the result always describes the current CSS", () => {
   it("drops the result and hands the primary action back to Check once the CSS is edited", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     fakes.state.computed = PASSING;
     await user.click(button(root, "チェック"));
     await settle();
@@ -404,7 +413,7 @@ describe("createApp: the result always describes the current CSS", () => {
   it("drops the result when the solution is shown and again when that is undone", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     fakes.state.computed = FAILING;
     await user.click(button(root, "チェック"));
     await settle();
@@ -425,7 +434,7 @@ describe("createApp: the result always describes the current CSS", () => {
   it("ignores a second check while one is running", async () => {
     const user = userEvent.setup();
     const { app, root, callbacks } = mount();
-    await app.open(CQ);
+    await app.open(loaded(CQ));
     fakes.state.viewports = [];
     fakes.state.computed = { card: { "font-size": "24px" } };
     fakes.state.computedAt = { "360": { card: { "font-size": "14px" } } };
@@ -446,7 +455,7 @@ describe("createApp: the result always describes the current CSS", () => {
 
   it("discards a check whose CSS was edited while it ran", async () => {
     const { app, root, callbacks } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     fakes.state.computed = PASSING;
     const ta = editorOf(root);
     button(root, "チェック").click();
@@ -463,12 +472,12 @@ describe("createApp: the result always describes the current CSS", () => {
 
   it("discards a check when the learner moves to another lesson meanwhile", async () => {
     const { app, root, callbacks } = mount();
-    await app.open(CQ);
+    await app.open(loaded(CQ));
     fakes.state.computed = { card: { "font-size": "24px" } };
     fakes.state.computedAt = { "360": { card: { "font-size": "14px" } } };
     editorOf(root).value = "@container (min-width: 400px) { .card { font-size: 24px } }";
     button(root, "チェック").click();
-    await app.open(CLASS);
+    await app.open(loaded(CLASS));
     fakes.state.viewports = [];
     await settle();
     // The old lesson's result, done tag and preview widths never reach the new lesson.
@@ -481,13 +490,13 @@ describe("createApp: the result always describes the current CSS", () => {
 
   it("discards a check when the lesson changes during an extra viewport state", async () => {
     const { app, root, callbacks } = mount();
-    await app.open(CQ);
+    await app.open(loaded(CQ));
     fakes.state.computed = { card: { "font-size": "24px" } };
     fakes.state.computedAt = { "360": { card: { "font-size": "14px" } } };
     button(root, "チェック").click();
     await nextFrame(); // main state measured; now waiting on the 360px state
     expect(fakes.state.viewports.at(-1)).toBe(360);
-    await app.open(CLASS);
+    await app.open(loaded(CLASS));
     fakes.state.viewports = [];
     await settle();
     expect(banner(root).textContent).toBe("");
@@ -498,7 +507,7 @@ describe("createApp: the result always describes the current CSS", () => {
   it("scrolls the result banner and each new hint into view, smoothly unless motion is reduced", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     expect(revealed).toEqual([]);
     await user.click(button(root, /ヒント/));
     expect(revealed).toEqual([
@@ -514,7 +523,7 @@ describe("createApp: the result always describes the current CSS", () => {
     document.body.innerHTML = "";
 
     const reduced = mount({ reducedMotion: true });
-    await reduced.app.open(PADDING);
+    await reduced.app.open(loaded(PADDING));
     await user.click(button(reduced.root, /ヒント/));
     expect(revealed.at(-1)?.options).toEqual({ block: "nearest", behavior: "instant" });
   });
@@ -524,7 +533,7 @@ describe("createApp: hints, reset, solution, undo", () => {
   it("reveals hints one at a time and disables the button at the end", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     const [h1, h2] = lessonById(PADDING)!.challenge.hints;
     await user.click(button(root, "ヒント（残り 2）"));
     expect(getByText(root, `💡 ${h1}`)).toBeTruthy();
@@ -539,7 +548,7 @@ describe("createApp: hints, reset, solution, undo", () => {
     const user = userEvent.setup();
     const { app, root } = mount();
     const lesson = lessonById(PADDING)!;
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     const ta = editorOf(root);
     ta.value = ".card { color: red }";
     await user.click(button(root, "解答を見る"));
@@ -563,7 +572,7 @@ describe("createApp: hints, reset, solution, undo", () => {
     const user = userEvent.setup();
     const { app, root } = mount();
     const lesson = lessonById(PADDING)!;
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     fakes.state.computed = { card: { "padding-top": "0px", "padding-left": "0px" } };
     await user.click(button(root, "チェック"));
     await settle();
@@ -589,7 +598,7 @@ describe("createApp: hints, reset, solution, undo", () => {
   it("does not offer undo when the CSS did not change", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     await user.click(button(root, "リセット"));
     expect(root.querySelector(".undo")?.classList.contains("hidden")).toBe(true);
     expect(queryByText(root, "最初の状態に戻しました。")).toBeNull();
@@ -598,7 +607,7 @@ describe("createApp: hints, reset, solution, undo", () => {
   it("hides the undo notice as soon as the learner types again", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     await user.click(button(root, "解答を見る"));
     expect(root.querySelector(".undo")?.classList.contains("hidden")).toBe(false);
     await user.click(editorOf(root));
@@ -621,7 +630,7 @@ describe("createApp: typing, drafts and live preview", () => {
   it("saves a draft on every keystroke and pushes the CSS to the preview after a pause", async () => {
     const user = userEvent.setup();
     const { app, root } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     const ta = editorOf(root);
     await user.click(ta);
     await user.keyboard("b");
@@ -646,7 +655,7 @@ describe("createApp: storage failures", () => {
     ];
     try {
       const { app, root, callbacks } = mount();
-      await app.open(PADDING);
+      await app.open(loaded(PADDING));
       await user.click(editorOf(root));
       await user.keyboard("x");
       fakes.state.computed = { card: { "padding-top": "20px", "padding-left": "20px" } };
@@ -664,10 +673,10 @@ describe("createApp: navigation", () => {
   it("Next opens the following lesson, or goes back to the catalogue at the end", async () => {
     const user = userEvent.setup();
     const { app, root, callbacks } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     await user.click(button(root, "次のレッスン →"));
     expect(callbacks.onOpen).toHaveBeenCalledWith(nextLesson(PADDING)!.id);
-    await app.open(LAST);
+    await app.open(loaded(LAST));
     await user.click(button(root, "レッスン一覧へ"));
     expect(callbacks.onBack).toHaveBeenCalledTimes(1);
   });
@@ -693,7 +702,7 @@ describe("createApp: navigation", () => {
 
   it("dispose tears down the visualizer and the sandbox", async () => {
     const { app } = mount();
-    await app.open(PADDING);
+    await app.open(loaded(PADDING));
     app.dispose();
     expect(fakes.state.viz.disposed).toBe(1);
     expect(fakes.state.destroyed).toBe(1);

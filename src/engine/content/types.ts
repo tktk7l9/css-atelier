@@ -1,6 +1,7 @@
 // Content is pure data. Tracks → Lessons → Challenge. Each challenge composes
 // ValidatorSpec primitives and declares which computed props the sandbox should
-// measure. Authored per-topic under content/*.ts and aggregated in index.ts.
+// measure. Authored per-topic under content/*.ts; index.ts holds the catalogue
+// and loads each track's module on demand.
 
 import type { ValidatorSpec } from "../validate/primitives.js";
 import type { SnapshotRequest } from "../validate/snapshot.js";
@@ -83,9 +84,23 @@ export interface Challenge {
   readonly solution: string;
 }
 
-export interface Lesson {
+/** What the catalogue (the first screen) shows for a lesson. */
+export interface LessonMeta {
   readonly id: string;
   readonly title: string;
+}
+
+/** What the catalogue shows for a track. Only this ships in the initial
+ *  bundle; the lessons themselves load with their track (see index.ts). */
+export interface TrackMeta {
+  readonly id: TrackId;
+  readonly title: string;
+  readonly summary: string;
+  readonly emoji: string;
+  readonly lessons: readonly LessonMeta[];
+}
+
+export interface Lesson extends LessonMeta {
   /** Short explanation (a tiny markdown-lite subset: paragraphs + `code`). */
   readonly explanation: string;
   readonly mdnPath?: string;
@@ -93,10 +108,6 @@ export interface Lesson {
   readonly challenge: Challenge;
 }
 
-export interface Track {
-  readonly id: TrackId;
-  readonly title: string;
-  readonly summary: string;
-  readonly emoji: string;
+export interface Track extends TrackMeta {
   readonly lessons: readonly Lesson[];
 }
