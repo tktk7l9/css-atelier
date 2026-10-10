@@ -212,6 +212,44 @@ describe("relativeSize", () => {
   });
 });
 
+describe("offset", () => {
+  // b starts 24px after a ends horizontally and 10px below a's top edge.
+  const s = snap([
+    elem("a", { x: 0, y: 0, w: 100, h: 50 }),
+    elem("b", { x: 124, y: 10, w: 100, h: 50 }),
+  ]);
+  const gap = (bounds: { min?: number; max?: number }, ids: { a?: string; b?: string } = {}): ValidatorSpec => ({
+    kind: "offset",
+    a: "a",
+    b: "b",
+    edgeA: "right",
+    edgeB: "left",
+    ...bounds,
+    ...ids,
+  });
+  it("measures from a's edge to b's edge and checks each bound that is given", () => {
+    expect(pass(gap({ min: 22, max: 26 }), s)).toBe(true);
+    expect(pass(gap({ min: 24 }), s)).toBe(true);
+    expect(pass(gap({ max: 24 }), s)).toBe(true);
+    expect(pass(gap({}), s)).toBe(true);
+    expect(pass(gap({ min: 25 }), s)).toBe(false);
+    expect(pass(gap({ max: 23 }), s)).toBe(false);
+    expect(pass(gap({ min: 0, max: 23 }), s)).toBe(false);
+  });
+  it("is signed: a negative offset means b's edge comes first", () => {
+    const down: ValidatorSpec = { kind: "offset", a: "b", b: "a", edgeA: "top", edgeB: "top", max: -10 };
+    expect(pass(down, s)).toBe(true);
+    expect(pass({ ...down, max: -11 }, s)).toBe(false);
+  });
+  it("reports the measured distance", () => {
+    expect(runSpec(gap({ min: 30 }), s).message).toContain("現在 24px");
+  });
+  it("fails when either element is missing", () => {
+    expect(pass(gap({ min: 0 }, { a: "x" }), s)).toBe(false);
+    expect(pass(gap({ min: 0 }, { b: "y" }), s)).toBe(false);
+  });
+});
+
 describe("combinators", () => {
   const s = snap([], [{ selector: ".a", decls: { color: "red" } }]);
   const passing: ValidatorSpec = { kind: "declarationEquals", selector: ".a", prop: "color", value: "red" };

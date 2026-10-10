@@ -51,6 +51,7 @@ function referencedIds(spec: ValidatorSpec): string[] {
     case "noOverlap":
       return [...spec.ids];
     case "relativeSize":
+    case "offset":
       return [spec.a, spec.b];
     default:
       return [];

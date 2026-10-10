@@ -35,6 +35,10 @@ export type ValidatorSpec =
   | (Base & { kind: "noOverlap"; ids: readonly string[] })
   | (Base & { kind: "sizeApprox"; id: string; w?: number; h?: number })
   | (Base & { kind: "relativeSize"; a: string; b: string; ratio: number; dim: Dim })
+  /** The distance from `a`'s `edgeA` to `b`'s `edgeB` (positive when b's edge
+   *  lies further right / down) stays within [min, max]; either bound may be
+   *  left out. Reads gaps between boxes and how far one line starts after another. */
+  | (Base & { kind: "offset"; a: string; b: string; edgeA: Edge; edgeB: Edge; min?: number; max?: number })
   | (Base & { kind: "allOf"; of: readonly ValidatorSpec[] })
   | (Base & { kind: "anyOf"; of: readonly ValidatorSpec[] });
 
@@ -215,6 +219,18 @@ function dispatch(spec: ValidatorSpec, s: Snapshot): ValidationResult {
       return Math.abs(av - spec.ratio * bv) <= tol
         ? ok
         : fail(`${spec.a} は ${spec.b} の ${spec.ratio} 倍の大きさになっていません`);
+    }
+    case "offset": {
+      const a = getEl(s, spec.a);
+      const b = getEl(s, spec.b);
+      if (!a) return fail(`要素 ${spec.a} が見つかりません`);
+      if (!b) return fail(`要素 ${spec.b} が見つかりません`);
+      const d = edgeCoord(b, spec.edgeB) - edgeCoord(a, spec.edgeA);
+      const tooSmall = spec.min !== undefined && d < spec.min;
+      const tooLarge = spec.max !== undefined && d > spec.max;
+      return tooSmall || tooLarge
+        ? fail(`${spec.a} の ${spec.edgeA} と ${spec.b} の ${spec.edgeB} の間隔が合っていません（現在 ${Math.round(d)}px）`)
+        : ok;
     }
     case "allOf": {
       for (const child of spec.of) {
