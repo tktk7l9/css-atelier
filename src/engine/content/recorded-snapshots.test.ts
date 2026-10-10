@@ -549,9 +549,46 @@ const GEOMETRY_RECORDINGS: Record<string, { readonly starter: Recorded; readonly
     starter: labelled([100, 65, 86.05, 28], [316, 65, 149.63, 28]),
     solution: labelled([56.98, 51, 86.05, 28], [241.19, 51, 149.63, 28]),
   },
+  // Multi-column, float / shape and table lessons (headless Chrome 155).
+  "multicol-columns": {
+    starter: { news: { rect: [0, 0, 280, 202], computed: {"column-count":"auto","column-width":"auto"} }, n1: { rect: [1, 9, 278, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 41, 278, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 73, 278, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [1, 105, 278, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [1, 137, 278, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [1, 169, 278, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+    solution: { news: { rect: [0, 0, 280, 106], computed: {"column-count":"2","column-width":"auto"} }, n1: { rect: [1, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [152, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [152, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [152, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  "multicol-span": {
+    starter: { news: { rect: [0, 0, 280, 139], computed: {"column-span":"none"} }, head: { rect: [1, 9, 127, 58], computed: {"column-span":"none"} }, n1: { rect: [1, 75, 127, 24], computed: {"column-span":"none"} }, n2: { rect: [1, 107, 127, 24], computed: {"column-span":"none"} }, n3: { rect: [152, 9, 127, 24], computed: {"column-span":"none"} }, n4: { rect: [152, 41, 127, 24], computed: {"column-span":"none"} }, n5: { rect: [152, 73, 127, 24], computed: {"column-span":"none"} }, n6: { rect: [152, 105, 127, 24], computed: {"column-span":"none"} } },
+    solution: { news: { rect: [0, 0, 280, 144], computed: {"column-span":"none"} }, head: { rect: [1, 9, 278, 30], computed: {"column-span":"all"} }, n1: { rect: [1, 47, 127, 24], computed: {"column-span":"none"} }, n2: { rect: [1, 79, 127, 24], computed: {"column-span":"none"} }, n3: { rect: [1, 111, 127, 24], computed: {"column-span":"none"} }, n4: { rect: [152, 47, 127, 24], computed: {"column-span":"none"} }, n5: { rect: [152, 79, 127, 24], computed: {"column-span":"none"} }, n6: { rect: [152, 111, 127, 24], computed: {"column-span":"none"} } },
+  },
+  "multicol-break": {
+    starter: { wrap: { rect: [0, 0, 280, 176], computed: {"break-inside":"auto"} }, c1: { rect: [0, 0, 128, 72], computed: {"break-inside":"auto"} }, c2: { rect: [0, 80, 128, 48], computed: {"break-inside":"auto"} }, c3: { rect: [0, 0, 280, 176], computed: {"break-inside":"auto"} }, c4: { rect: [152, 40, 128, 48], computed: {"break-inside":"auto"} }, c5: { rect: [152, 96, 128, 72], computed: {"break-inside":"auto"} } },
+    solution: { wrap: { rect: [0, 0, 280, 208], computed: {"break-inside":"auto"} }, c1: { rect: [0, 0, 128, 72], computed: {"break-inside":"avoid"} }, c2: { rect: [0, 80, 128, 48], computed: {"break-inside":"avoid"} }, c3: { rect: [0, 136, 128, 72], computed: {"break-inside":"avoid"} }, c4: { rect: [152, 0, 128, 48], computed: {"break-inside":"avoid"} }, c5: { rect: [152, 56, 128, 72], computed: {"break-inside":"avoid"} } },
+  },
+  "float-left": {
+    starter: { para: { rect: [0, 0, 320, 376], computed: {"float":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"float":"none"} }, l1: { rect: [0, 160, 92, 24], computed: {"float":"none"} }, l2: { rect: [0, 184, 92, 24], computed: {"float":"none"} }, l3: { rect: [0, 208, 78, 24], computed: {"float":"none"} }, l4: { rect: [0, 232, 92, 24], computed: {"float":"none"} }, l5: { rect: [0, 256, 92, 24], computed: {"float":"none"} }, l6: { rect: [0, 280, 64, 24], computed: {"float":"none"} }, l7: { rect: [0, 304, 92, 24], computed: {"float":"none"} }, l8: { rect: [0, 328, 92, 24], computed: {"float":"none"} }, l9: { rect: [0, 352, 134, 24], computed: {"float":"none"} } },
+    solution: { para: { rect: [0, 0, 320, 216], computed: {"float":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"float":"left"} }, l1: { rect: [160, 0, 92, 24], computed: {"float":"none"} }, l2: { rect: [160, 24, 92, 24], computed: {"float":"none"} }, l3: { rect: [160, 48, 78, 24], computed: {"float":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"float":"none"} }, l5: { rect: [160, 96, 92, 24], computed: {"float":"none"} }, l6: { rect: [160, 120, 64, 24], computed: {"float":"none"} }, l7: { rect: [160, 144, 92, 24], computed: {"float":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"float":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"float":"none"} } },
+  },
+  "shape-circle": {
+    starter: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"none"} }, l1: { rect: [160, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [160, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [160, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [160, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [160, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [160, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+    solution: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"circle()"} }, l1: { rect: [137.13, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [153.31, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [159.59, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [158.38, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [149.28, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [128, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  "shape-margin": {
+    starter: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [12, 12, 160, 160], computed: {"shape-margin":"0px"} }, l1: { rect: [134.14, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [158.81, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [169.45, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [172, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [171.89, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [166.94, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [152.78, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [116.97, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+    solution: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [12, 12, 160, 160], computed: {"shape-margin":"12px"} }, l1: { rect: [153.95, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [172.78, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [181.8, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [184, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [183.91, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [179.63, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [167.89, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [143.84, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+  },
+  "table-collapse": {
+    starter: { sheet: { rect: [0, 0, 248, 96.78], computed: {"border-collapse":"separate"} }, h1: { rect: [2, 2, 80, 29.59], computed: {"border-collapse":"separate"} }, h2: { rect: [84, 2, 80, 29.59], computed: {"border-collapse":"separate"} }, h3: { rect: [166, 2, 80, 29.59], computed: {"border-collapse":"separate"} }, a1: { rect: [2, 33.59, 80, 29.59], computed: {"border-collapse":"separate"} }, a2: { rect: [84, 33.59, 80, 29.59], computed: {"border-collapse":"separate"} }, a3: { rect: [166, 33.59, 80, 29.59], computed: {"border-collapse":"separate"} }, b1: { rect: [2, 65.19, 80, 29.59], computed: {"border-collapse":"separate"} }, b2: { rect: [84, 65.19, 80, 29.59], computed: {"border-collapse":"separate"} }, b3: { rect: [166, 65.19, 80, 29.59], computed: {"border-collapse":"separate"} } },
+    solution: { sheet: { rect: [0, 0, 241, 86.78], computed: {"border-collapse":"collapse"} }, h1: { rect: [0.5, 0.5, 80, 28.59], computed: {"border-collapse":"collapse"} }, h2: { rect: [80.5, 0.5, 80, 28.59], computed: {"border-collapse":"collapse"} }, h3: { rect: [160.5, 0.5, 80, 28.59], computed: {"border-collapse":"collapse"} }, a1: { rect: [0.5, 29.09, 80, 28.59], computed: {"border-collapse":"collapse"} }, a2: { rect: [80.5, 29.09, 80, 28.59], computed: {"border-collapse":"collapse"} }, a3: { rect: [160.5, 29.09, 80, 28.59], computed: {"border-collapse":"collapse"} }, b1: { rect: [0.5, 57.69, 80, 28.59], computed: {"border-collapse":"collapse"} }, b2: { rect: [80.5, 57.69, 80, 28.59], computed: {"border-collapse":"collapse"} }, b3: { rect: [160.5, 57.69, 80, 28.59], computed: {"border-collapse":"collapse"} } },
+  },
+  "table-fixed": {
+    starter: { wrap: { rect: [0, 0, 360, 125.97], computed: {"table-layout":"auto"} }, sheet: { rect: [0, 0, 360, 125.97], computed: {"table-layout":"auto"} }, h1: { rect: [0.5, 0.5, 54.8, 28.59], computed: {"table-layout":"auto"} }, h2: { rect: [55.3, 0.5, 269.89, 28.59], computed: {"table-layout":"auto"} }, h3: { rect: [325.19, 0.5, 34.31, 28.59], computed: {"table-layout":"auto"} }, a1: { rect: [0.5, 29.09, 54.8, 48.19], computed: {"table-layout":"auto"} }, a2: { rect: [55.3, 29.09, 269.89, 48.19], computed: {"table-layout":"auto"} }, a3: { rect: [325.19, 29.09, 34.31, 48.19], computed: {"table-layout":"auto"} }, b1: { rect: [0.5, 77.28, 54.8, 48.19], computed: {"table-layout":"auto"} }, b2: { rect: [55.3, 77.28, 269.89, 48.19], computed: {"table-layout":"auto"} }, b3: { rect: [325.19, 77.28, 34.31, 48.19], computed: {"table-layout":"auto"} } },
+    solution: { wrap: { rect: [0, 0, 360, 145.56], computed: {"table-layout":"auto"} }, sheet: { rect: [0, 0, 360, 145.56], computed: {"table-layout":"fixed"} }, h1: { rect: [0.5, 0.5, 119.66, 28.59], computed: {"table-layout":"auto"} }, h2: { rect: [120.16, 0.5, 119.66, 28.59], computed: {"table-layout":"auto"} }, h3: { rect: [239.81, 0.5, 119.69, 28.59], computed: {"table-layout":"auto"} }, a1: { rect: [0.5, 29.09, 119.66, 87.38], computed: {"table-layout":"auto"} }, a2: { rect: [120.16, 29.09, 119.66, 87.38], computed: {"table-layout":"auto"} }, a3: { rect: [239.81, 29.09, 119.69, 87.38], computed: {"table-layout":"auto"} }, b1: { rect: [0.5, 116.47, 119.66, 28.59], computed: {"table-layout":"auto"} }, b2: { rect: [120.16, 116.47, 119.66, 28.59], computed: {"table-layout":"auto"} }, b3: { rect: [239.81, 116.47, 119.69, 28.59], computed: {"table-layout":"auto"} } },
+  },
+  "table-caption": {
+    starter: { wrap: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"top"} }, sheet: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"top"} }, cap: { rect: [0, 0, 360, 27.59], computed: {"caption-side":"top"} }, h1: { rect: [0.5, 28.09, 119.66, 28.59], computed: {"caption-side":"top"} }, h2: { rect: [120.16, 28.09, 119.66, 28.59], computed: {"caption-side":"top"} }, h3: { rect: [239.81, 28.09, 119.69, 28.59], computed: {"caption-side":"top"} }, a1: { rect: [0.5, 56.69, 119.66, 87.38], computed: {"caption-side":"top"} }, a2: { rect: [120.16, 56.69, 119.66, 87.38], computed: {"caption-side":"top"} }, a3: { rect: [239.81, 56.69, 119.69, 87.38], computed: {"caption-side":"top"} }, b1: { rect: [0.5, 144.06, 119.66, 28.59], computed: {"caption-side":"top"} }, b2: { rect: [120.16, 144.06, 119.66, 28.59], computed: {"caption-side":"top"} }, b3: { rect: [239.81, 144.06, 119.69, 28.59], computed: {"caption-side":"top"} } },
+    solution: { wrap: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"top"} }, sheet: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"bottom"} }, cap: { rect: [0, 145.56, 360, 27.59], computed: {"caption-side":"bottom"} }, h1: { rect: [0.5, 0.5, 119.66, 28.59], computed: {"caption-side":"bottom"} }, h2: { rect: [120.16, 0.5, 119.66, 28.59], computed: {"caption-side":"bottom"} }, h3: { rect: [239.81, 0.5, 119.69, 28.59], computed: {"caption-side":"bottom"} }, a1: { rect: [0.5, 29.09, 119.66, 87.38], computed: {"caption-side":"bottom"} }, a2: { rect: [120.16, 29.09, 119.66, 87.38], computed: {"caption-side":"bottom"} }, a3: { rect: [239.81, 29.09, 119.69, 87.38], computed: {"caption-side":"bottom"} }, b1: { rect: [0.5, 116.47, 119.66, 28.59], computed: {"caption-side":"bottom"} }, b2: { rect: [120.16, 116.47, 119.66, 28.59], computed: {"caption-side":"bottom"} }, b3: { rect: [239.81, 116.47, 119.69, 28.59], computed: {"caption-side":"bottom"} } },
+  },
 };
 
-/** The lessons added with the intrinsic sizing, grid alignment, positioning and 2D transform tracks. */
+/** The lessons added with the intrinsic sizing, grid alignment, positioning, 2D transform, multi-column, shape and table tracks. */
 const NEW_GEOMETRY_LESSONS = [
   "size-max-content",
   "size-min-content",
@@ -565,6 +602,15 @@ const NEW_GEOMETRY_LESSONS = [
   "transform-origin",
   "transform-individual",
   "transform-translate-percent",
+  "multicol-columns",
+  "multicol-span",
+  "multicol-break",
+  "float-left",
+  "shape-circle",
+  "shape-margin",
+  "table-collapse",
+  "table-fixed",
+  "table-caption",
 ];
 
 function geometrySnapshot(css: string, rec: Recorded): Snapshot {
@@ -1435,5 +1481,364 @@ describe("lessons replayed from recorded sandbox geometry", () => {
     expect(run(auto, labelled([56.97, 51, 86.05, 28], [241.19, 51, 149.63, 28]))).toEqual([
       "translate で、ラベル自身の幅と高さの半分だけ戻しましょう",
     ]);
+  });
+});
+
+// The multi-column, float / shape and table lessons are graded by geometry, so
+// the other ways of writing them were rendered in the real sandbox too: each
+// entry is one CSS the learner might write, with the rects and computed values
+// it produced and the one message the lesson gives for it.
+interface Variant {
+  readonly lesson: string;
+  readonly name: string;
+  readonly css: string;
+  readonly passes: boolean;
+  readonly message?: string;
+  readonly elements: Recorded;
+}
+
+const VARIANTS: readonly Variant[] = [
+{
+    lesson: "multicol-columns",
+    name: "column-count + gap",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n  column-count: 2;\n  column-gap: 24px;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { news: { rect: [0, 0, 280, 106], computed: {"column-count":"2","column-width":"auto"} }, n1: { rect: [1, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [152, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [152, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [152, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  {
+    lesson: "multicol-columns",
+    name: "gap shorthand",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n  columns: 2;\n  gap: 24px;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { news: { rect: [0, 0, 280, 106], computed: {"column-count":"2","column-width":"auto"} }, n1: { rect: [1, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [152, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [152, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [152, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  {
+    lesson: "multicol-columns",
+    name: "column-width 120px",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n  column-width: 120px;\n  column-gap: 24px;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { news: { rect: [0, 0, 280, 106], computed: {"column-count":"auto","column-width":"120px"} }, n1: { rect: [1, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [152, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [152, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [152, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  {
+    lesson: "multicol-columns",
+    name: "columns without gap",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n.news { columns: 2; }\n",
+    passes: false,
+    message: "段と段の間が 24px 空いていません（column-gap で指定します。指定しないと 1em です）",
+    elements: { news: { rect: [0, 0, 280, 106], computed: {"column-count":"2","column-width":"auto"} }, n1: { rect: [1, 9, 131, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 41, 131, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 73, 131, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [148, 9, 131, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [148, 41, 131, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [148, 73, 131, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  {
+    lesson: "multicol-columns",
+    name: "columns 3",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n  columns: 3;\n  column-gap: 24px;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n",
+    passes: false,
+    message: "お知らせが 2 段に分かれていません（4 件目が、1 件目の横＝2 段目の先頭に来ていません）",
+    elements: { news: { rect: [0, 0, 280, 122], computed: {"column-count":"3","column-width":"auto"} }, n1: { rect: [1, 9, 76.66, 48], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 65, 76.66, 48], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [101.67, 9, 76.66, 48], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [101.67, 65, 76.66, 48], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [202.33, 9, 76.66, 48], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [202.33, 65, 76.66, 48], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  {
+    lesson: "multicol-columns",
+    name: "grid 2 cols",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n.news { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }\n",
+    passes: false,
+    message: "お知らせが 2 段に分かれていません（4 件目が、1 件目の横＝2 段目の先頭に来ていません）",
+    elements: { news: { rect: [0, 0, 280, 106], computed: {"column-count":"auto","column-width":"auto"} }, n1: { rect: [1, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [152, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [152, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [1, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [152, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  {
+    lesson: "multicol-columns",
+    name: "flex column wrap",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n.news { display: flex; flex-direction: column; flex-wrap: wrap; height: 106px; column-gap: 24px; }\n",
+    passes: false,
+    message: "columns: 2（または column-count: 2）で段組みにしましょう（flex や grid で 2 列に並べると、段の高さが中身の量に合わせて決まりません）",
+    elements: { news: { rect: [0, 0, 280, 106], computed: {"column-count":"auto","column-width":"auto"} }, n1: { rect: [1, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n2: { rect: [1, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n3: { rect: [1, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n4: { rect: [152, 9, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n5: { rect: [152, 41, 127, 24], computed: {"column-count":"auto","column-width":"auto"} }, n6: { rect: [152, 73, 127, 24], computed: {"column-count":"auto","column-width":"auto"} } },
+  },
+  {
+    lesson: "multicol-span",
+    name: "width 200%",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  columns: 2;\n  column-gap: 24px;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n}\n.head {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 16px;\n  line-height: 28px;\n  border-bottom: 2px solid #2f5fd0;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n.head { width: 200%; }\n",
+    passes: false,
+    message: "見出し（h3）が 1 段目の幅のままです（段をまたいでいません）",
+    elements: { news: { rect: [0, 0, 280, 130], computed: {"column-span":"none"} }, head: { rect: [1, 9, 254, 30], computed: {"column-span":"none"} }, n1: { rect: [1, 47, 127, 24], computed: {"column-span":"none"} }, n2: { rect: [1, 79, 127, 24], computed: {"column-span":"none"} }, n3: { rect: [152, 9, 127, 24], computed: {"column-span":"none"} }, n4: { rect: [152, 41, 127, 24], computed: {"column-span":"none"} }, n5: { rect: [152, 73, 127, 24], computed: {"column-span":"none"} }, n6: { rect: [152, 105, 127, 24], computed: {"column-span":"none"} } },
+  },
+  {
+    lesson: "multicol-span",
+    name: "absolute full width",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  columns: 2;\n  column-gap: 24px;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n}\n.head {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 16px;\n  line-height: 28px;\n  border-bottom: 2px solid #2f5fd0;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n.news { position: relative; } .head { position: absolute; top: 0; width: 100%; }\n",
+    passes: false,
+    message: "column-span: all で、見出しにすべての段をまたがせましょう",
+    elements: { news: { rect: [0, 0, 280, 106], computed: {"column-span":"none"} }, head: { rect: [1, 1, 278, 30], computed: {"column-span":"none"} }, n1: { rect: [1, 9, 127, 24], computed: {"column-span":"none"} }, n2: { rect: [1, 41, 127, 24], computed: {"column-span":"none"} }, n3: { rect: [1, 73, 127, 24], computed: {"column-span":"none"} }, n4: { rect: [152, 9, 127, 24], computed: {"column-span":"none"} }, n5: { rect: [152, 41, 127, 24], computed: {"column-span":"none"} }, n6: { rect: [152, 73, 127, 24], computed: {"column-span":"none"} } },
+  },
+  {
+    lesson: "multicol-span",
+    name: "columns 1",
+    css: ".news {\n  width: 280px;\n  padding: 8px 0 0;\n  columns: 2;\n  column-gap: 24px;\n  border: 1px solid #dbe4fb;\n  border-radius: 8px;\n}\n.head {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 16px;\n  line-height: 28px;\n  border-bottom: 2px solid #2f5fd0;\n}\n.item {\n  margin: 0 0 8px;\n  padding: 0 8px;\n  font-size: 14px;\n  line-height: 24px;\n  background: #eef1f8;\n}\n.news { columns: 1; }\n",
+    passes: false,
+    message: "お知らせが、見出しの下から 2 段に分かれていません",
+    elements: { news: { rect: [0, 0, 280, 240], computed: {"column-span":"none"} }, head: { rect: [1, 9, 278, 30], computed: {"column-span":"none"} }, n1: { rect: [1, 47, 278, 24], computed: {"column-span":"none"} }, n2: { rect: [1, 79, 278, 24], computed: {"column-span":"none"} }, n3: { rect: [1, 111, 278, 24], computed: {"column-span":"none"} }, n4: { rect: [1, 143, 278, 24], computed: {"column-span":"none"} }, n5: { rect: [1, 175, 278, 24], computed: {"column-span":"none"} }, n6: { rect: [1, 207, 278, 24], computed: {"column-span":"none"} } },
+  },
+  {
+    lesson: "multicol-break",
+    name: "avoid-column",
+    css: ".wrap {\n  width: 280px;\n  columns: 2;\n  column-gap: 24px;\n}\n.card {\n  margin: 0 0 8px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #eef1f8;\n  break-inside: avoid-column;\n}\n.card h4 {\n  margin: 0;\n  font-size: 14px;\n  line-height: 20px;\n}\n.card p {\n  margin: 4px 0 0;\n  font-size: 12px;\n  line-height: 18px;\n}\n.tall {\n  height: 72px;\n}\n.short {\n  height: 48px;\n}\n",
+    passes: true,
+    elements: { wrap: { rect: [0, 0, 280, 208], computed: {"break-inside":"auto"} }, c1: { rect: [0, 0, 128, 72], computed: {"break-inside":"avoid-column"} }, c2: { rect: [0, 80, 128, 48], computed: {"break-inside":"avoid-column"} }, c3: { rect: [0, 136, 128, 72], computed: {"break-inside":"avoid-column"} }, c4: { rect: [152, 0, 128, 48], computed: {"break-inside":"avoid-column"} }, c5: { rect: [152, 56, 128, 72], computed: {"break-inside":"avoid-column"} } },
+  },
+  {
+    lesson: "multicol-break",
+    name: "page-break-inside",
+    css: ".wrap {\n  width: 280px;\n  columns: 2;\n  column-gap: 24px;\n}\n.card {\n  margin: 0 0 8px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #eef1f8;\n  page-break-inside: avoid;\n}\n.card h4 {\n  margin: 0;\n  font-size: 14px;\n  line-height: 20px;\n}\n.card p {\n  margin: 4px 0 0;\n  font-size: 12px;\n  line-height: 18px;\n}\n.tall {\n  height: 72px;\n}\n.short {\n  height: 48px;\n}\n",
+    passes: true,
+    elements: { wrap: { rect: [0, 0, 280, 208], computed: {"break-inside":"auto"} }, c1: { rect: [0, 0, 128, 72], computed: {"break-inside":"avoid"} }, c2: { rect: [0, 80, 128, 48], computed: {"break-inside":"avoid"} }, c3: { rect: [0, 136, 128, 72], computed: {"break-inside":"avoid"} }, c4: { rect: [152, 0, 128, 48], computed: {"break-inside":"avoid"} }, c5: { rect: [152, 56, 128, 72], computed: {"break-inside":"avoid"} } },
+  },
+  {
+    lesson: "multicol-break",
+    name: "inline-block hack",
+    css: ".wrap {\n  width: 280px;\n  columns: 2;\n  column-gap: 24px;\n}\n.card {\n  margin: 0 0 8px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #eef1f8;\n}\n.card h4 {\n  margin: 0;\n  font-size: 14px;\n  line-height: 20px;\n}\n.card p {\n  margin: 4px 0 0;\n  font-size: 12px;\n  line-height: 18px;\n}\n.tall {\n  height: 72px;\n}\n.short {\n  height: 48px;\n}\n.card { display: inline-block; width: 100%; }\n",
+    passes: false,
+    message: "break-inside: avoid で、カードの途中で段が変わらないようにしましょう（display: inline-block や overflow: hidden でも分かれなくなりますが、段組みや印刷のための本来の指定は break-inside です）",
+    elements: { wrap: { rect: [0, 0, 280, 216], computed: {"break-inside":"auto"} }, c1: { rect: [0, 0, 128, 72], computed: {"break-inside":"auto"} }, c2: { rect: [0, 80, 128, 48], computed: {"break-inside":"auto"} }, c3: { rect: [0, 136, 128, 72], computed: {"break-inside":"auto"} }, c4: { rect: [152, 0, 128, 48], computed: {"break-inside":"auto"} }, c5: { rect: [152, 56, 128, 72], computed: {"break-inside":"auto"} } },
+  },
+  {
+    lesson: "multicol-break",
+    name: "column-fill auto",
+    css: ".wrap {\n  width: 280px;\n  columns: 2;\n  column-gap: 24px;\n}\n.card {\n  margin: 0 0 8px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #eef1f8;\n}\n.card h4 {\n  margin: 0;\n  font-size: 14px;\n  line-height: 20px;\n}\n.card p {\n  margin: 4px 0 0;\n  font-size: 12px;\n  line-height: 18px;\n}\n.tall {\n  height: 72px;\n}\n.short {\n  height: 48px;\n}\n.wrap { column-fill: auto; }\n",
+    passes: false,
+    message: "break-inside: avoid で、カードの途中で段が変わらないようにしましょう（display: inline-block や overflow: hidden でも分かれなくなりますが、段組みや印刷のための本来の指定は break-inside です）",
+    elements: { wrap: { rect: [0, 0, 280, 352], computed: {"break-inside":"auto"} }, c1: { rect: [0, 0, 128, 72], computed: {"break-inside":"auto"} }, c2: { rect: [0, 80, 128, 48], computed: {"break-inside":"auto"} }, c3: { rect: [0, 136, 128, 72], computed: {"break-inside":"auto"} }, c4: { rect: [0, 216, 128, 48], computed: {"break-inside":"auto"} }, c5: { rect: [0, 272, 128, 72], computed: {"break-inside":"auto"} } },
+  },
+  {
+    lesson: "multicol-break",
+    name: "overflow hidden (monolithic)",
+    css: ".wrap {\n  width: 280px;\n  columns: 2;\n  column-gap: 24px;\n}\n.card {\n  margin: 0 0 8px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #eef1f8;\n}\n.card h4 {\n  margin: 0;\n  font-size: 14px;\n  line-height: 20px;\n}\n.card p {\n  margin: 4px 0 0;\n  font-size: 12px;\n  line-height: 18px;\n}\n.tall {\n  height: 72px;\n}\n.short {\n  height: 48px;\n}\n.card { overflow: hidden; }\n",
+    passes: false,
+    message: "break-inside: avoid で、カードの途中で段が変わらないようにしましょう（display: inline-block や overflow: hidden でも分かれなくなりますが、段組みや印刷のための本来の指定は break-inside です）",
+    elements: { wrap: { rect: [0, 0, 280, 208], computed: {"break-inside":"auto"} }, c1: { rect: [0, 0, 128, 72], computed: {"break-inside":"auto"} }, c2: { rect: [0, 80, 128, 48], computed: {"break-inside":"auto"} }, c3: { rect: [0, 136, 128, 72], computed: {"break-inside":"auto"} }, c4: { rect: [152, 0, 128, 48], computed: {"break-inside":"auto"} }, c5: { rect: [152, 56, 128, 72], computed: {"break-inside":"auto"} } },
+  },
+  {
+    lesson: "float-left",
+    name: "float + margin-right",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left; margin-right: 12px;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"float":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"float":"left"} }, l1: { rect: [172, 0, 92, 24], computed: {"float":"none"} }, l2: { rect: [172, 24, 92, 24], computed: {"float":"none"} }, l3: { rect: [172, 48, 78, 24], computed: {"float":"none"} }, l4: { rect: [172, 72, 92, 24], computed: {"float":"none"} }, l5: { rect: [172, 96, 92, 24], computed: {"float":"none"} }, l6: { rect: [172, 120, 64, 24], computed: {"float":"none"} }, l7: { rect: [172, 144, 92, 24], computed: {"float":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"float":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"float":"none"} } },
+  },
+  {
+    lesson: "float-left",
+    name: "float right",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: right;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: false,
+    message: "説明文が写真の右に回り込んでいません（写真の下から始まっています）",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"float":"none"} }, photo: { rect: [160, 0, 160, 160], computed: {"float":"right"} }, l1: { rect: [0, 0, 92, 24], computed: {"float":"none"} }, l2: { rect: [0, 24, 92, 24], computed: {"float":"none"} }, l3: { rect: [0, 48, 78, 24], computed: {"float":"none"} }, l4: { rect: [0, 72, 92, 24], computed: {"float":"none"} }, l5: { rect: [0, 96, 92, 24], computed: {"float":"none"} }, l6: { rect: [0, 120, 64, 24], computed: {"float":"none"} }, l7: { rect: [0, 144, 92, 24], computed: {"float":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"float":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"float":"none"} } },
+  },
+  {
+    lesson: "float-left",
+    name: "absolute + padding",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n.para { position: relative; padding-left: 160px; } .photo { position: absolute; top: 0; left: 0; }\n",
+    passes: false,
+    message: "写真より下の行（8 行目から）が、左端に戻っていません",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"float":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"float":"none"} }, l1: { rect: [160, 0, 92, 24], computed: {"float":"none"} }, l2: { rect: [160, 24, 92, 24], computed: {"float":"none"} }, l3: { rect: [160, 48, 78, 24], computed: {"float":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"float":"none"} }, l5: { rect: [160, 96, 92, 24], computed: {"float":"none"} }, l6: { rect: [160, 120, 64, 24], computed: {"float":"none"} }, l7: { rect: [160, 144, 92, 24], computed: {"float":"none"} }, l8: { rect: [160, 168, 92, 24], computed: {"float":"none"} }, l9: { rect: [160, 192, 134, 24], computed: {"float":"none"} } },
+  },
+  {
+    lesson: "float-left",
+    name: "inline-block",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n.photo { display: inline-block; vertical-align: top; }\n",
+    passes: false,
+    message: "説明文が写真の右に回り込んでいません（写真の下から始まっています）",
+    elements: { para: { rect: [0, 0, 320, 352], computed: {"float":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"float":"none"} }, l1: { rect: [160, 0, 92, 24], computed: {"float":"none"} }, l2: { rect: [0, 160, 92, 24], computed: {"float":"none"} }, l3: { rect: [0, 184, 78, 24], computed: {"float":"none"} }, l4: { rect: [0, 208, 92, 24], computed: {"float":"none"} }, l5: { rect: [0, 232, 92, 24], computed: {"float":"none"} }, l6: { rect: [0, 256, 64, 24], computed: {"float":"none"} }, l7: { rect: [0, 280, 92, 24], computed: {"float":"none"} }, l8: { rect: [0, 304, 92, 24], computed: {"float":"none"} }, l9: { rect: [0, 328, 134, 24], computed: {"float":"none"} } },
+  },
+  {
+    lesson: "shape-circle",
+    name: "circle(50%)",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  border-radius: 50%;\n  shape-outside: circle(50%);\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"circle(50%)"} }, l1: { rect: [137.13, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [153.31, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [159.59, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [158.38, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [149.28, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [128, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  {
+    lesson: "shape-circle",
+    name: "ellipse()",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  border-radius: 50%;\n  shape-outside: ellipse();\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"ellipse()"} }, l1: { rect: [137.13, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [153.31, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [159.59, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [158.38, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [149.28, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [128, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  {
+    lesson: "shape-circle",
+    name: "inset round",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  border-radius: 50%;\n  shape-outside: inset(0 round 50%);\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"inset(0px round 50%)"} }, l1: { rect: [137.13, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [153.31, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [159.59, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [158.38, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [149.28, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [128, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  {
+    lesson: "shape-circle",
+    name: "circle(40%) too small",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  border-radius: 50%;\n  shape-outside: circle(40%);\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: false,
+    message: "真ん中の行の文字が、写真に重なっています（円が写真より小さくなっています。半径を省略した circle() なら、写真の短い辺の半分です）",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"circle(40%)"} }, l1: { rect: [110.97, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [135.42, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [143.48, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [144, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [141.95, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [129.95, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [0, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  {
+    lesson: "shape-circle",
+    name: "clip-path only",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  border-radius: 50%;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n.photo { clip-path: circle(); }\n",
+    passes: false,
+    message: "説明文が円の形に沿っていません（上の行も真ん中の行も同じ位置から始まり、四角い箱に沿っています）",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"none"} }, l1: { rect: [160, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [160, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [160, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [160, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [160, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [160, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  {
+    lesson: "shape-circle",
+    name: "margin-box",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  border-radius: 50%;\n  shape-outside: margin-box;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: false,
+    message: "shape-outside: circle() で、回り込みの形を円にしましょう（border-radius や clip-path は見た目だけで、回り込みの形は変わりません）",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"margin-box"} }, l1: { rect: [137.13, 0, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [153.31, 24, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [159.59, 48, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [160, 72, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [158.38, 96, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [149.28, 120, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [128, 144, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 168, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  {
+    lesson: "shape-circle",
+    name: "no float",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  \n  border-radius: 50%;\n  shape-outside: circle();\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: false,
+    message: "説明文が円の形に沿っていません（上の行も真ん中の行も同じ位置から始まり、四角い箱に沿っています）",
+    elements: { para: { rect: [0, 0, 320, 376], computed: {"shape-outside":"none"} }, photo: { rect: [0, 0, 160, 160], computed: {"shape-outside":"circle()"} }, l1: { rect: [0, 160, 92, 24], computed: {"shape-outside":"none"} }, l2: { rect: [0, 184, 92, 24], computed: {"shape-outside":"none"} }, l3: { rect: [0, 208, 78, 24], computed: {"shape-outside":"none"} }, l4: { rect: [0, 232, 92, 24], computed: {"shape-outside":"none"} }, l5: { rect: [0, 256, 92, 24], computed: {"shape-outside":"none"} }, l6: { rect: [0, 280, 64, 24], computed: {"shape-outside":"none"} }, l7: { rect: [0, 304, 92, 24], computed: {"shape-outside":"none"} }, l8: { rect: [0, 328, 92, 24], computed: {"shape-outside":"none"} }, l9: { rect: [0, 352, 134, 24], computed: {"shape-outside":"none"} } },
+  },
+  {
+    lesson: "shape-margin",
+    name: "shape-margin 16px",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  margin: 12px;\n  border-radius: 50%;\n  shape-outside: circle(80px);\n  shape-margin: 16px;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [12, 12, 160, 160], computed: {"shape-margin":"16px"} }, l1: { rect: [159.75, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [177.31, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [184, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [184, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [184, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [183.81, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [172.69, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [150.64, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+  },
+  {
+    lesson: "shape-margin",
+    name: "shape-margin 8px",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  margin: 12px;\n  border-radius: 50%;\n  shape-outside: circle(80px);\n  shape-margin: 8px;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: false,
+    message: "真ん中の行の文字が写真に近すぎます（図形の外側に 12px ほどの余白を足しましょう。写真の margin を広げても、円は写真の大きさのままです）",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [12, 12, 160, 160], computed: {"shape-margin":"8px"} }, l1: { rect: [147.84, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [168.2, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [177.69, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [180, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [179.91, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [175.42, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [162.98, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [136.36, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+  },
+  {
+    lesson: "shape-margin",
+    name: "margin 24",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  margin: 12px;\n  border-radius: 50%;\n  shape-outside: circle(80px);\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n.photo { margin: 24px; }\n",
+    passes: false,
+    message: "真ん中の行の文字が写真に近すぎます（図形の外側に 12px ほどの余白を足しましょう。写真の margin を広げても、円は写真の大きさのままです）",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [24, 24, 160, 160], computed: {"shape-margin":"0px"} }, l1: { rect: [0, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [161.13, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [177.31, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [183.59, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [184, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [182.38, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [173.28, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [152, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+  },
+  {
+    lesson: "shape-margin",
+    name: "bigger circle",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  margin: 12px;\n  border-radius: 50%;\n  shape-outside: circle(80px);\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n.photo { shape-outside: circle(92px); }\n",
+    passes: false,
+    message: "shape-margin で、図形の外側に余白を足しましょう（circle() の半径を大きくすると、図形が写真と合わなくなります）",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [12, 12, 160, 160], computed: {"shape-margin":"0px"} }, l1: { rect: [153.95, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [172.78, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [181.8, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [184, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [183.91, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [179.63, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [167.89, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [143.84, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+  },
+  {
+    lesson: "shape-margin",
+    name: "shape-margin 24 (clipped by the margin box)",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  margin: 12px;\n  border-radius: 50%;\n  shape-outside: circle(80px);\n  shape-margin: 24px;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: false,
+    message: "回り込みが円の形でなくなっています",
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [12, 12, 160, 160], computed: {"shape-margin":"24px"} }, l1: { rect: [170.69, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [184, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [184, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [184, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [184, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [184, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [182.06, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [162.98, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+  },
+  {
+    lesson: "shape-margin",
+    name: "shape-margin + bigger margin",
+    css: ".para {\n  max-width: 320px;\n  margin: 0;\n  font-size: 14px;\n  line-height: 24px;\n}\n.photo {\n  display: block;\n  width: 160px;\n  height: 160px;\n  background: radial-gradient(circle at 40% 35%, #ffd27a, #ff8a65 70%);\n  float: left;\n  margin: 20px;\n  border-radius: 50%;\n  shape-outside: circle(80px);\n  shape-margin: 12px;\n}\n.line {\n  display: inline-block;\n  padding: 0 4px;\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { para: { rect: [0, 0, 320, 216], computed: {"shape-margin":"0px"} }, photo: { rect: [20, 20, 160, 160], computed: {"shape-margin":"12px"} }, l1: { rect: [151.84, 0, 92, 24], computed: {"shape-margin":"0px"} }, l2: { rect: [175.89, 24, 92, 24], computed: {"shape-margin":"0px"} }, l3: { rect: [187.63, 48, 78, 24], computed: {"shape-margin":"0px"} }, l4: { rect: [191.91, 72, 92, 24], computed: {"shape-margin":"0px"} }, l5: { rect: [192, 96, 92, 24], computed: {"shape-margin":"0px"} }, l6: { rect: [189.8, 120, 64, 24], computed: {"shape-margin":"0px"} }, l7: { rect: [180.78, 144, 92, 24], computed: {"shape-margin":"0px"} }, l8: { rect: [161.95, 168, 92, 24], computed: {"shape-margin":"0px"} }, l9: { rect: [0, 192, 134, 24], computed: {"shape-margin":"0px"} } },
+  },
+  {
+    lesson: "table-collapse",
+    name: "spacing 0",
+    css: ".sheet {\n  font-size: 14px;\n}\n.sheet th,\n.sheet td {\n  width: 80px;\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n}\n.sheet th {\n  background: #eef1f8;\n}\n.sheet { border-spacing: 0; }\n",
+    passes: false,
+    message: "border-spacing: 0 ではセルが触れるだけで線は二重のままです。border-collapse: collapse で、隣り合う枠線を 1 本にまとめましょう",
+    elements: { sheet: { rect: [0, 0, 240, 88.78], computed: {"border-collapse":"separate"} }, h1: { rect: [0, 0, 80, 29.59], computed: {"border-collapse":"separate"} }, h2: { rect: [80, 0, 80, 29.59], computed: {"border-collapse":"separate"} }, h3: { rect: [160, 0, 80, 29.59], computed: {"border-collapse":"separate"} }, a1: { rect: [0, 29.59, 80, 29.59], computed: {"border-collapse":"separate"} }, a2: { rect: [80, 29.59, 80, 29.59], computed: {"border-collapse":"separate"} }, a3: { rect: [160, 29.59, 80, 29.59], computed: {"border-collapse":"separate"} }, b1: { rect: [0, 59.19, 80, 29.59], computed: {"border-collapse":"separate"} }, b2: { rect: [80, 59.19, 80, 29.59], computed: {"border-collapse":"separate"} }, b3: { rect: [160, 59.19, 80, 29.59], computed: {"border-collapse":"separate"} } },
+  },
+  {
+    lesson: "table-collapse",
+    name: "collapse + spacing 0",
+    css: ".sheet {\n  font-size: 14px;\n  border-collapse: collapse; border-spacing: 0;\n}\n.sheet th,\n.sheet td {\n  width: 80px;\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n}\n.sheet th {\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { sheet: { rect: [0, 0, 241, 86.78], computed: {"border-collapse":"collapse"} }, h1: { rect: [0.5, 0.5, 80, 28.59], computed: {"border-collapse":"collapse"} }, h2: { rect: [80.5, 0.5, 80, 28.59], computed: {"border-collapse":"collapse"} }, h3: { rect: [160.5, 0.5, 80, 28.59], computed: {"border-collapse":"collapse"} }, a1: { rect: [0.5, 29.09, 80, 28.59], computed: {"border-collapse":"collapse"} }, a2: { rect: [80.5, 29.09, 80, 28.59], computed: {"border-collapse":"collapse"} }, a3: { rect: [160.5, 29.09, 80, 28.59], computed: {"border-collapse":"collapse"} }, b1: { rect: [0.5, 57.69, 80, 28.59], computed: {"border-collapse":"collapse"} }, b2: { rect: [80.5, 57.69, 80, 28.59], computed: {"border-collapse":"collapse"} }, b3: { rect: [160.5, 57.69, 80, 28.59], computed: {"border-collapse":"collapse"} } },
+  },
+  {
+    lesson: "table-fixed",
+    name: "fixed without width",
+    css: ".wrap {\n  max-width: 360px;\n}\n.sheet {\n  font-size: 14px;\n  border-collapse: collapse;\n}\n.sheet th,\n.sheet td {\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n  vertical-align: top;\n}\n.sheet th {\n  background: #eef1f8;\n}\n.sheet { table-layout: fixed; }\n",
+    passes: false,
+    message: "3 つの列の幅がそろっていません（auto では長い文のある列が広がります。table-layout: fixed は幅の決まった表にだけ効くので、width: 100% も必要です）",
+    elements: { wrap: { rect: [0, 0, 360, 125.97], computed: {"table-layout":"auto"} }, sheet: { rect: [0, 0, 360, 125.97], computed: {"table-layout":"fixed"} }, h1: { rect: [0.5, 0.5, 54.8, 28.59], computed: {"table-layout":"auto"} }, h2: { rect: [55.3, 0.5, 269.89, 28.59], computed: {"table-layout":"auto"} }, h3: { rect: [325.19, 0.5, 34.31, 28.59], computed: {"table-layout":"auto"} }, a1: { rect: [0.5, 29.09, 54.8, 48.19], computed: {"table-layout":"auto"} }, a2: { rect: [55.3, 29.09, 269.89, 48.19], computed: {"table-layout":"auto"} }, a3: { rect: [325.19, 29.09, 34.31, 48.19], computed: {"table-layout":"auto"} }, b1: { rect: [0.5, 77.28, 54.8, 48.19], computed: {"table-layout":"auto"} }, b2: { rect: [55.3, 77.28, 269.89, 48.19], computed: {"table-layout":"auto"} }, b3: { rect: [325.19, 77.28, 34.31, 48.19], computed: {"table-layout":"auto"} } },
+  },
+  {
+    lesson: "table-fixed",
+    name: "width only",
+    css: ".wrap {\n  max-width: 360px;\n}\n.sheet {\n  font-size: 14px;\n  border-collapse: collapse;\n}\n.sheet th,\n.sheet td {\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n  vertical-align: top;\n}\n.sheet th {\n  background: #eef1f8;\n}\n.sheet { width: 100%; }\n",
+    passes: false,
+    message: "3 つの列の幅がそろっていません（auto では長い文のある列が広がります。table-layout: fixed は幅の決まった表にだけ効くので、width: 100% も必要です）",
+    elements: { wrap: { rect: [0, 0, 360, 125.97], computed: {"table-layout":"auto"} }, sheet: { rect: [0, 0, 360, 125.97], computed: {"table-layout":"auto"} }, h1: { rect: [0.5, 0.5, 54.8, 28.59], computed: {"table-layout":"auto"} }, h2: { rect: [55.3, 0.5, 269.89, 28.59], computed: {"table-layout":"auto"} }, h3: { rect: [325.19, 0.5, 34.31, 28.59], computed: {"table-layout":"auto"} }, a1: { rect: [0.5, 29.09, 54.8, 48.19], computed: {"table-layout":"auto"} }, a2: { rect: [55.3, 29.09, 269.89, 48.19], computed: {"table-layout":"auto"} }, a3: { rect: [325.19, 29.09, 34.31, 48.19], computed: {"table-layout":"auto"} }, b1: { rect: [0.5, 77.28, 54.8, 48.19], computed: {"table-layout":"auto"} }, b2: { rect: [55.3, 77.28, 269.89, 48.19], computed: {"table-layout":"auto"} }, b3: { rect: [325.19, 77.28, 34.31, 48.19], computed: {"table-layout":"auto"} } },
+  },
+  {
+    lesson: "table-fixed",
+    name: "th width 33%",
+    css: ".wrap {\n  max-width: 360px;\n}\n.sheet {\n  font-size: 14px;\n  border-collapse: collapse;\n}\n.sheet th,\n.sheet td {\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n  vertical-align: top;\n}\n.sheet th {\n  background: #eef1f8;\n}\n.sheet { width: 100%; } .sheet th { width: 33.33%; }\n",
+    passes: false,
+    message: "列ごとに width を書いてもそろいますが、table-layout: fixed を使いましょう（最初の行だけで列幅が決まり、長い中身があっても列が動かず、描画も速くなります）",
+    elements: { wrap: { rect: [0, 0, 360, 145.56], computed: {"table-layout":"auto"} }, sheet: { rect: [0, 0, 360, 145.56], computed: {"table-layout":"auto"} }, h1: { rect: [0.5, 0.5, 119.66, 28.59], computed: {"table-layout":"auto"} }, h2: { rect: [120.16, 0.5, 119.66, 28.59], computed: {"table-layout":"auto"} }, h3: { rect: [239.81, 0.5, 119.69, 28.59], computed: {"table-layout":"auto"} }, a1: { rect: [0.5, 29.09, 119.66, 87.38], computed: {"table-layout":"auto"} }, a2: { rect: [120.16, 29.09, 119.66, 87.38], computed: {"table-layout":"auto"} }, a3: { rect: [239.81, 29.09, 119.69, 87.38], computed: {"table-layout":"auto"} }, b1: { rect: [0.5, 116.47, 119.66, 28.59], computed: {"table-layout":"auto"} }, b2: { rect: [120.16, 116.47, 119.66, 28.59], computed: {"table-layout":"auto"} }, b3: { rect: [239.81, 116.47, 119.69, 28.59], computed: {"table-layout":"auto"} } },
+  },
+  {
+    lesson: "table-fixed",
+    name: "width 360px + fixed",
+    css: ".wrap {\n  max-width: 360px;\n}\n.sheet {\n  font-size: 14px;\n  border-collapse: collapse;\n  width: 360px;\n  table-layout: fixed;\n}\n.sheet th,\n.sheet td {\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n  vertical-align: top;\n}\n.sheet th {\n  background: #eef1f8;\n}\n",
+    passes: true,
+    elements: { wrap: { rect: [0, 0, 360, 145.56], computed: {"table-layout":"auto"} }, sheet: { rect: [0, 0, 360, 145.56], computed: {"table-layout":"fixed"} }, h1: { rect: [0.5, 0.5, 119.66, 28.59], computed: {"table-layout":"auto"} }, h2: { rect: [120.16, 0.5, 119.66, 28.59], computed: {"table-layout":"auto"} }, h3: { rect: [239.81, 0.5, 119.69, 28.59], computed: {"table-layout":"auto"} }, a1: { rect: [0.5, 29.09, 119.66, 87.38], computed: {"table-layout":"auto"} }, a2: { rect: [120.16, 29.09, 119.66, 87.38], computed: {"table-layout":"auto"} }, a3: { rect: [239.81, 29.09, 119.69, 87.38], computed: {"table-layout":"auto"} }, b1: { rect: [0.5, 116.47, 119.66, 28.59], computed: {"table-layout":"auto"} }, b2: { rect: [120.16, 116.47, 119.66, 28.59], computed: {"table-layout":"auto"} }, b3: { rect: [239.81, 116.47, 119.69, 28.59], computed: {"table-layout":"auto"} } },
+  },
+  {
+    lesson: "table-caption",
+    name: "on the caption",
+    css: ".wrap {\n  max-width: 360px;\n}\n.sheet {\n  width: 100%;\n  table-layout: fixed;\n  font-size: 14px;\n  border-collapse: collapse;\n}\n.sheet caption {\n  padding: 4px 0;\n  font-weight: 700;\n  text-align: left;\n}\n.sheet th,\n.sheet td {\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n  vertical-align: top;\n}\n.sheet th {\n  background: #eef1f8;\n}\n.sheet caption { caption-side: bottom; }\n",
+    passes: true,
+    elements: { wrap: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"top"} }, sheet: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"top"} }, cap: { rect: [0, 145.56, 360, 27.59], computed: {"caption-side":"bottom"} }, h1: { rect: [0.5, 0.5, 119.66, 28.59], computed: {"caption-side":"top"} }, h2: { rect: [120.16, 0.5, 119.66, 28.59], computed: {"caption-side":"top"} }, h3: { rect: [239.81, 0.5, 119.69, 28.59], computed: {"caption-side":"top"} }, a1: { rect: [0.5, 29.09, 119.66, 87.38], computed: {"caption-side":"top"} }, a2: { rect: [120.16, 29.09, 119.66, 87.38], computed: {"caption-side":"top"} }, a3: { rect: [239.81, 29.09, 119.69, 87.38], computed: {"caption-side":"top"} }, b1: { rect: [0.5, 116.47, 119.66, 28.59], computed: {"caption-side":"top"} }, b2: { rect: [120.16, 116.47, 119.66, 28.59], computed: {"caption-side":"top"} }, b3: { rect: [239.81, 116.47, 119.69, 28.59], computed: {"caption-side":"top"} } },
+  },
+  {
+    lesson: "table-caption",
+    name: "transform",
+    css: ".wrap {\n  max-width: 360px;\n}\n.sheet {\n  width: 100%;\n  table-layout: fixed;\n  font-size: 14px;\n  border-collapse: collapse;\n}\n.sheet caption {\n  padding: 4px 0;\n  font-weight: 700;\n  text-align: left;\n}\n.sheet th,\n.sheet td {\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n  vertical-align: top;\n}\n.sheet th {\n  background: #eef1f8;\n}\n.sheet caption { transform: translateY(140px); }\n",
+    passes: false,
+    message: "表題（caption）が表の下にありません（上に出たままです）",
+    elements: { wrap: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"top"} }, sheet: { rect: [0, 0, 360, 173.16], computed: {"caption-side":"top"} }, cap: { rect: [0, 140, 360, 27.59], computed: {"caption-side":"top"} }, h1: { rect: [0.5, 28.09, 119.66, 28.59], computed: {"caption-side":"top"} }, h2: { rect: [120.16, 28.09, 119.66, 28.59], computed: {"caption-side":"top"} }, h3: { rect: [239.81, 28.09, 119.69, 28.59], computed: {"caption-side":"top"} }, a1: { rect: [0.5, 56.69, 119.66, 87.38], computed: {"caption-side":"top"} }, a2: { rect: [120.16, 56.69, 119.66, 87.38], computed: {"caption-side":"top"} }, a3: { rect: [239.81, 56.69, 119.69, 87.38], computed: {"caption-side":"top"} }, b1: { rect: [0.5, 144.06, 119.66, 28.59], computed: {"caption-side":"top"} }, b2: { rect: [120.16, 144.06, 119.66, 28.59], computed: {"caption-side":"top"} }, b3: { rect: [239.81, 144.06, 119.69, 28.59], computed: {"caption-side":"top"} } },
+  },
+  {
+    lesson: "table-caption",
+    name: "table-footer-group",
+    css: ".wrap {\n  max-width: 360px;\n}\n.sheet {\n  width: 100%;\n  table-layout: fixed;\n  font-size: 14px;\n  border-collapse: collapse;\n}\n.sheet caption {\n  padding: 4px 0;\n  font-weight: 700;\n  text-align: left;\n}\n.sheet th,\n.sheet td {\n  padding: 4px 8px;\n  border: 1px solid #9fb2e6;\n  text-align: left;\n  vertical-align: top;\n}\n.sheet th {\n  background: #eef1f8;\n}\n.sheet caption { display: table-footer-group; }\n",
+    passes: false,
+    message: "caption-side: bottom で表題を下側に置きましょう（表に指定しても、継承されて caption に効きます）",
+    elements: { wrap: { rect: [0, 0, 360, 184.75], computed: {"caption-side":"top"} }, sheet: { rect: [0, 0, 360, 184.75], computed: {"caption-side":"top"} }, cap: { rect: [0.5, 145.06, 359, 39.69], computed: {"caption-side":"top"} }, h1: { rect: [0.5, 0.5, 119.66, 28.59], computed: {"caption-side":"top"} }, h2: { rect: [120.16, 0.5, 119.66, 28.59], computed: {"caption-side":"top"} }, h3: { rect: [239.81, 0.5, 119.69, 28.59], computed: {"caption-side":"top"} }, a1: { rect: [0.5, 29.09, 119.66, 87.38], computed: {"caption-side":"top"} }, a2: { rect: [120.16, 29.09, 119.66, 87.38], computed: {"caption-side":"top"} }, a3: { rect: [239.81, 29.09, 119.69, 87.38], computed: {"caption-side":"top"} }, b1: { rect: [0.5, 116.47, 119.66, 28.59], computed: {"caption-side":"top"} }, b2: { rect: [120.16, 116.47, 119.66, 28.59], computed: {"caption-side":"top"} }, b3: { rect: [239.81, 116.47, 119.69, 28.59], computed: {"caption-side":"top"} } },
+  },
+];
+
+describe("multi-column, float / shape and table lessons: alternatives and wrong answers", () => {
+  it("covers every lesson of the three tracks", () => {
+    expect(new Set(VARIANTS.map((v) => v.lesson)).size).toBe(9);
+  });
+
+  for (const v of VARIANTS) {
+    it(`${v.lesson}: ${v.name} ${v.passes ? "passes" : "fails with one message"}`, () => {
+      const { challenge } = lessonById(v.lesson)!;
+      const res = evaluate(challenge.validators, geometrySnapshot(v.css, v.elements));
+      expect(res.failures).toEqual(v.passes ? [] : [v.message]);
+    });
+  }
+
+  it("the shape lessons read the line starts: with a square wrap every line beside the photo starts at the same x", () => {
+    const { starter } = GEOMETRY_RECORDINGS["shape-circle"];
+    const xs = ["l1", "l2", "l3", "l4", "l5", "l6", "l7"].map((id) => starter[id]!.rect![0]);
+    expect(new Set(xs).size).toBe(1);
+    const { solution } = GEOMETRY_RECORDINGS["shape-circle"];
+    expect(solution.l1!.rect![0]).toBeLessThan(solution.l4!.rect![0] - 10);
+    expect(solution.l7!.rect![0]).toBeLessThan(solution.l4!.rect![0] - 10);
+  });
+
+  it("a card broken across the columns reports a box spanning both columns", () => {
+    const { starter, solution } = GEOMETRY_RECORDINGS["multicol-break"];
+    expect(starter.c3!.rect).toEqual([0, 0, 280, 176]);
+    expect(solution.c3!.rect).toEqual([0, 136, 128, 72]);
   });
 });

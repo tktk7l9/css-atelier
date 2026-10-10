@@ -15,7 +15,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * 2D transform track sits between transitions and 3D transforms, and comes
  * after positioning (its needle and labels are absolutely positioned). The
  * math functions come last: their lessons build on custom properties,
- * transitions and transforms from earlier tracks.
+ * transitions and transforms from earlier tracks. Multi-column and table
+ * layout follow the intrinsic sizes (the remaining layout modes), and the
+ * float / shape track follows absolute positioning: both take a box out of
+ * the normal flow.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -219,6 +222,28 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "multicol",
+    title: "段組み（multi-column）",
+    summary: "columns で中身を段に流し、column-gap・column-span・break-inside で段の間隔・またぎ・途切れを整える。",
+    emoji: "🗞️",
+    lessons: [
+      { id: "multicol-columns", title: "段組みにする: columns" },
+      { id: "multicol-span", title: "段をまたぐ見出し: column-span" },
+      { id: "multicol-break", title: "途中で段を変えない: break-inside" },
+    ],
+  },
+  {
+    id: "tables",
+    title: "表のレイアウト（table）",
+    summary: "border-collapse で枠線を 1 本に、table-layout: fixed で列幅をそろえ、caption-side で表題を下に。",
+    emoji: "📊",
+    lessons: [
+      { id: "table-collapse", title: "枠線を 1 本にまとめる: border-collapse" },
+      { id: "table-fixed", title: "列幅をそろえる: table-layout: fixed" },
+      { id: "table-caption", title: "表題を下に置く: caption-side" },
+    ],
+  },
+  {
     id: "logical-props",
     title: "論理プロパティ",
     summary: "left/right ではなく inline/block で、書字方向に強いCSS。",
@@ -248,6 +273,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "position-relative", title: "基準の箱を決める: position: relative" },
       { id: "position-inset", title: "四辺をまとめて指定する: inset" },
       { id: "position-logical", title: "書字方向に合わせる: inset-inline-end" },
+    ],
+  },
+  {
+    id: "shapes",
+    title: "回り込みと図形（float・shape-outside）",
+    summary: "float で文章を写真の横に流し、shape-outside で円に沿わせ、shape-margin で余白を取る。",
+    emoji: "🫧",
+    lessons: [
+      { id: "float-left", title: "文章を回り込ませる: float" },
+      { id: "shape-circle", title: "丸い写真に沿わせる: shape-outside: circle()" },
+      { id: "shape-margin", title: "図形の外側に余白を取る: shape-margin" },
     ],
   },
   {
@@ -482,9 +518,12 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "grid-alignment": () => import("./grid-alignment.js").then((m) => m.gridAlignmentTrack),
   subgrid: () => import("./subgrid.js").then((m) => m.subgridTrack),
   "intrinsic-sizing": () => import("./intrinsic-sizing.js").then((m) => m.intrinsicSizingTrack),
+  multicol: () => import("./multicol.js").then((m) => m.multicolTrack),
+  tables: () => import("./tables.js").then((m) => m.tablesTrack),
   "logical-props": () => import("./logical-props.js").then((m) => m.logicalPropsTrack),
   "writing-modes": () => import("./writing-modes.js").then((m) => m.writingModesTrack),
   positioning: () => import("./positioning.js").then((m) => m.positioningTrack),
+  shapes: () => import("./shapes.js").then((m) => m.shapesTrack),
   "aspect-ratio": () => import("./aspect-ratio.js").then((m) => m.aspectRatioTrack),
   "object-fit": () => import("./object-fit.js").then((m) => m.objectFitTrack),
   "anchor-positioning": () => import("./anchor-positioning.js").then((m) => m.anchorPositioningTrack),
