@@ -18,7 +18,12 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * transitions and transforms from earlier tracks. Multi-column and table
  * layout follow the intrinsic sizes (the remaining layout modes), and the
  * float / shape track follows absolute positioning: both take a box out of
- * the normal flow.
+ * the normal flow. Generated content (::before / ::after, attribute
+ * selectors, counters) joins the selector tracks after the :has() patterns;
+ * the flex and grid pattern tracks follow the basics they extend (grid
+ * patterns after grid alignment); keyframe animations come after the
+ * transform tracks (their frames move the ball with translate) and before the
+ * entry animations and @property, whose animation lesson builds on @keyframes.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -144,6 +149,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "generated-content",
+    title: "生成コンテンツ（::before・::after）",
+    summary: "::before と ::after で HTML にない飾りや印を足し、属性セレクタで付ける相手を選び、CSS カウンターで番号を振る。",
+    emoji: "🔖",
+    lessons: [
+      { id: "before-content", title: "飾りを足す: ::before と content" },
+      { id: "after-attribute", title: "外部リンクに印を付ける: [href^=…]::after" },
+      { id: "counter-chapters", title: "番号を自動で振る: counter-reset と counter()" },
+    ],
+  },
+  {
     id: "nesting",
     title: "ネスト",
     summary: "& を使って入れ子でルールを書く（プリプロセッサ不要）。",
@@ -178,6 +194,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "flex-patterns",
+    title: "Flexbox の応用",
+    summary: "flex-wrap で折り返し、flex-shrink: 0 で縮みを止め、margin-left: auto で 1 つだけ端に寄せる。",
+    emoji: "🧵",
+    lessons: [
+      { id: "flex-wrap", title: "折り返して並べる: flex-wrap" },
+      { id: "flex-shrink", title: "縮ませない: flex-shrink: 0" },
+      { id: "flex-auto-margin", title: "1 つだけ右端へ: margin-left: auto" },
+    ],
+  },
+  {
     id: "grid",
     title: "Grid",
     summary: "2次元レイアウト。行と列のトラックで自在に配置する。",
@@ -198,6 +225,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "grid-place-items", title: "セルの中央に置く: place-items" },
       { id: "grid-place-self", title: "1 つだけ別の位置に: place-self" },
       { id: "grid-place-content", title: "トラック全体を動かす: place-content" },
+    ],
+  },
+  {
+    id: "grid-patterns",
+    title: "グリッドの応用",
+    summary: "repeat(auto-fill, minmax()) で列の数を幅に任せ、grid-column: 1 / -1 で行いっぱいに広げ、minmax(0, 1fr) で列の広がりを止める。",
+    emoji: "🍱",
+    lessons: [
+      { id: "grid-auto-fill", title: "列の数を幅に任せる: repeat(auto-fill, minmax())" },
+      { id: "grid-full-row", title: "行いっぱいに広げる: grid-column: 1 / -1" },
+      { id: "grid-minmax-zero", title: "1fr が広がるのを止める: minmax(0, 1fr)" },
     ],
   },
   {
@@ -445,6 +483,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "keyframes",
+    title: "キーフレームアニメーション",
+    summary: "@keyframes で動きを定義し、steps() でコマ送りに、animation-fill-mode で終わったあとの状態を保つ。",
+    emoji: "🎠",
+    lessons: [
+      { id: "keyframes-define", title: "動きを定義する: @keyframes" },
+      { id: "keyframes-steps", title: "コマ送りにする: steps()" },
+      { id: "keyframes-fill-mode", title: "終わった状態を保つ: animation-fill-mode" },
+    ],
+  },
+  {
     id: "entry-animations",
     title: "出現と退場のアニメーション",
     summary: "@starting-style と allow-discrete で、display: none からの出入りを滑らかに。",
@@ -511,11 +560,14 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "text-overflow": () => import("./text-overflow.js").then((m) => m.textOverflowTrack),
   "modern-selectors": () => import("./modern-selectors.js").then((m) => m.modernSelectorsTrack),
   "has-patterns": () => import("./has-patterns.js").then((m) => m.hasPatternsTrack),
+  "generated-content": () => import("./generated-content.js").then((m) => m.generatedContentTrack),
   nesting: () => import("./nesting.js").then((m) => m.nestingTrack),
   scope: () => import("./scope.js").then((m) => m.scopeTrack),
   flexbox: () => import("./flexbox.js").then((m) => m.flexboxTrack),
+  "flex-patterns": () => import("./flex-patterns.js").then((m) => m.flexPatternsTrack),
   grid: () => import("./grid.js").then((m) => m.gridTrack),
   "grid-alignment": () => import("./grid-alignment.js").then((m) => m.gridAlignmentTrack),
+  "grid-patterns": () => import("./grid-patterns.js").then((m) => m.gridPatternsTrack),
   subgrid: () => import("./subgrid.js").then((m) => m.subgridTrack),
   "intrinsic-sizing": () => import("./intrinsic-sizing.js").then((m) => m.intrinsicSizingTrack),
   multicol: () => import("./multicol.js").then((m) => m.multicolTrack),
@@ -539,6 +591,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   transitions: () => import("./transitions.js").then((m) => m.transitionsTrack),
   "transforms-2d": () => import("./transforms-2d.js").then((m) => m.transforms2dTrack),
   "transforms-3d": () => import("./transforms-3d.js").then((m) => m.transforms3dTrack),
+  keyframes: () => import("./keyframes.js").then((m) => m.keyframesTrack),
   "entry-animations": () => import("./entry-animations.js").then((m) => m.entryAnimationsTrack),
   "registered-props": () => import("./registered-props.js").then((m) => m.registeredPropsTrack),
   "math-functions": () => import("./math-functions.js").then((m) => m.mathFunctionsTrack),

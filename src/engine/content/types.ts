@@ -17,11 +17,14 @@ export type TrackId =
   | "registered-props"
   | "modern-selectors"
   | "has-patterns"
+  | "generated-content"
   | "nesting"
   | "scope"
   | "flexbox"
+  | "flex-patterns"
   | "grid"
   | "grid-alignment"
+  | "grid-patterns"
   | "intrinsic-sizing"
   | "multicol"
   | "tables"
@@ -50,6 +53,7 @@ export type TrackId =
   | "transitions"
   | "transforms-2d"
   | "transforms-3d"
+  | "keyframes"
   | "entry-animations";
 
 /** Drives the 3D concept visualizer. `subjectId`/`containerId` tell the pure
