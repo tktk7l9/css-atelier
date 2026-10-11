@@ -51,7 +51,7 @@ export const flexSizingTrack: Track = {
       id: "flex-ratio",
       title: "幅を 2:1 に分ける: flex: 2 と flex: 1",
       explanation:
-        "<p><code>flex-grow</code> は、余ったスペースを<b>アイテムどうしの比</b>で分けます。<code>flex: 2</code> と <code>flex: 1</code> なら、2:1 の割合です。</p><p>一括指定の <code>flex: 2</code> は <code>flex: 2 1 0%</code> と同じで、<b>基準の幅（flex-basis）が 0</b> になります。全員の基準が 0 なので、行の幅（gap を除く）がそのまま 2:1 に分かれ、本文はサイドの<b>ちょうど 2 倍</b>になります（アイテム自身の padding や border は比に含まれないので、余白は中の要素に付けています）。<code>flex-grow: 2</code> だけを書くと、基準の幅は中身の幅のまま（<code>auto</code>）で、<b>余り</b>だけが 2:1 に分かれるので、ちょうど 2 倍にはなりません。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。プレビューは幅 560px で採点し、320px でも確かめます。</p>",
+        "<p><code>flex-grow</code> は、余ったスペースを<b>アイテムどうしの比</b>で分けます。<code>flex: 2</code> と <code>flex: 1</code> なら、2:1 の割合です。</p><p>一括指定の <code>flex: 2</code> は <code>flex: 2 1 0%</code> と同じで、<b>基準の幅（flex-basis）が 0</b> になります。全員の基準が 0 なので、行の幅（gap を除く）がそのまま 2:1 に分かれ、本文はサイドの<b>ちょうど 2 倍</b>になります（アイテム自身の padding や border は比に含まれないので、余白は中の要素に付けています）。一括指定を使わずに <code>flex-grow</code> だけを書いた場合は、基準の幅が初期値の <code>auto</code>（ここでは中身の幅）のままなので、<b>余り</b>だけが 2:1 に分かれ、ちょうど 2 倍にはなりません（このプレビューでは土台の <code>flex: 1</code> で基準が 0 になっているので、<code>flex-grow: 2</code> を足すだけでも 2:1 になります）。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。プレビューは幅 560px で採点し、320px でも確かめます。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/flex-grow",
       viz: { concept: "none" },
       challenge: {
@@ -89,7 +89,7 @@ export const flexSizingTrack: Track = {
       id: "flex-basis-wrap",
       title: "基準の幅で折り返して埋める: flex: 1 1 140px",
       explanation:
-        "<p><code>flex-basis</code> は、伸び縮みする前の<b>基準の大きさ</b>です。<code>flex: 1 1 140px</code>（伸びる・縮む・基準 140px）を <code>flex-wrap: wrap</code> の中のアイテムに指定すると、1 行に<b>140px が入るだけ</b>並び、入りきらないものは折り返し、<b>各行の余りはその行のアイテムで分け合います</b>。メディアクエリなしで、幅に合わせて 1 行の数が変わります。</p><p>グリッドの <code>repeat(auto-fill, minmax(140px, 1fr))</code> と違い、行ごとに伸びるので、最後の行のアイテムは前の行より広くなります（列はそろいません）。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。プレビューは幅 560px で採点し、320px でも確かめます。</p>",
+        "<p><code>flex-basis</code> は、伸び縮みする前の<b>基準の大きさ</b>です。<code>flex: 1 1 140px</code>（伸びる・縮む・基準 140px）を <code>flex-wrap: wrap</code> の中のアイテムに指定すると、1 行に<b>140px が入るだけ</b>並び、入りきらないものは折り返し、<b>各行の余りはその行のアイテムで分け合います</b>。メディアクエリなしで、幅に合わせて 1 行の数が変わります。</p><p>グリッドの <code>repeat(auto-fill, minmax(140px, 1fr))</code> と違い、行ごとに伸びるので、最後の行のアイテムが少ないと、前の行より広くなります（列はそろいません）。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。プレビューは幅 560px で採点し、320px でも確かめます。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/flex-basis",
       viz: { concept: "none" },
       challenge: {

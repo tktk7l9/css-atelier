@@ -129,7 +129,7 @@ export const outlineShadowTrack: Track = {
       id: "border-radius-shapes",
       title: "丸い写真とピル形: border-radius",
       explanation:
-        "<p><code>border-radius</code> は角を丸めます。正方形に <code>border-radius: 50%</code> を付けると<b>円</b>になり、丸いプロフィール写真によく使います（画像そのものが角丸の形に切り抜かれます）。</p><p>横長のボタンに <code>50%</code> を付けると、幅と高さそれぞれの半分が半径になるので、両端が尖った<b>楕円</b>になってしまいます。両端が半円の<b>ピル形</b>にするには、高さの半分以上の<b>長さ</b>を指定します。ボタンの高さが変わってもピル形のままになるよう、<code>999px</code> のような大きな値を書くのが定番です。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
+        "<p><code>border-radius</code> は角を丸めます。正方形に <code>border-radius: 50%</code> を付けると<b>円</b>になり、丸いプロフィール写真によく使います（<code>img</code> 要素にもそのまま使えます）。</p><p>横長のボタンに <code>50%</code> を付けると、幅と高さそれぞれの半分が半径になるので、両端が尖った<b>楕円</b>になってしまいます。両端が半円の<b>ピル形</b>にするには、高さの半分以上の<b>長さ</b>を指定します。ボタンの高さが変わってもピル形のままになるよう、<code>999px</code> のような大きな値を書くのが定番です。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/border-radius",
       viz: { concept: "none" },
       challenge: {
