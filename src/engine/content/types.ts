@@ -10,8 +10,11 @@ export type ConceptViz = "box-model" | "flexbox" | "grid" | "transform-3d" | "no
 
 export type TrackId =
   | "selectors"
+  | "combinators"
   | "box-model"
   | "units"
+  | "relative-units"
+  | "inheritance"
   | "math-functions"
   | "custom-props"
   | "registered-props"
@@ -29,6 +32,7 @@ export type TrackId =
   | "multicol"
   | "tables"
   | "positioning"
+  | "hiding"
   | "shapes"
   | "media-queries"
   | "container-queries"
