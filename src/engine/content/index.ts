@@ -28,6 +28,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * dvh) follow the first units track, and inheritance and its keywords come
  * right after, before custom properties (which inherit too); the ways of
  * hiding follow absolute positioning, which the visually-hidden lesson uses.
+ * The structural pseudo-classes follow the combinators; the inline boxes
+ * (inline-block, the image gap, unitless line-height) follow the box model;
+ * flow-root, clear and display: contents follow the float / shape track; and
+ * the scroll areas come right before sticky, whose lessons scroll.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -58,6 +62,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "structural-selectors",
+    title: "何番目かで選ぶ（:nth-child・:last-child）",
+    summary: ":nth-child(even) で 1 行おき、:last-child で最後だけ、:nth-child(-n + 3) で最初の 3 つを、クラスを足さずに選ぶ。",
+    emoji: "🔢",
+    lessons: [
+      { id: "nth-child-even", title: "1 行おきに色を付ける: :nth-child(even)" },
+      { id: "last-child", title: "最後だけ線を消す: :last-child" },
+      { id: "nth-child-first-three", title: "最初の 3 つだけ: :nth-child(-n + 3)" },
+    ],
+  },
+  {
     id: "box-model",
     title: "ボックスモデル",
     summary: "content・padding・border・margin の4層を理解する。",
@@ -66,6 +81,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "box-model-padding", title: "内側の余白: padding" },
       { id: "box-model-border", title: "枠線: border" },
       { id: "box-model-margin-auto", title: "外側の余白で中央寄せ: margin auto" },
+    ],
+  },
+  {
+    id: "inline-boxes",
+    title: "行の中の箱（inline-block・画像のすき間・line-height）",
+    summary: "inline-block で幅の効く部品を行に並べ、画像の下のすき間をなくし、単位なしの line-height で行の高さを文字に合わせる。",
+    emoji: "🔤",
+    lessons: [
+      { id: "inline-block", title: "行に並べたまま幅を効かせる: inline-block" },
+      { id: "image-gap", title: "画像の下のすき間をなくす: display: block" },
+      { id: "unitless-line-height", title: "行の高さを文字に合わせる: 単位なしの line-height" },
     ],
   },
   {
@@ -373,6 +399,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "formatting-contexts",
+    title: "フロートを囲む・下げる（flow-root・clear・display: contents）",
+    summary: "display: flow-root で float を囲み、clear で float の下から始め、display: contents で入れ物の箱をなくす。",
+    emoji: "🧺",
+    lessons: [
+      { id: "flow-root", title: "float を囲む: display: flow-root" },
+      { id: "clear-float", title: "float の下から始める: clear" },
+      { id: "display-contents", title: "入れ物の箱をなくす: display: contents" },
+    ],
+  },
+  {
     id: "aspect-ratio",
     title: "アスペクト比",
     summary: "aspect-ratio で幅から高さを自動計算する。",
@@ -402,6 +439,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "anchor-position-area", title: "アンカーに結びつける: anchor-name と position-area" },
       { id: "anchor-function", title: "辺を合わせる: anchor() 関数" },
       { id: "anchor-try-fallbacks", title: "はみ出したら反転: position-try-fallbacks" },
+    ],
+  },
+  {
+    id: "scroll-areas",
+    title: "スクロールする領域（max-height・overflow-x・min-height: 0）",
+    summary: "max-height と overflow で高さに上限を付けてスクロールさせ、広い表は横にスクロールさせ、flex の中では min-height: 0 で縮められるようにする。",
+    emoji: "🧻",
+    lessons: [
+      { id: "max-height-scroll", title: "高さに上限を付けてスクロール: max-height と overflow-y" },
+      { id: "overflow-x-table", title: "広い表を横にスクロール: overflow-x: auto" },
+      { id: "flex-min-height", title: "flex の中でスクロールさせる: min-height: 0" },
     ],
   },
   {
@@ -599,7 +647,9 @@ export function nextLesson(id: string): LessonMeta | undefined {
 const LOADERS: Record<TrackId, () => Promise<Track>> = {
   selectors: () => import("./selectors.js").then((m) => m.selectorsTrack),
   combinators: () => import("./combinators.js").then((m) => m.combinatorsTrack),
+  "structural-selectors": () => import("./structural-selectors.js").then((m) => m.structuralSelectorsTrack),
   "box-model": () => import("./box-model.js").then((m) => m.boxModelTrack),
+  "inline-boxes": () => import("./inline-boxes.js").then((m) => m.inlineBoxesTrack),
   units: () => import("./units.js").then((m) => m.unitsTrack),
   "relative-units": () => import("./relative-units.js").then((m) => m.relativeUnitsTrack),
   inheritance: () => import("./inheritance.js").then((m) => m.inheritanceTrack),
@@ -628,9 +678,11 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   positioning: () => import("./positioning.js").then((m) => m.positioningTrack),
   hiding: () => import("./hiding.js").then((m) => m.hidingTrack),
   shapes: () => import("./shapes.js").then((m) => m.shapesTrack),
+  "formatting-contexts": () => import("./formatting-contexts.js").then((m) => m.formattingContextsTrack),
   "aspect-ratio": () => import("./aspect-ratio.js").then((m) => m.aspectRatioTrack),
   "object-fit": () => import("./object-fit.js").then((m) => m.objectFitTrack),
   "anchor-positioning": () => import("./anchor-positioning.js").then((m) => m.anchorPositioningTrack),
+  "scroll-areas": () => import("./scroll-areas.js").then((m) => m.scrollAreasTrack),
   sticky: () => import("./sticky.js").then((m) => m.stickyTrack),
   "scroll-snap": () => import("./scroll-snap.js").then((m) => m.scrollSnapTrack),
   "media-queries": () => import("./media-queries.js").then((m) => m.mediaQueriesTrack),
