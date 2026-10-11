@@ -32,6 +32,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * (inline-block, the image gap, unitless line-height) follow the box model;
  * flow-root, clear and display: contents follow the float / shape track; and
  * the scroll areas come right before sticky, whose lessons scroll.
+ * How widths are decided (box-sizing, width: auto, max-width: 100%) follows
+ * the box model; outlines, shadows and radii follow the colour and gradient
+ * tracks; the flex sizing and grid placement tracks follow the pattern tracks
+ * of their layout modes.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -81,6 +85,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "box-model-padding", title: "内側の余白: padding" },
       { id: "box-model-border", title: "枠線: border" },
       { id: "box-model-margin-auto", title: "外側の余白で中央寄せ: margin auto" },
+    ],
+  },
+  {
+    id: "sizing-basics",
+    title: "幅の決まり方（box-sizing・width: auto・max-width: 100%）",
+    summary: "box-sizing: border-box で余白と枠線を幅に含め、width: auto で margin のぶん自動で縮め、max-width: 100% で画像を枠に収める。",
+    emoji: "📦",
+    lessons: [
+      { id: "box-sizing", title: "余白と枠線を幅に含める: box-sizing: border-box" },
+      { id: "width-auto", title: "margin のぶん自動で縮む: width: auto" },
+      { id: "image-max-width", title: "画像を枠に収める: max-width: 100% と height: auto" },
     ],
   },
   {
@@ -167,6 +182,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "gradient-stripes", title: "しま模様: repeating-linear-gradient()" },
       { id: "gradient-conic", title: "円グラフ: conic-gradient()" },
       { id: "gradient-oklch", title: "途中の色をくすませない: in oklch" },
+    ],
+  },
+  {
+    id: "outline-shadow",
+    title: "枠線と影（outline・box-shadow・border-radius）",
+    summary: "outline で大きさを変えずに選択を示し、box-shadow を重ねて自然に浮かせ、border-radius で丸い写真とピル形のボタンを作る。",
+    emoji: "🪄",
+    lessons: [
+      { id: "outline-selected", title: "大きさを変えずに線を引く: outline" },
+      { id: "layered-shadow", title: "影を重ねて浮かせる: box-shadow" },
+      { id: "border-radius-shapes", title: "丸い写真とピル形: border-radius" },
     ],
   },
   {
@@ -268,6 +294,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "flex-sizing",
+    title: "flex の伸び方と順番（flex の比・flex-basis・order）",
+    summary: "flex の数で幅を 2:1 に分け、flex-basis を基準に折り返して行を埋め、order で見た目の順番だけを入れ替える。",
+    emoji: "🎚️",
+    lessons: [
+      { id: "flex-ratio", title: "幅を 2:1 に分ける: flex: 2 と flex: 1" },
+      { id: "flex-basis-wrap", title: "基準の幅で折り返して埋める: flex: 1 1 140px" },
+      { id: "flex-order", title: "見た目の順番だけ入れ替える: order" },
+    ],
+  },
+  {
     id: "grid",
     title: "Grid",
     summary: "2次元レイアウト。行と列のトラックで自在に配置する。",
@@ -299,6 +336,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "grid-auto-fill", title: "列の数を幅に任せる: repeat(auto-fill, minmax())" },
       { id: "grid-full-row", title: "行いっぱいに広げる: grid-column: 1 / -1" },
       { id: "grid-minmax-zero", title: "1fr が広がるのを止める: minmax(0, 1fr)" },
+    ],
+  },
+  {
+    id: "grid-placement",
+    title: "グリッドの配置（span・dense・同じマスに重ねる）",
+    summary: "span で 1 枚だけ大きくし、grid-auto-flow: dense ですき間を埋め、同じマスに置いて写真とキャプションを重ねる。",
+    emoji: "🧱",
+    lessons: [
+      { id: "grid-span", title: "1 枚だけ大きくする: grid-column: span 2" },
+      { id: "grid-dense", title: "すき間を埋める: grid-auto-flow: dense" },
+      { id: "grid-overlap", title: "同じマスに重ねる: grid-area: 1 / 1" },
     ],
   },
   {
@@ -649,6 +697,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   combinators: () => import("./combinators.js").then((m) => m.combinatorsTrack),
   "structural-selectors": () => import("./structural-selectors.js").then((m) => m.structuralSelectorsTrack),
   "box-model": () => import("./box-model.js").then((m) => m.boxModelTrack),
+  "sizing-basics": () => import("./sizing-basics.js").then((m) => m.sizingBasicsTrack),
   "inline-boxes": () => import("./inline-boxes.js").then((m) => m.inlineBoxesTrack),
   units: () => import("./units.js").then((m) => m.unitsTrack),
   "relative-units": () => import("./relative-units.js").then((m) => m.relativeUnitsTrack),
@@ -657,6 +706,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   color: () => import("./color.js").then((m) => m.colorTrack),
   "color-functions": () => import("./color-functions.js").then((m) => m.colorFunctionsTrack),
   gradients: () => import("./gradients.js").then((m) => m.gradientsTrack),
+  "outline-shadow": () => import("./outline-shadow.js").then((m) => m.outlineShadowTrack),
   "text-wrap": () => import("./text-wrap.js").then((m) => m.textWrapTrack),
   "text-overflow": () => import("./text-overflow.js").then((m) => m.textOverflowTrack),
   "modern-selectors": () => import("./modern-selectors.js").then((m) => m.modernSelectorsTrack),
@@ -666,9 +716,11 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   scope: () => import("./scope.js").then((m) => m.scopeTrack),
   flexbox: () => import("./flexbox.js").then((m) => m.flexboxTrack),
   "flex-patterns": () => import("./flex-patterns.js").then((m) => m.flexPatternsTrack),
+  "flex-sizing": () => import("./flex-sizing.js").then((m) => m.flexSizingTrack),
   grid: () => import("./grid.js").then((m) => m.gridTrack),
   "grid-alignment": () => import("./grid-alignment.js").then((m) => m.gridAlignmentTrack),
   "grid-patterns": () => import("./grid-patterns.js").then((m) => m.gridPatternsTrack),
+  "grid-placement": () => import("./grid-placement.js").then((m) => m.gridPlacementTrack),
   subgrid: () => import("./subgrid.js").then((m) => m.subgridTrack),
   "intrinsic-sizing": () => import("./intrinsic-sizing.js").then((m) => m.intrinsicSizingTrack),
   multicol: () => import("./multicol.js").then((m) => m.multicolTrack),
