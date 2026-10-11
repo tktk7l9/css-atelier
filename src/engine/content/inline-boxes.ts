@@ -120,7 +120,7 @@ export const inlineBoxesTrack: Track = {
                   { kind: "computedEquals", id: "photo", prop: "display", value: "block" },
                   { kind: "computedMatches", id: "photo", prop: "vertical-align", pattern: "^(?!baseline$)" },
                 ],
-                message: "行の高さを 0 にするのではなく、画像を display: block（または vertical-align: middle など）にしましょう（文字を足しても崩れません）",
+                message: "枠の高さや行の高さで隠すのではなく、画像を display: block（または vertical-align: middle など）にしましょう（画像の大きさや文字が変わっても崩れません）",
               },
             ],
           },
@@ -161,7 +161,7 @@ export const inlineBoxesTrack: Track = {
               },
               {
                 kind: "sourceMatches",
-                pattern: "line-height\\s*:\\s*[\\d.]+\\s*[;}]",
+                pattern: "line-height\\s*:\\s*[\\d.]+\\s*[;}]|font\\s*:[^;}]*/\\s*[\\d.]+\\s*(?:\\s|;|})",
                 message: "見出しだけを px で直すのではなく、親の line-height を 1.5 のような単位なしの数にしましょう（子は自分の文字の大きさに掛け算します）",
               },
             ],

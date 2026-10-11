@@ -3177,3 +3177,597 @@ describe("combinators, units, inheritance and hiding: recorded answers", () => {
     }
   });
 });
+
+// The structural selector, inline box, float and scroll area lessons, recorded
+// the same way (headless Chrome 155, the lesson viewport only).
+const DETAIL_LESSONS = [
+  "nth-child-even",
+  "last-child",
+  "nth-child-first-three",
+  "inline-block",
+  "image-gap",
+  "unitless-line-height",
+  "flow-root",
+  "clear-float",
+  "display-contents",
+  "max-height-scroll",
+  "overflow-x-table",
+  "flex-min-height",
+];
+
+const DETAIL_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "nth-child-even",
+    name: "starter",
+    messages: ["2 行目と 4 行目に背景（#eef1f8）が付いていません"],
+    elements: { table: { rect: [0, 0, 169.45, 167.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r1: { rect: [0, 28.59, 169.45, 28.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 57.19, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r3: { rect: [0, 84.78, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 112.38, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r5: { rect: [0, 139.97, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-even",
+    name: "solution",
+    messages: [],
+    elements: { table: { rect: [0, 0, 169.45, 167.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r1: { rect: [0, 28.59, 169.45, 28.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 57.19, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r3: { rect: [0, 84.78, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 112.38, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 139.97, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-even",
+    name: "2n",
+    css: ".table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 12px;\n  text-align: left;\n}\n.table thead th {\n  border-bottom: 2px solid #2f5fd0;\n}\n.table tbody tr:nth-child(2n) {\n  background: #eef1f8;\n}\n",
+    messages: [],
+    elements: { table: { rect: [0, 0, 169.45, 167.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r1: { rect: [0, 28.59, 169.45, 28.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 57.19, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r3: { rect: [0, 84.78, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 112.38, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 139.97, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-even",
+    name: "nth-of-type(even)",
+    css: ".table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 12px;\n  text-align: left;\n}\n.table thead th {\n  border-bottom: 2px solid #2f5fd0;\n}\n.table tbody tr:nth-of-type(even) {\n  background: #eef1f8;\n}\n",
+    messages: [],
+    elements: { table: { rect: [0, 0, 169.45, 167.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r1: { rect: [0, 28.59, 169.45, 28.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 57.19, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r3: { rect: [0, 84.78, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 112.38, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 139.97, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-even",
+    name: "odd",
+    css: ".table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 12px;\n  text-align: left;\n}\n.table thead th {\n  border-bottom: 2px solid #2f5fd0;\n}\n.table tbody tr:nth-child(odd) {\n  background: #eef1f8;\n}\n",
+    messages: ["2 行目と 4 行目に背景（#eef1f8）が付いていません"],
+    elements: { table: { rect: [0, 0, 169.45, 167.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r1: { rect: [0, 28.59, 169.45, 28.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r2: { rect: [0, 57.19, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r3: { rect: [0, 84.78, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r4: { rect: [0, 112.38, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r5: { rect: [0, 139.97, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "nth-child-even",
+    name: "rows 2 and 4 listed",
+    css: ".table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 12px;\n  text-align: left;\n}\n.table thead th {\n  border-bottom: 2px solid #2f5fd0;\n}\n.table tbody tr:nth-child(2),\n.table tbody tr:nth-child(4) {\n  background: #eef1f8;\n}\n",
+    messages: ["行ごとに番号を書くのではなく :nth-child(even) で選びましょう（行が増えても 1 行おきのままになります）"],
+    elements: { table: { rect: [0, 0, 169.45, 167.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r1: { rect: [0, 28.59, 169.45, 28.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 57.19, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r3: { rect: [0, 84.78, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 112.38, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 139.97, 169.45, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-even",
+    name: "every row",
+    css: ".table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 12px;\n  text-align: left;\n}\n.table thead th {\n  border-bottom: 2px solid #2f5fd0;\n}\n.table tbody tr {\n  background: #eef1f8;\n}\n",
+    messages: ["1・3・5 行目にまで背景が付いています（even は偶数番目＝2・4…行目です）"],
+    elements: { table: { rect: [0, 0, 169.45, 167.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r1: { rect: [0, 28.59, 169.45, 28.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r2: { rect: [0, 57.19, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r3: { rect: [0, 84.78, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r4: { rect: [0, 112.38, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 139.97, 169.45, 27.59], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "last-child",
+    name: "starter",
+    messages: ["最後の項目（ログアウト）の下線が残っています"],
+    elements: { list: { rect: [0, 0, 596, 148.38], computed: {"border-bottom-width":"1px"} }, i1: { rect: [1, 1, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i2: { rect: [1, 37.59, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i3: { rect: [1, 74.19, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i4: { rect: [1, 110.78, 594, 36.59], computed: {"border-bottom-width":"1px"} } },
+  },
+  {
+    lesson: "last-child",
+    name: "solution",
+    messages: [],
+    elements: { list: { rect: [0, 0, 596, 147.38], computed: {"border-bottom-width":"1px"} }, i1: { rect: [1, 1, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i2: { rect: [1, 37.59, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i3: { rect: [1, 74.19, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i4: { rect: [1, 110.78, 594, 35.59], computed: {"border-bottom-width":"0px"} } },
+  },
+  {
+    lesson: "last-child",
+    name: ":not(:last-child) for the lines",
+    css: ".list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.list li {\n  padding: 8px 12px;\n  font-size: 14px;\n}\n.list li:not(:last-child) {\n  border-bottom: 1px solid #9fb2e6;\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 0, 596, 147.38], computed: {"border-bottom-width":"1px"} }, i1: { rect: [1, 1, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i2: { rect: [1, 37.59, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i3: { rect: [1, 74.19, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i4: { rect: [1, 110.78, 594, 35.59], computed: {"border-bottom-width":"0px"} } },
+  },
+  {
+    lesson: "last-child",
+    name: ":last-of-type",
+    css: ".list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #9fb2e6;\n  font-size: 14px;\n}\n.list li:last-of-type {\n  border-bottom: 0;\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 0, 596, 147.38], computed: {"border-bottom-width":"1px"} }, i1: { rect: [1, 1, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i2: { rect: [1, 37.59, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i3: { rect: [1, 74.19, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i4: { rect: [1, 110.78, 594, 35.59], computed: {"border-bottom-width":"0px"} } },
+  },
+  {
+    lesson: "last-child",
+    name: "nth-child(4)",
+    css: ".list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #9fb2e6;\n  font-size: 14px;\n}\n.list li:nth-child(4) {\n  border-bottom: 0;\n}\n",
+    messages: ["4 番目と数えるのではなく :last-child で選びましょう（項目が増えても最後だけに効きます）"],
+    elements: { list: { rect: [0, 0, 596, 147.38], computed: {"border-bottom-width":"1px"} }, i1: { rect: [1, 1, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i2: { rect: [1, 37.59, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i3: { rect: [1, 74.19, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i4: { rect: [1, 110.78, 594, 35.59], computed: {"border-bottom-width":"0px"} } },
+  },
+  {
+    lesson: "last-child",
+    name: ":first-child",
+    css: ".list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #9fb2e6;\n  font-size: 14px;\n}\n.list li:first-child {\n  border-bottom: 0;\n}\n",
+    messages: ["最後の項目（ログアウト）の下線が残っています"],
+    elements: { list: { rect: [0, 0, 596, 147.38], computed: {"border-bottom-width":"1px"} }, i1: { rect: [1, 1, 594, 35.59], computed: {"border-bottom-width":"0px"} }, i2: { rect: [1, 36.59, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i3: { rect: [1, 73.19, 594, 36.59], computed: {"border-bottom-width":"1px"} }, i4: { rect: [1, 109.78, 594, 36.59], computed: {"border-bottom-width":"1px"} } },
+  },
+  {
+    lesson: "last-child",
+    name: "every line removed",
+    css: ".list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #9fb2e6;\n  font-size: 14px;\n}\n.list li {\n  border-bottom: 0;\n}\n",
+    messages: ["最後以外の項目の下線まで消えています（区切り線は残します）"],
+    elements: { list: { rect: [0, 0, 596, 144.38], computed: {"border-bottom-width":"1px"} }, i1: { rect: [1, 1, 594, 35.59], computed: {"border-bottom-width":"0px"} }, i2: { rect: [1, 36.59, 594, 35.59], computed: {"border-bottom-width":"0px"} }, i3: { rect: [1, 72.19, 594, 35.59], computed: {"border-bottom-width":"0px"} }, i4: { rect: [1, 107.78, 594, 35.59], computed: {"border-bottom-width":"0px"} } },
+  },
+  {
+    lesson: "nth-child-first-three",
+    name: "starter",
+    messages: ["上位 3 位に背景（#fff3c4）が付いていません"],
+    elements: { ranking: { rect: [0, 0, 596, 165.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k1: { rect: [28, 0, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k2: { rect: [28, 27.59, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k3: { rect: [28, 55.19, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k4: { rect: [28, 82.78, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k5: { rect: [28, 110.38, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k6: { rect: [28, 137.97, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-first-three",
+    name: "solution",
+    messages: [],
+    elements: { ranking: { rect: [0, 0, 596, 165.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k1: { rect: [28, 0, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k2: { rect: [28, 27.59, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k3: { rect: [28, 55.19, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k4: { rect: [28, 82.78, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k5: { rect: [28, 110.38, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k6: { rect: [28, 137.97, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-first-three",
+    name: "-n+3 without spaces",
+    css: ".ranking {\n  margin: 0;\n  padding-left: 28px;\n  font-size: 14px;\n}\n.ranking li {\n  padding: 4px 8px;\n  border-radius: 6px;\n}\n.ranking li:nth-child(-n+3) {\n  background: #fff3c4;\n}\n",
+    messages: [],
+    elements: { ranking: { rect: [0, 0, 596, 165.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k1: { rect: [28, 0, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k2: { rect: [28, 27.59, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k3: { rect: [28, 55.19, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k4: { rect: [28, 82.78, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k5: { rect: [28, 110.38, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k6: { rect: [28, 137.97, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-first-three",
+    name: "all, then n + 4 reset",
+    css: ".ranking {\n  margin: 0;\n  padding-left: 28px;\n  font-size: 14px;\n}\n.ranking li {\n  padding: 4px 8px;\n  border-radius: 6px;\n}\n.ranking li {\n  background: #fff3c4;\n}\n.ranking li:nth-child(n + 4) {\n  background: none;\n}\n",
+    messages: [],
+    elements: { ranking: { rect: [0, 0, 596, 165.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k1: { rect: [28, 0, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k2: { rect: [28, 27.59, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k3: { rect: [28, 55.19, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k4: { rect: [28, 82.78, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k5: { rect: [28, 110.38, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k6: { rect: [28, 137.97, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-first-three",
+    name: "1, 2 and 3 listed",
+    css: ".ranking {\n  margin: 0;\n  padding-left: 28px;\n  font-size: 14px;\n}\n.ranking li {\n  padding: 4px 8px;\n  border-radius: 6px;\n}\n.ranking li:nth-child(1),\n.ranking li:nth-child(2),\n.ranking li:nth-child(3) {\n  background: #fff3c4;\n}\n",
+    messages: ["1・2・3 と順に書くのではなく、:nth-child(-n + 3) で「最初の 3 つ」を選びましょう（順位の数が変わっても書き直しが要りません）"],
+    elements: { ranking: { rect: [0, 0, 596, 165.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k1: { rect: [28, 0, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k2: { rect: [28, 27.59, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k3: { rect: [28, 55.19, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k4: { rect: [28, 82.78, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k5: { rect: [28, 110.38, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k6: { rect: [28, 137.97, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-first-three",
+    name: "-n + 2",
+    css: ".ranking {\n  margin: 0;\n  padding-left: 28px;\n  font-size: 14px;\n}\n.ranking li {\n  padding: 4px 8px;\n  border-radius: 6px;\n}\n.ranking li:nth-child(-n + 2) {\n  background: #fff3c4;\n}\n",
+    messages: ["上位 3 位に背景（#fff3c4）が付いていません"],
+    elements: { ranking: { rect: [0, 0, 596, 165.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k1: { rect: [28, 0, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k2: { rect: [28, 27.59, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k3: { rect: [28, 55.19, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k4: { rect: [28, 82.78, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k5: { rect: [28, 110.38, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k6: { rect: [28, 137.97, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-first-three",
+    name: "n + 3",
+    css: ".ranking {\n  margin: 0;\n  padding-left: 28px;\n  font-size: 14px;\n}\n.ranking li {\n  padding: 4px 8px;\n  border-radius: 6px;\n}\n.ranking li:nth-child(n + 3) {\n  background: #fff3c4;\n}\n",
+    messages: ["上位 3 位に背景（#fff3c4）が付いていません"],
+    elements: { ranking: { rect: [0, 0, 596, 165.56], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k1: { rect: [28, 0, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k2: { rect: [28, 27.59, 568, 27.59], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, k3: { rect: [28, 55.19, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k4: { rect: [28, 82.78, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k5: { rect: [28, 110.38, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} }, k6: { rect: [28, 137.97, 568, 27.59], computed: {"background-color":"rgb(255, 243, 196)"} } },
+  },
+  {
+    lesson: "inline-block",
+    name: "starter",
+    messages: ["タグの幅が 72px になっていません（インライン要素には width が効きません）"],
+    elements: { tags: { rect: [0, 0, 596, 28], computed: {"display":"block"} }, t1: { rect: [39.8, 3, 27.42, 21], computed: {"display":"inline"} }, t2: { rect: [75.22, 3, 38.86, 21], computed: {"display":"inline"} }, t3: { rect: [122.08, 3, 55.17, 21], computed: {"display":"inline"} } },
+  },
+  {
+    lesson: "inline-block",
+    name: "solution",
+    messages: [],
+    elements: { tags: { rect: [0, 0, 596, 40], computed: {"display":"block"} }, t1: { rect: [39.8, 4, 72, 32], computed: {"display":"inline-block"} }, t2: { rect: [119.8, 4, 72, 32], computed: {"display":"inline-block"} }, t3: { rect: [199.8, 4, 72, 32], computed: {"display":"inline-block"} } },
+  },
+  {
+    lesson: "inline-block",
+    name: "inline-flex",
+    css: ".tags {\n  margin: 0;\n  font-size: 14px;\n  line-height: 2;\n}\n.tag {\n  width: 72px;\n  margin: 4px;\n  padding: 2px 0;\n  border-radius: 999px;\n  background: #dbe4fb;\n  color: #18203a;\n  text-align: center;\n  text-decoration: none;\n  display: inline-flex;\n}\n",
+    messages: [],
+    elements: { tags: { rect: [0, 0, 596, 40], computed: {"display":"block"} }, t1: { rect: [39.8, 4, 72, 32], computed: {"display":"inline-flex"} }, t2: { rect: [119.8, 4, 72, 32], computed: {"display":"inline-flex"} }, t3: { rect: [199.8, 4, 72, 32], computed: {"display":"inline-flex"} } },
+  },
+  {
+    lesson: "inline-block",
+    name: "block",
+    css: ".tags {\n  margin: 0;\n  font-size: 14px;\n  line-height: 2;\n}\n.tag {\n  width: 72px;\n  margin: 4px;\n  padding: 2px 0;\n  border-radius: 999px;\n  background: #dbe4fb;\n  color: #18203a;\n  text-align: center;\n  text-decoration: none;\n  display: block;\n}\n",
+    messages: ["タグが 1 つずつ改行されています（display: block ではなく、行の中に並ぶ inline-block にします）"],
+    elements: { tags: { rect: [0, 0, 596, 136], computed: {"display":"block"} }, t1: { rect: [4, 32, 72, 32], computed: {"display":"block"} }, t2: { rect: [4, 68, 72, 32], computed: {"display":"block"} }, t3: { rect: [4, 104, 72, 32], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "inline-block",
+    name: "float left",
+    css: ".tags {\n  margin: 0;\n  font-size: 14px;\n  line-height: 2;\n}\n.tag {\n  float: left;\n  width: 72px;\n  margin: 4px;\n  padding: 2px 0;\n  border-radius: 999px;\n  background: #dbe4fb;\n  color: #18203a;\n  text-align: center;\n  text-decoration: none;\n}\n",
+    messages: ["float や flex でも並びますが、文章の行の中に置く部品は display: inline-block にしましょう"],
+    elements: { tags: { rect: [0, 0, 596, 28], computed: {"display":"block"} }, t1: { rect: [4, 4, 72, 32], computed: {"display":"block"} }, t2: { rect: [84, 4, 72, 32], computed: {"display":"block"} }, t3: { rect: [164, 4, 72, 32], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "inline-block",
+    name: "flex on the paragraph",
+    css: ".tags {\n  margin: 0;\n  font-size: 14px;\n  line-height: 2;\n}\n.tag {\n  width: 72px;\n  margin: 4px;\n  padding: 2px 0;\n  border-radius: 999px;\n  background: #dbe4fb;\n  color: #18203a;\n  text-align: center;\n  text-decoration: none;\n}\n.tags {\n  display: flex;\n  align-items: center;\n}\n",
+    messages: ["float や flex でも並びますが、文章の行の中に置く部品は display: inline-block にしましょう"],
+    elements: { tags: { rect: [0, 0, 596, 40], computed: {"display":"flex"} }, t1: { rect: [36.02, 4, 72, 32], computed: {"display":"block"} }, t2: { rect: [116.02, 4, 72, 32], computed: {"display":"block"} }, t3: { rect: [196.02, 4, 72, 32], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "image-gap",
+    name: "starter",
+    messages: ["写真の下にすき間が残っています（画像は文字のベースラインに乗るので、下に文字の下がり分の余白ができます）"],
+    elements: { frame: { rect: [0, 0, 240, 125.39], computed: {"display":"block","vertical-align":"baseline"} }, photo: { rect: [0, 0, 240, 120], computed: {"display":"inline","vertical-align":"baseline"} } },
+  },
+  {
+    lesson: "image-gap",
+    name: "solution",
+    messages: [],
+    elements: { frame: { rect: [0, 0, 240, 120], computed: {"display":"block","vertical-align":"baseline"} }, photo: { rect: [0, 0, 240, 120], computed: {"display":"block","vertical-align":"baseline"} } },
+  },
+  {
+    lesson: "image-gap",
+    name: "vertical-align middle",
+    css: ".frame {\n  width: fit-content;\n  margin: 0;\n  padding: 0;\n  background: #f5c400;\n}\n.photo {\n  vertical-align: middle;\n}\n",
+    messages: [],
+    elements: { frame: { rect: [0, 0, 240, 120], computed: {"display":"block","vertical-align":"baseline"} }, photo: { rect: [0, 0, 240, 120], computed: {"display":"inline","vertical-align":"middle"} } },
+  },
+  {
+    lesson: "image-gap",
+    name: "vertical-align bottom",
+    css: ".frame {\n  width: fit-content;\n  margin: 0;\n  padding: 0;\n  background: #f5c400;\n}\n.photo {\n  vertical-align: bottom;\n}\n",
+    messages: [],
+    elements: { frame: { rect: [0, 0, 240, 120], computed: {"display":"block","vertical-align":"baseline"} }, photo: { rect: [0, 0, 240, 120], computed: {"display":"inline","vertical-align":"bottom"} } },
+  },
+  {
+    lesson: "image-gap",
+    name: "line-height 0 on the frame",
+    css: ".frame {\n  width: fit-content;\n  margin: 0;\n  padding: 0;\n  background: #f5c400;\n}\n.frame {\n  line-height: 0;\n}\n",
+    messages: ["枠の高さや行の高さで隠すのではなく、画像を display: block（または vertical-align: middle など）にしましょう（画像の大きさや文字が変わっても崩れません）"],
+    elements: { frame: { rect: [0, 0, 240, 120], computed: {"display":"block","vertical-align":"baseline"} }, photo: { rect: [0, 0, 240, 120], computed: {"display":"inline","vertical-align":"baseline"} } },
+  },
+  {
+    lesson: "image-gap",
+    name: "frame height fixed",
+    css: ".frame {\n  width: fit-content;\n  margin: 0;\n  padding: 0;\n  background: #f5c400;\n}\n.frame {\n  height: 120px;\n}\n",
+    messages: ["枠の高さや行の高さで隠すのではなく、画像を display: block（または vertical-align: middle など）にしましょう（画像の大きさや文字が変わっても崩れません）"],
+    elements: { frame: { rect: [0, 0, 240, 120], computed: {"display":"block","vertical-align":"baseline"} }, photo: { rect: [0, 0, 240, 120], computed: {"display":"inline","vertical-align":"baseline"} } },
+  },
+  {
+    lesson: "image-gap",
+    name: "inline-block image",
+    css: ".frame {\n  width: fit-content;\n  margin: 0;\n  padding: 0;\n  background: #f5c400;\n}\n.photo {\n  display: inline-block;\n}\n",
+    messages: ["写真の下にすき間が残っています（画像は文字のベースラインに乗るので、下に文字の下がり分の余白ができます）"],
+    elements: { frame: { rect: [0, 0, 240, 125.39], computed: {"display":"block","vertical-align":"baseline"} }, photo: { rect: [0, 0, 240, 120], computed: {"display":"inline-block","vertical-align":"baseline"} } },
+  },
+  {
+    lesson: "unitless-line-height",
+    name: "starter",
+    messages: ["見出しの行が詰まっています（親の 24px がそのまま受け継がれています。28px の 1.5 倍の 42px × 2 行＝ 84px になるはずです）"],
+    elements: { post: { rect: [0, 0, 596, 104] }, title: { rect: [0, 0, 596, 48] }, body: { rect: [0, 56, 596, 48] } },
+  },
+  {
+    lesson: "unitless-line-height",
+    name: "solution",
+    messages: [],
+    elements: { post: { rect: [0, 0, 596, 140] }, title: { rect: [0, 0, 596, 84] }, body: { rect: [0, 92, 596, 48] } },
+  },
+  {
+    lesson: "unitless-line-height",
+    name: "font shorthand 16px/1.5",
+    css: ".post {\n  font-size: 16px;\n  line-height: 24px;\n}\n.post h2 {\n  margin: 0;\n  font-size: 28px;\n}\n.post p {\n  margin: 8px 0 0;\n}\n.post {\n  font: 16px/1.5 system-ui, sans-serif;\n}\n",
+    messages: [],
+    elements: { post: { rect: [0, 0, 596, 140] }, title: { rect: [0, 0, 596, 84] }, body: { rect: [0, 92, 596, 48] } },
+  },
+  {
+    lesson: "unitless-line-height",
+    name: "unitless on the heading",
+    css: ".post {\n  font-size: 16px;\n  line-height: 24px;\n}\n.post h2 {\n  margin: 0;\n  font-size: 28px;\n}\n.post p {\n  margin: 8px 0 0;\n}\n.post h2 {\n  line-height: 1.5;\n}\n",
+    messages: [],
+    elements: { post: { rect: [0, 0, 596, 140] }, title: { rect: [0, 0, 596, 84] }, body: { rect: [0, 92, 596, 48] } },
+  },
+  {
+    lesson: "unitless-line-height",
+    name: "1.5em",
+    css: ".post {\n  font-size: 16px;\n  line-height: 1.5em;\n}\n.post h2 {\n  margin: 0;\n  font-size: 28px;\n}\n.post p {\n  margin: 8px 0 0;\n}\n",
+    messages: ["見出しの行が詰まっています（親の 24px がそのまま受け継がれています。28px の 1.5 倍の 42px × 2 行＝ 84px になるはずです）"],
+    elements: { post: { rect: [0, 0, 596, 104] }, title: { rect: [0, 0, 596, 48] }, body: { rect: [0, 56, 596, 48] } },
+  },
+  {
+    lesson: "unitless-line-height",
+    name: "150%",
+    css: ".post {\n  font-size: 16px;\n  line-height: 150%;\n}\n.post h2 {\n  margin: 0;\n  font-size: 28px;\n}\n.post p {\n  margin: 8px 0 0;\n}\n",
+    messages: ["見出しの行が詰まっています（親の 24px がそのまま受け継がれています。28px の 1.5 倍の 42px × 2 行＝ 84px になるはずです）"],
+    elements: { post: { rect: [0, 0, 596, 104] }, title: { rect: [0, 0, 596, 48] }, body: { rect: [0, 56, 596, 48] } },
+  },
+  {
+    lesson: "unitless-line-height",
+    name: "42px on the heading",
+    css: ".post {\n  font-size: 16px;\n  line-height: 24px;\n}\n.post h2 {\n  margin: 0;\n  font-size: 28px;\n}\n.post p {\n  margin: 8px 0 0;\n}\n.post h2 {\n  line-height: 42px;\n}\n",
+    messages: ["見出しだけを px で直すのではなく、親の line-height を 1.5 のような単位なしの数にしましょう（子は自分の文字の大きさに掛け算します）"],
+    elements: { post: { rect: [0, 0, 596, 140] }, title: { rect: [0, 0, 596, 84] }, body: { rect: [0, 92, 596, 48] } },
+  },
+  {
+    lesson: "flow-root",
+    name: "starter",
+    messages: ["写真がカードの枠からはみ出しています（float した要素は、親の高さに含まれません）"],
+    elements: { card: { rect: [0, 0, 596, 48.39], computed: {"display":"block"} }, photo: { rect: [13, 13, 96, 96], computed: {"display":"block"} }, text: { rect: [13, 13, 570, 22.39], computed: {"display":"block"} }, after: { rect: [0, 56.39, 596, 22.39], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "flow-root",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 596, 122], computed: {"display":"flow-root"} }, photo: { rect: [13, 13, 96, 96], computed: {"display":"block"} }, text: { rect: [13, 13, 570, 22.39], computed: {"display":"block"} }, after: { rect: [0, 130, 596, 22.39], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "flow-root",
+    name: "overflow hidden",
+    css: ".card {\n  overflow: hidden;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.photo {\n  float: left;\n  margin-right: 12px;\n}\n.card p {\n  margin: 0;\n}\n.after {\n  margin: 8px 0 0;\n}\n",
+    messages: ["overflow: hidden や高さの指定、clearfix でも囲めますが、display: flow-root を使いましょう（影や中身が切れたり、文章が増えて崩れたりせず、余計な指定も要りません）"],
+    elements: { card: { rect: [0, 0, 596, 122], computed: {"display":"block"} }, photo: { rect: [13, 13, 96, 96], computed: {"display":"block"} }, text: { rect: [13, 13, 570, 22.39], computed: {"display":"block"} }, after: { rect: [0, 130, 596, 22.39], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "flow-root",
+    name: "fixed height",
+    css: ".card {\n  height: 122px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.photo {\n  float: left;\n  margin-right: 12px;\n}\n.card p {\n  margin: 0;\n}\n.after {\n  margin: 8px 0 0;\n}\n",
+    messages: ["overflow: hidden や高さの指定、clearfix でも囲めますが、display: flow-root を使いましょう（影や中身が切れたり、文章が増えて崩れたりせず、余計な指定も要りません）"],
+    elements: { card: { rect: [0, 0, 596, 122], computed: {"display":"block"} }, photo: { rect: [13, 13, 96, 96], computed: {"display":"block"} }, text: { rect: [13, 13, 570, 22.39], computed: {"display":"block"} }, after: { rect: [0, 130, 596, 22.39], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "flow-root",
+    name: "clearfix",
+    css: ".card {\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.photo {\n  float: left;\n  margin-right: 12px;\n}\n.card p {\n  margin: 0;\n}\n.after {\n  margin: 8px 0 0;\n}\n.card::after {\n  content: \"\";\n  display: block;\n  clear: both;\n}\n",
+    messages: ["overflow: hidden や高さの指定、clearfix でも囲めますが、display: flow-root を使いましょう（影や中身が切れたり、文章が増えて崩れたりせず、余計な指定も要りません）"],
+    elements: { card: { rect: [0, 0, 596, 122], computed: {"display":"block"} }, photo: { rect: [13, 13, 96, 96], computed: {"display":"block"} }, text: { rect: [13, 13, 570, 22.39], computed: {"display":"block"} }, after: { rect: [0, 130, 596, 22.39], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "flow-root",
+    name: "flex card",
+    css: ".card {\n  display: flex;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.photo {\n  float: left;\n  margin-right: 12px;\n}\n.card p {\n  margin: 0;\n}\n.after {\n  margin: 8px 0 0;\n}\n",
+    messages: ["overflow: hidden や高さの指定、clearfix でも囲めますが、display: flow-root を使いましょう（影や中身が切れたり、文章が増えて崩れたりせず、余計な指定も要りません）"],
+    elements: { card: { rect: [0, 0, 596, 122], computed: {"display":"flex"} }, photo: { rect: [13, 13, 96, 96], computed: {"display":"block"} }, text: { rect: [121, 13, 224, 96], computed: {"display":"block"} }, after: { rect: [0, 130, 596, 22.39], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "clear-float",
+    name: "starter",
+    messages: ["見出し「淹れ方」が、写真の横に回り込んでいます（写真の下から始めます）"],
+    elements: { post: { rect: [0, 0, 596, 87.17], computed: {"clear":"none"} }, photo: { rect: [0, 0, 96, 96], computed: {"clear":"none"} }, lead: { rect: [0, 0, 596, 22.39], computed: {"clear":"none"} }, next: { rect: [0, 38.39, 596, 22.39], computed: {"clear":"none"} }, tail: { rect: [0, 64.78, 596, 22.39], computed: {"clear":"none"} } },
+  },
+  {
+    lesson: "clear-float",
+    name: "solution",
+    messages: [],
+    elements: { post: { rect: [0, 0, 596, 152.78], computed: {"clear":"none"} }, photo: { rect: [0, 0, 96, 96], computed: {"clear":"none"} }, lead: { rect: [0, 0, 596, 22.39], computed: {"clear":"none"} }, next: { rect: [0, 104, 596, 22.39], computed: {"clear":"both"} }, tail: { rect: [0, 130.39, 596, 22.39], computed: {"clear":"none"} } },
+  },
+  {
+    lesson: "clear-float",
+    name: "clear left",
+    css: ".photo {\n  float: left;\n  margin: 0 12px 8px 0;\n}\n.lead,\n.tail {\n  margin: 0;\n}\n.next {\n  margin: 16px 0 4px;\n  font-size: 16px;\n  clear: left;\n}\n",
+    messages: [],
+    elements: { post: { rect: [0, 0, 596, 152.78], computed: {"clear":"none"} }, photo: { rect: [0, 0, 96, 96], computed: {"clear":"none"} }, lead: { rect: [0, 0, 596, 22.39], computed: {"clear":"none"} }, next: { rect: [0, 104, 596, 22.39], computed: {"clear":"left"} }, tail: { rect: [0, 130.39, 596, 22.39], computed: {"clear":"none"} } },
+  },
+  {
+    lesson: "clear-float",
+    name: "pushed down with a margin",
+    css: ".photo {\n  float: left;\n  margin: 0 12px 8px 0;\n}\n.lead,\n.tail {\n  margin: 0;\n}\n.next {\n  margin: 80px 0 4px;\n  font-size: 16px;\n}\n",
+    messages: ["余白で押し下げるのではなく、clear で float の下へ送りましょう（写真の大きさが変わっても、ちょうど下から始まります）"],
+    elements: { post: { rect: [0, 0, 596, 151.17], computed: {"clear":"none"} }, photo: { rect: [0, 0, 96, 96], computed: {"clear":"none"} }, lead: { rect: [0, 0, 596, 22.39], computed: {"clear":"none"} }, next: { rect: [0, 102.39, 596, 22.39], computed: {"clear":"none"} }, tail: { rect: [0, 128.78, 596, 22.39], computed: {"clear":"none"} } },
+  },
+  {
+    lesson: "clear-float",
+    name: "clear right",
+    css: ".photo {\n  float: left;\n  margin: 0 12px 8px 0;\n}\n.lead,\n.tail {\n  margin: 0;\n}\n.next {\n  margin: 16px 0 4px;\n  font-size: 16px;\n  clear: right;\n}\n",
+    messages: ["見出し「淹れ方」が、写真の横に回り込んでいます（写真の下から始めます）"],
+    elements: { post: { rect: [0, 0, 596, 87.17], computed: {"clear":"none"} }, photo: { rect: [0, 0, 96, 96], computed: {"clear":"none"} }, lead: { rect: [0, 0, 596, 22.39], computed: {"clear":"none"} }, next: { rect: [0, 38.39, 596, 22.39], computed: {"clear":"right"} }, tail: { rect: [0, 64.78, 596, 22.39], computed: {"clear":"none"} } },
+  },
+  {
+    lesson: "clear-float",
+    name: "flow-root on the lead",
+    css: ".photo {\n  float: left;\n  margin: 0 12px 8px 0;\n}\n.lead,\n.tail {\n  margin: 0;\n}\n.next {\n  margin: 16px 0 4px;\n  font-size: 16px;\n}\n.lead {\n  display: flow-root;\n}\n",
+    messages: ["見出し「淹れ方」が、写真の横に回り込んでいます（写真の下から始めます）"],
+    elements: { post: { rect: [0, 0, 596, 87.17], computed: {"clear":"none"} }, photo: { rect: [0, 0, 96, 96], computed: {"clear":"none"} }, lead: { rect: [108, 0, 488, 22.39], computed: {"clear":"none"} }, next: { rect: [0, 38.39, 596, 22.39], computed: {"clear":"none"} }, tail: { rect: [0, 64.78, 596, 22.39], computed: {"clear":"none"} } },
+  },
+  {
+    lesson: "display-contents",
+    name: "starter",
+    messages: ["おすすめの 2 枚が 1 マスの中に積まれています（入れ物の .group が、1 つのグリッドアイテムになっています）"],
+    elements: { grid: { rect: [0, 0, 596, 87.19], computed: {"display":"grid"} }, c1: { rect: [0, 0, 143, 87.19], computed: {"display":"block"} }, group: { rect: [151, 0, 143, 87.19], computed: {"display":"block"} }, c2: { rect: [151, 0, 143, 43.59], computed: {"display":"block"} }, c3: { rect: [151, 43.59, 143, 43.59], computed: {"display":"block"} }, c4: { rect: [302, 0, 143, 87.19], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "display-contents",
+    name: "solution",
+    messages: [],
+    elements: { grid: { rect: [0, 0, 596, 43.59], computed: {"display":"grid"} }, c1: { rect: [0, 0, 143, 43.59], computed: {"display":"block"} }, group: { rect: [0, 0, 0, 0], computed: {"display":"contents"} }, c2: { rect: [151, 0, 143, 43.59], computed: {"display":"block"} }, c3: { rect: [302, 0, 143, 43.59], computed: {"display":"block"} }, c4: { rect: [453, 0, 143, 43.59], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "display-contents",
+    name: "subgrid",
+    css: ".grid {\n  display: grid;\n  grid-template-columns: repeat(4, 1fr);\n  gap: 8px;\n}\n.card {\n  padding: 12px 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n.pick {\n  background: #fff3c4;\n}\n.group {\n  display: grid;\n  grid-column: span 2;\n  grid-template-columns: subgrid;\n}\n",
+    messages: ["subgrid などでも並べられますが、ここでは display: contents で入れ物の箱をなくしましょう"],
+    elements: { grid: { rect: [0, 0, 596, 43.59], computed: {"display":"grid"} }, c1: { rect: [0, 0, 143, 43.59], computed: {"display":"block"} }, group: { rect: [151, 0, 294, 43.59], computed: {"display":"grid"} }, c2: { rect: [151, 0, 143, 43.59], computed: {"display":"block"} }, c3: { rect: [302, 0, 143, 43.59], computed: {"display":"block"} }, c4: { rect: [453, 0, 143, 43.59], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "display-contents",
+    name: "group hidden",
+    css: ".grid {\n  display: grid;\n  grid-template-columns: repeat(4, 1fr);\n  gap: 8px;\n}\n.card {\n  padding: 12px 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n.pick {\n  background: #fff3c4;\n}\n.group {\n  display: none;\n}\n",
+    messages: ["おすすめの 2 枚が 1 マスの中に積まれています（入れ物の .group が、1 つのグリッドアイテムになっています）"],
+    elements: { grid: { rect: [0, 0, 596, 43.59], computed: {"display":"grid"} }, c1: { rect: [0, 0, 143, 43.59], computed: {"display":"block"} }, group: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, c2: { rect: [0, 0, 0, 0], computed: {"display":"block"} }, c3: { rect: [0, 0, 0, 0], computed: {"display":"block"} }, c4: { rect: [151, 0, 143, 43.59], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "display-contents",
+    name: "flex group",
+    css: ".grid {\n  display: grid;\n  grid-template-columns: repeat(4, 1fr);\n  gap: 8px;\n}\n.card {\n  padding: 12px 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n.pick {\n  background: #fff3c4;\n}\n.group {\n  display: flex;\n  gap: 8px;\n}\n",
+    messages: ["おすすめの 2 枚が 1 マスの中に積まれています（入れ物の .group が、1 つのグリッドアイテムになっています）"],
+    elements: { grid: { rect: [0, 0, 596, 63.19], computed: {"display":"grid"} }, c1: { rect: [0, 0, 143, 63.19], computed: {"display":"block"} }, group: { rect: [151, 0, 143, 63.19], computed: {"display":"flex"} }, c2: { rect: [151, 0, 66.75, 63.19], computed: {"display":"block"} }, c3: { rect: [225.75, 0, 68.25, 63.19], computed: {"display":"block"} }, c4: { rect: [302, 0, 143, 63.19], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "max-height-scroll",
+    name: "starter",
+    messages: ["一覧の高さが 160px になっていません（max-height で上限を決めます）"],
+    elements: { panel: { rect: [0, 0, 260, 305.59], computed: {"overflow-y":"visible","max-height":"none"} }, list: { rect: [9, 32.59, 242, 264], computed: {"overflow-y":"visible","max-height":"none"} } },
+  },
+  {
+    lesson: "max-height-scroll",
+    name: "solution",
+    messages: [],
+    elements: { panel: { rect: [0, 0, 260, 201.59], computed: {"overflow-y":"visible","max-height":"none"} }, list: { rect: [9, 32.59, 242, 160], computed: {"overflow-y":"auto","max-height":"160px"} } },
+  },
+  {
+    lesson: "max-height-scroll",
+    name: "overflow-y scroll",
+    css: ".panel {\n  width: 260px;\n  padding: 8px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.panel h3 {\n  margin: 0 0 4px;\n  font-size: 14px;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  max-height: 160px;\n  overflow-y: scroll;\n}\n.list li {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  font-size: 14px;\n  line-height: 24px;\n}\n",
+    messages: [],
+    elements: { panel: { rect: [0, 0, 260, 201.59], computed: {"overflow-y":"visible","max-height":"none"} }, list: { rect: [9, 32.59, 242, 160], computed: {"overflow-y":"scroll","max-height":"160px"} } },
+  },
+  {
+    lesson: "max-height-scroll",
+    name: "overflow shorthand",
+    css: ".panel {\n  width: 260px;\n  padding: 8px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.panel h3 {\n  margin: 0 0 4px;\n  font-size: 14px;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  max-height: 160px;\n  overflow: auto;\n}\n.list li {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  font-size: 14px;\n  line-height: 24px;\n}\n",
+    messages: [],
+    elements: { panel: { rect: [0, 0, 260, 201.59], computed: {"overflow-y":"visible","max-height":"none"} }, list: { rect: [9, 32.59, 242, 160], computed: {"overflow-y":"auto","max-height":"160px"} } },
+  },
+  {
+    lesson: "max-height-scroll",
+    name: "height instead of max-height",
+    css: ".panel {\n  width: 260px;\n  padding: 8px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.panel h3 {\n  margin: 0 0 4px;\n  font-size: 14px;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  height: 160px;\n  overflow-y: auto;\n}\n.list li {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  font-size: 14px;\n  line-height: 24px;\n}\n",
+    messages: ["height: 160px だと、通知が少ないときも 160px のままです。max-height で「最大 160px」にしましょう"],
+    elements: { panel: { rect: [0, 0, 260, 201.59], computed: {"overflow-y":"visible","max-height":"none"} }, list: { rect: [9, 32.59, 242, 160], computed: {"overflow-y":"auto","max-height":"none"} } },
+  },
+  {
+    lesson: "max-height-scroll",
+    name: "max-height without overflow",
+    css: ".panel {\n  width: 260px;\n  padding: 8px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.panel h3 {\n  margin: 0 0 4px;\n  font-size: 14px;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  max-height: 160px;\n}\n.list li {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  font-size: 14px;\n  line-height: 24px;\n}\n",
+    messages: ["高さは 160px ですが、あふれた通知が一覧の外にはみ出しています（overflow-y: auto で一覧の中をスクロールさせます）"],
+    elements: { panel: { rect: [0, 0, 260, 201.59], computed: {"overflow-y":"visible","max-height":"none"} }, list: { rect: [9, 32.59, 242, 160], computed: {"overflow-y":"visible","max-height":"160px"} } },
+  },
+  {
+    lesson: "max-height-scroll",
+    name: "overflow hidden",
+    css: ".panel {\n  width: 260px;\n  padding: 8px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.panel h3 {\n  margin: 0 0 4px;\n  font-size: 14px;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  max-height: 160px;\n  overflow-y: hidden;\n}\n.list li {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  font-size: 14px;\n  line-height: 24px;\n}\n",
+    messages: ["overflow-y: hidden では、あふれた通知が見えなくなり、スクロールもできません。auto にしましょう"],
+    elements: { panel: { rect: [0, 0, 260, 201.59], computed: {"overflow-y":"visible","max-height":"none"} }, list: { rect: [9, 32.59, 242, 160], computed: {"overflow-y":"hidden","max-height":"160px"} } },
+  },
+  {
+    lesson: "overflow-x-table",
+    name: "starter",
+    messages: ["表がカードの枠からはみ出したままです（表を包む .table-wrap を、横にスクロールする領域にします）"],
+    elements: { card: { rect: [0, 0, 280, 111.78], computed: {"overflow-x":"visible"} }, wrap: { rect: [13, 13, 254, 85.78], computed: {"overflow-x":"visible"} }, table: { rect: [13, 13, 350.66, 85.78], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "overflow-x-table",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 126.78], computed: {"overflow-x":"visible"} }, wrap: { rect: [13, 13, 254, 100.78], computed: {"overflow-x":"auto"} }, table: { rect: [13, 13, 350.66, 85.78], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "overflow-x-table",
+    name: "overflow-x scroll",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  white-space: nowrap;\n  text-align: left;\n}\n.table-wrap {\n  overflow-x: scroll;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 126.78], computed: {"overflow-x":"visible"} }, wrap: { rect: [13, 13, 254, 100.78], computed: {"overflow-x":"scroll"} }, table: { rect: [13, 13, 350.66, 85.78], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "overflow-x-table",
+    name: "the card scrolls",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  white-space: nowrap;\n  text-align: left;\n}\n.card {\n  overflow-x: auto;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 126.78], computed: {"overflow-x":"auto"} }, wrap: { rect: [13, 13, 254, 85.78], computed: {"overflow-x":"visible"} }, table: { rect: [13, 13, 350.66, 85.78], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "overflow-x-table",
+    name: "overflow-x hidden",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  white-space: nowrap;\n  text-align: left;\n}\n.table-wrap {\n  overflow-x: hidden;\n}\n",
+    messages: ["overflow-x: hidden では右の列が切れて見えなくなり、スクロールもできません。auto にしましょう"],
+    elements: { card: { rect: [0, 0, 280, 111.78], computed: {"overflow-x":"visible"} }, wrap: { rect: [13, 13, 254, 85.78], computed: {"overflow-x":"hidden"} }, table: { rect: [13, 13, 350.66, 85.78], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "overflow-x-table",
+    name: "columns squeezed",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  white-space: nowrap;\n  text-align: left;\n}\n.table-wrap {\n  overflow-x: auto;\n}\n.table {\n  width: 100%;\n  table-layout: fixed;\n}\n.table th,\n.table td {\n  white-space: normal;\n}\n",
+    messages: ["表の列が縮められています（列を折り返したり詰めたりせず、表の幅のままスクロールさせます）"],
+    elements: { card: { rect: [0, 0, 280, 224.75], computed: {"overflow-x":"visible"} }, wrap: { rect: [13, 13, 254, 198.75], computed: {"overflow-x":"auto"} }, table: { rect: [13, 13, 254, 183.75], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "overflow-x-table",
+    name: "overflow on the table",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.table {\n  border-collapse: collapse;\n  font-size: 14px;\n}\n.table th,\n.table td {\n  padding: 4px 8px;\n  border-bottom: 1px solid #dbe4fb;\n  white-space: nowrap;\n  text-align: left;\n}\n.table {\n  overflow-x: auto;\n}\n",
+    messages: ["表がカードの枠からはみ出したままです（表を包む .table-wrap を、横にスクロールする領域にします）"],
+    elements: { card: { rect: [0, 0, 280, 111.78], computed: {"overflow-x":"visible"} }, wrap: { rect: [13, 13, 254, 85.78], computed: {"overflow-x":"visible"} }, table: { rect: [13, 13, 350.66, 85.78], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "flex-min-height",
+    name: "starter",
+    messages: ["一覧がパネル（240px）の下へはみ出しています（真ん中の .main が、中身より小さく縮めないためです）"],
+    elements: { panel: { rect: [0, 0, 581, 240], computed: {"min-height":"0px","overflow-y":"visible"} }, main: { rect: [1, 49, 579, 320], computed: {"min-height":"auto","overflow-y":"visible"} }, list: { rect: [1, 49, 579, 320], computed: {"min-height":"auto","overflow-y":"auto"} } },
+  },
+  {
+    lesson: "flex-min-height",
+    name: "solution",
+    messages: [],
+    elements: { panel: { rect: [0, 0, 596, 240], computed: {"min-height":"0px","overflow-y":"visible"} }, main: { rect: [1, 49, 594, 190], computed: {"min-height":"0px","overflow-y":"visible"} }, list: { rect: [1, 49, 594, 190], computed: {"min-height":"auto","overflow-y":"auto"} } },
+  },
+  {
+    lesson: "flex-min-height",
+    name: "overflow hidden on .main",
+    css: ".panel {\n  display: flex;\n  flex-direction: column;\n  height: 240px;\n  border: 1px solid #9fb2e6;\n}\n.head {\n  flex: none;\n  height: 48px;\n  padding: 12px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n.list {\n  flex: 1;\n  margin: 0;\n  padding: 0 12px;\n  overflow-y: auto;\n  list-style: none;\n}\n.list li {\n  padding: 4px 0;\n  line-height: 24px;\n}\n",
+    messages: [],
+    elements: { panel: { rect: [0, 0, 596, 240], computed: {"min-height":"0px","overflow-y":"visible"} }, main: { rect: [1, 49, 594, 190], computed: {"min-height":"auto","overflow-y":"hidden"} }, list: { rect: [1, 49, 594, 190], computed: {"min-height":"auto","overflow-y":"auto"} } },
+  },
+  {
+    lesson: "flex-min-height",
+    name: "min-height 0 on the list only",
+    css: ".panel {\n  display: flex;\n  flex-direction: column;\n  height: 240px;\n  border: 1px solid #9fb2e6;\n}\n.head {\n  flex: none;\n  height: 48px;\n  padding: 12px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n}\n.list {\n  flex: 1;\n  margin: 0;\n  padding: 0 12px;\n  overflow-y: auto;\n  list-style: none;\n}\n.list li {\n  padding: 4px 0;\n  line-height: 24px;\n}\n.list {\n  min-height: 0;\n}\n",
+    messages: ["一覧がパネル（240px）の下へはみ出しています（真ん中の .main が、中身より小さく縮めないためです）"],
+    elements: { panel: { rect: [0, 0, 581, 240], computed: {"min-height":"0px","overflow-y":"visible"} }, main: { rect: [1, 49, 579, 320], computed: {"min-height":"auto","overflow-y":"visible"} }, list: { rect: [1, 49, 579, 320], computed: {"min-height":"0px","overflow-y":"auto"} } },
+  },
+  {
+    lesson: "flex-min-height",
+    name: "fixed height on .main",
+    css: ".panel {\n  display: flex;\n  flex-direction: column;\n  height: 240px;\n  border: 1px solid #9fb2e6;\n}\n.head {\n  flex: none;\n  height: 48px;\n  padding: 12px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n}\n.list {\n  flex: 1;\n  margin: 0;\n  padding: 0 12px;\n  overflow-y: auto;\n  list-style: none;\n}\n.list li {\n  padding: 4px 0;\n  line-height: 24px;\n}\n.main {\n  height: 190px;\n  flex: none;\n}\n",
+    messages: ["高さを固定するのではなく、.main に min-height: 0 を指定して縮められるようにしましょう（パネルの高さが変わっても合います）"],
+    elements: { panel: { rect: [0, 0, 596, 240], computed: {"min-height":"0px","overflow-y":"visible"} }, main: { rect: [1, 49, 594, 190], computed: {"min-height":"auto","overflow-y":"visible"} }, list: { rect: [1, 49, 594, 190], computed: {"min-height":"auto","overflow-y":"auto"} } },
+  },
+  {
+    lesson: "flex-min-height",
+    name: "max-height on the list",
+    css: ".panel {\n  display: flex;\n  flex-direction: column;\n  height: 240px;\n  border: 1px solid #9fb2e6;\n}\n.head {\n  flex: none;\n  height: 48px;\n  padding: 12px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n}\n.list {\n  flex: 1;\n  margin: 0;\n  padding: 0 12px;\n  overflow-y: auto;\n  list-style: none;\n}\n.list li {\n  padding: 4px 0;\n  line-height: 24px;\n}\n.list {\n  max-height: 190px;\n}\n",
+    messages: ["高さを固定するのではなく、.main に min-height: 0 を指定して縮められるようにしましょう（パネルの高さが変わっても合います）"],
+    elements: { panel: { rect: [0, 0, 596, 240], computed: {"min-height":"0px","overflow-y":"visible"} }, main: { rect: [1, 49, 594, 190], computed: {"min-height":"auto","overflow-y":"visible"} }, list: { rect: [1, 49, 594, 190], computed: {"min-height":"auto","overflow-y":"auto"} } },
+  },
+  {
+    lesson: "flex-min-height",
+    name: "flex basis 0",
+    css: ".panel {\n  display: flex;\n  flex-direction: column;\n  height: 240px;\n  border: 1px solid #9fb2e6;\n}\n.head {\n  flex: none;\n  height: 48px;\n  padding: 12px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n}\n.list {\n  flex: 1;\n  margin: 0;\n  padding: 0 12px;\n  overflow-y: auto;\n  list-style: none;\n}\n.list li {\n  padding: 4px 0;\n  line-height: 24px;\n}\n.main {\n  flex: 1 1 0;\n}\n",
+    messages: ["一覧がパネル（240px）の下へはみ出しています（真ん中の .main が、中身より小さく縮めないためです）"],
+    elements: { panel: { rect: [0, 0, 581, 240], computed: {"min-height":"0px","overflow-y":"visible"} }, main: { rect: [1, 49, 579, 320], computed: {"min-height":"auto","overflow-y":"visible"} }, list: { rect: [1, 49, 579, 320], computed: {"min-height":"auto","overflow-y":"auto"} } },
+  },
+];
+
+describe("structural selectors, inline boxes, floats and scroll areas: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 12 lessons", () => {
+    expect([...new Set(DETAIL_CASES.map((c) => c.lesson))].sort()).toEqual([...DETAIL_LESSONS].sort());
+    for (const id of DETAIL_LESSONS) {
+      const names = DETAIL_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of DETAIL_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its message" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of DETAIL_LESSONS) {
+      const starter = DETAIL_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = DETAIL_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("measures what the layout does, not how the CSS reads", () => {
+    const rect = (id: string, name: string, el: string): readonly number[] =>
+      DETAIL_CASES.find((c) => c.lesson === id && c.name === name)!.elements[el]!.rect!;
+    // On the baseline the image leaves a strip under it; off the baseline it does not.
+    const gap = (name: string): number => {
+      const [, fy, , fh] = rect("image-gap", name, "frame");
+      const [, py, , ph] = rect("image-gap", name, "photo");
+      return fy + fh - (py + ph);
+    };
+    expect(gap("starter")).toBeGreaterThan(2);
+    expect(gap("solution")).toBe(0);
+    // An inherited 24px squeezes the 28px heading's two lines; a unitless 1.5 gives each 42px.
+    expect(rect("unitless-line-height", "starter", "title")[3]).toBe(48);
+    expect(rect("unitless-line-height", "solution", "title")[3]).toBe(84);
+    // The middle box grows with the list until min-height: 0 lets it shrink into the panel.
+    expect(rect("flex-min-height", "starter", "main")[3]).toBeGreaterThan(rect("flex-min-height", "starter", "panel")[3]);
+    expect(rect("flex-min-height", "solution", "main")[3]).toBeLessThan(rect("flex-min-height", "solution", "panel")[3]);
+  });
+});

@@ -77,7 +77,7 @@ export const formattingContextsTrack: Track = {
                 id: "card",
                 prop: "display",
                 value: "flow-root",
-                message: "overflow: hidden や高さの指定でも囲めますが、display: flow-root を使いましょう（影や中身が切れたり、文章が増えて崩れたりしません）",
+                message: "overflow: hidden や高さの指定、clearfix でも囲めますが、display: flow-root を使いましょう（影や中身が切れたり、文章が増えて崩れたりせず、余計な指定も要りません）",
               },
             ],
           },
