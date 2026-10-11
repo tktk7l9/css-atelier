@@ -24,6 +24,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * patterns after grid alignment); keyframe animations come after the
  * transform tracks (their frames move the ball with translate) and before the
  * entry animations and @property, whose animation lesson builds on @keyframes.
+ * Combinators follow the selector basics; the relative units (calc(), rem,
+ * dvh) follow the first units track, and inheritance and its keywords come
+ * right after, before custom properties (which inherit too); the ways of
+ * hiding follow absolute positioning, which the visually-hidden lesson uses.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -40,6 +44,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "selectors-class", title: "クラスで狙う" },
       { id: "selectors-descendant", title: "子孫セレクタで絞り込む" },
       { id: "selectors-first-child", title: "擬似クラス: :first-child" },
+    ],
+  },
+  {
+    id: "combinators",
+    title: "結合子（> + ~）",
+    summary: "> で直下の子、+ で直後の兄弟、~ で後ろのすべての兄弟を選び、HTML にクラスを足さずに狙いを絞る。",
+    emoji: "🌳",
+    lessons: [
+      { id: "child-combinator", title: "直下の子だけ: 子結合子 >" },
+      { id: "next-sibling", title: "直後の兄弟だけ: 次兄弟結合子 +" },
+      { id: "subsequent-sibling", title: "後ろのすべての兄弟: 後続兄弟結合子 ~" },
     ],
   },
   {
@@ -62,6 +77,28 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "units-percent", title: "親に対する割合: %" },
       { id: "units-clamp", title: "下限・推奨・上限: clamp()" },
       { id: "units-min", title: "小さい方を採用: min()" },
+    ],
+  },
+  {
+    id: "relative-units",
+    title: "単位の使い分け（calc()・rem・dvh）",
+    summary: "calc() で単位を混ぜて計算し、rem で入れ子でも変わらない大きさに、dvh で画面の高さに合わせる。",
+    emoji: "⚖️",
+    lessons: [
+      { id: "calc-columns", title: "gap を引いて 3 等分: calc()" },
+      { id: "rem-nested", title: "入れ子でも同じ大きさ: rem" },
+      { id: "dvh-height", title: "画面の残りの高さ: calc(100dvh - 56px)" },
+    ],
+  },
+  {
+    id: "inheritance",
+    title: "継承とキーワード（inherit・currentColor・revert）",
+    summary: "inherit で親の値を受け継ぎ、currentColor で文字の色を使い回し、revert でリセット前のブラウザの見た目に戻す。",
+    emoji: "👪",
+    lessons: [
+      { id: "inherit-font", title: "フォームの文字をそろえる: font: inherit" },
+      { id: "current-color", title: "文字の色を使い回す: currentColor" },
+      { id: "revert-reset", title: "リセットを元に戻す: revert" },
     ],
   },
   {
@@ -314,6 +351,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "hiding",
+    title: "隠し方の使い分け（visibility・hidden・visually-hidden）",
+    summary: "visibility で場所を残して隠し、hidden 属性を display で打ち消さないようにし、読み上げには残して見た目だけ消す。",
+    emoji: "🙈",
+    lessons: [
+      { id: "visibility-hidden", title: "場所を残して隠す: visibility: hidden" },
+      { id: "hidden-attribute", title: "hidden 属性を効かせる: [hidden] { display: none }" },
+      { id: "visually-hidden", title: "読み上げには残す: visually-hidden" },
+    ],
+  },
+  {
     id: "shapes",
     title: "回り込みと図形（float・shape-outside）",
     summary: "float で文章を写真の横に流し、shape-outside で円に沿わせ、shape-margin で余白を取る。",
@@ -550,8 +598,11 @@ export function nextLesson(id: string): LessonMeta | undefined {
  */
 const LOADERS: Record<TrackId, () => Promise<Track>> = {
   selectors: () => import("./selectors.js").then((m) => m.selectorsTrack),
+  combinators: () => import("./combinators.js").then((m) => m.combinatorsTrack),
   "box-model": () => import("./box-model.js").then((m) => m.boxModelTrack),
   units: () => import("./units.js").then((m) => m.unitsTrack),
+  "relative-units": () => import("./relative-units.js").then((m) => m.relativeUnitsTrack),
+  inheritance: () => import("./inheritance.js").then((m) => m.inheritanceTrack),
   "custom-props": () => import("./custom-props.js").then((m) => m.customPropsTrack),
   color: () => import("./color.js").then((m) => m.colorTrack),
   "color-functions": () => import("./color-functions.js").then((m) => m.colorFunctionsTrack),
@@ -575,6 +626,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "logical-props": () => import("./logical-props.js").then((m) => m.logicalPropsTrack),
   "writing-modes": () => import("./writing-modes.js").then((m) => m.writingModesTrack),
   positioning: () => import("./positioning.js").then((m) => m.positioningTrack),
+  hiding: () => import("./hiding.js").then((m) => m.hidingTrack),
   shapes: () => import("./shapes.js").then((m) => m.shapesTrack),
   "aspect-ratio": () => import("./aspect-ratio.js").then((m) => m.aspectRatioTrack),
   "object-fit": () => import("./object-fit.js").then((m) => m.objectFitTrack),
