@@ -19,11 +19,11 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * layout follow the intrinsic sizes (the remaining layout modes), and the
  * float / shape track follows absolute positioning: both take a box out of
  * the normal flow. Generated content (::before / ::after, attribute
- * selectors, counters) closes the selector tracks; the flex and grid pattern
- * tracks follow the basics they extend (grid patterns after grid alignment);
- * keyframe animations come after the transform tracks (their frames move the
- * ball with translate) and before the entry animations and @property, whose
- * lessons build on @keyframes.
+ * selectors, counters) joins the selector tracks after the :has() patterns;
+ * the flex and grid pattern tracks follow the basics they extend (grid
+ * patterns after grid alignment); keyframe animations come after the
+ * transform tracks (their frames move the ball with translate) and before the
+ * entry animations and @property, whose animation lesson builds on @keyframes.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
