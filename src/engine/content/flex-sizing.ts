@@ -11,10 +11,10 @@ import type { Track } from "./types.js";
 // order so that percentages or a reversed row fail with a reason.
 
 const LAYOUT_HTML =
-  '<div data-id="layout" class="layout"><main data-id="main" class="main">本文</main><aside data-id="side" class="side">サイド</aside></div>';
+  '<div data-id="layout" class="layout"><main data-id="main" class="main"><p>本文</p></main><aside data-id="side" class="side"><p>サイド</p></aside></div>';
 
 const LAYOUT_CSS = (extra: string): string =>
-  `.layout {\n  display: flex;\n  gap: 12px;\n}\n.main,\n.side {\n  flex: 1;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.side {\n  background: #eef1f8;\n}\n${extra}`;
+  `.layout {\n  display: flex;\n  gap: 12px;\n}\n.main,\n.side {\n  flex: 1;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.side {\n  background: #eef1f8;\n}\n.layout p {\n  margin: 0;\n  padding: 12px;\n}\n${extra}`;
 
 const CARDS_HTML =
   '<div data-id="cards" class="cards">' +
@@ -51,7 +51,7 @@ export const flexSizingTrack: Track = {
       id: "flex-ratio",
       title: "幅を 2:1 に分ける: flex: 2 と flex: 1",
       explanation:
-        "<p><code>flex-grow</code> は、余ったスペースを<b>アイテムどうしの比</b>で分けます。<code>flex: 2</code> と <code>flex: 1</code> なら、2:1 の割合です。</p><p>一括指定の <code>flex: 2</code> は <code>flex: 2 1 0%</code> と同じで、<b>基準の幅（flex-basis）が 0</b> になります。全員の基準が 0 なので、行の幅（gap を除く）がそのまま 2:1 に分かれ、本文はサイドの<b>ちょうど 2 倍</b>になります。<code>flex-grow: 2</code> だけを書くと、基準の幅は中身の幅のまま（<code>auto</code>）で、<b>余り</b>だけが 2:1 に分かれるので、ちょうど 2 倍にはなりません。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。プレビューは幅 560px で採点し、320px でも確かめます。</p>",
+        "<p><code>flex-grow</code> は、余ったスペースを<b>アイテムどうしの比</b>で分けます。<code>flex: 2</code> と <code>flex: 1</code> なら、2:1 の割合です。</p><p>一括指定の <code>flex: 2</code> は <code>flex: 2 1 0%</code> と同じで、<b>基準の幅（flex-basis）が 0</b> になります。全員の基準が 0 なので、行の幅（gap を除く）がそのまま 2:1 に分かれ、本文はサイドの<b>ちょうど 2 倍</b>になります（アイテム自身の padding や border は比に含まれないので、余白は中の要素に付けています）。<code>flex-grow: 2</code> だけを書くと、基準の幅は中身の幅のまま（<code>auto</code>）で、<b>余り</b>だけが 2:1 に分かれるので、ちょうど 2 倍にはなりません。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。プレビューは幅 560px で採点し、320px でも確かめます。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/flex-grow",
       viz: { concept: "none" },
       challenge: {

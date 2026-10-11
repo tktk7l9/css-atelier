@@ -147,8 +147,10 @@ export const gridPlacementTrack: Track = {
                   { kind: "insideContainer", id: "cap", containerId: "photo" },
                   bottomFlush("cap", "photo"),
                   bottomFlush("photo", "card"),
+                  // Aligned to the end, not stretched over the whole cell.
+                  { kind: "offset", a: "photo", b: "cap", edgeA: "top", edgeB: "top", min: 75 },
                 ],
-                message: "キャプションが、写真の下端に重なっていません（写真とキャプションを同じマスに置き、キャプションを下端にそろえます）",
+                message: "キャプションが、写真の下端に重なっていません（写真とキャプションを同じマスに置き、align-self: end で下端にそろえます。そろえないと、マス全体に引き伸ばされます）",
               },
               {
                 kind: "computedEquals",

@@ -3771,3 +3771,494 @@ describe("structural selectors, inline boxes, floats and scroll areas: recorded 
     expect(rect("flex-min-height", "solution", "main")[3]).toBeLessThan(rect("flex-min-height", "solution", "panel")[3]);
   });
 });
+
+// The sizing, decoration, flex sizing and grid placement lessons, recorded the
+// same way (headless Chrome 155; the two flex sizing lessons at 560px and 320px).
+const SIZING_LESSONS = [
+  "box-sizing",
+  "width-auto",
+  "image-max-width",
+  "outline-selected",
+  "layered-shadow",
+  "border-radius-shapes",
+  "flex-ratio",
+  "flex-basis-wrap",
+  "flex-order",
+  "grid-span",
+  "grid-dense",
+  "grid-overlap",
+];
+
+const SIZING_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "box-sizing",
+    name: "starter",
+    messages: ["検索欄がカードの幅にぴったり収まっていません（content-box では、width: 100% に padding と枠線が足されます）"],
+    elements: { card: { rect: [0, 0, 280, 91.98], computed: {"box-sizing":"border-box"} }, field: { rect: [13, 36.59, 282, 42.39], computed: {"box-sizing":"content-box"} } },
+  },
+  {
+    lesson: "box-sizing",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 91.98], computed: {"box-sizing":"border-box"} }, field: { rect: [13, 36.59, 254, 42.39], computed: {"box-sizing":"border-box"} } },
+  },
+  {
+    lesson: "box-sizing",
+    name: "calc(100% - 28px)",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.label {\n  display: block;\n  margin-bottom: 4px;\n  font-size: 14px;\n}\n/* 以前から使っている部品の CSS */\n.field {\n  box-sizing: content-box;\n  width: calc(100% - 28px);\n  padding: 8px 12px;\n  border: 2px solid #2f5fd0;\n  border-radius: 6px;\n  font: inherit;\n}\n",
+    messages: ["calc で引き算しなくても、box-sizing: border-box なら width に padding と枠線が含まれます"],
+    elements: { card: { rect: [0, 0, 280, 91.98], computed: {"box-sizing":"border-box"} }, field: { rect: [13, 36.59, 254, 42.39], computed: {"box-sizing":"content-box"} } },
+  },
+  {
+    lesson: "box-sizing",
+    name: "width auto",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.label {\n  display: block;\n  margin-bottom: 4px;\n  font-size: 14px;\n}\n/* 以前から使っている部品の CSS */\n.field {\n  box-sizing: content-box;\n  width: auto;\n  padding: 8px 12px;\n  border: 2px solid #2f5fd0;\n  border-radius: 6px;\n  font: inherit;\n}\n",
+    messages: ["検索欄がカードの幅にぴったり収まっていません（content-box では、width: 100% に padding と枠線が足されます）"],
+    elements: { card: { rect: [0, 0, 280, 91.98], computed: {"box-sizing":"border-box"} }, field: { rect: [13, 36.59, 203, 42.39], computed: {"box-sizing":"content-box"} } },
+  },
+  {
+    lesson: "box-sizing",
+    name: "padding removed",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.label {\n  display: block;\n  margin-bottom: 4px;\n  font-size: 14px;\n}\n/* 以前から使っている部品の CSS */\n.field {\n  box-sizing: content-box;\n  width: 100%;\n  padding: 0;\n  border: 2px solid #2f5fd0;\n  border-radius: 6px;\n  font: inherit;\n}\n",
+    messages: ["検索欄がカードの幅にぴったり収まっていません（content-box では、width: 100% に padding と枠線が足されます）"],
+    elements: { card: { rect: [0, 0, 280, 75.98], computed: {"box-sizing":"border-box"} }, field: { rect: [13, 36.59, 258, 26.39], computed: {"box-sizing":"content-box"} } },
+  },
+  {
+    lesson: "width-auto",
+    name: "starter",
+    messages: ["お知らせが、左右に 16px ずつあけてカードに収まっていません（width: 100% に margin が足されてはみ出しています）"],
+    elements: { card: { rect: [0, 0, 280, 111.58] }, notice: { rect: [29, 43.39, 254, 55.19] } },
+  },
+  {
+    lesson: "width-auto",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 111.58] }, notice: { rect: [29, 43.39, 222, 55.19] } },
+  },
+  {
+    lesson: "width-auto",
+    name: "width: auto written",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.title {\n  margin: 0 0 8px;\n  font-weight: 700;\n}\n.notice {\n  width: auto;\n  margin: 0 16px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #fff3c4;\n  font-size: 14px;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 111.58] }, notice: { rect: [29, 43.39, 222, 55.19] } },
+  },
+  {
+    lesson: "width-auto",
+    name: "calc(100% - 32px)",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.title {\n  margin: 0 0 8px;\n  font-weight: 700;\n}\n.notice {\n  width: calc(100% - 32px);\n  margin: 0 16px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #fff3c4;\n  font-size: 14px;\n}\n",
+    messages: ["calc で幅を引き算しなくても、width: auto（指定しない）なら左右の margin を除いた幅に自動で収まります"],
+    elements: { card: { rect: [0, 0, 280, 111.58] }, notice: { rect: [29, 43.39, 222, 55.19] } },
+  },
+  {
+    lesson: "width-auto",
+    name: "margins removed",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.title {\n  margin: 0 0 8px;\n  font-weight: 700;\n}\n.notice {\n  width: 100%;\n  margin: 0;\n  padding: 8px;\n  border-radius: 6px;\n  background: #fff3c4;\n  font-size: 14px;\n}\n",
+    messages: ["お知らせが、左右に 16px ずつあけてカードに収まっていません（width: 100% に margin が足されてはみ出しています）"],
+    elements: { card: { rect: [0, 0, 280, 111.58] }, notice: { rect: [13, 43.39, 254, 55.19] } },
+  },
+  {
+    lesson: "width-auto",
+    name: "border-box does not help",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.title {\n  margin: 0 0 8px;\n  font-weight: 700;\n}\n.notice {\n  width: 100%;\n  margin: 0 16px;\n  padding: 8px;\n  border-radius: 6px;\n  background: #fff3c4;\n  font-size: 14px;\n}\n.notice {\n  box-sizing: border-box;\n}\n",
+    messages: ["お知らせが、左右に 16px ずつあけてカードに収まっていません（width: 100% に margin が足されてはみ出しています）"],
+    elements: { card: { rect: [0, 0, 280, 111.58] }, notice: { rect: [29, 43.39, 254, 55.19] } },
+  },
+  {
+    lesson: "image-max-width",
+    name: "starter",
+    messages: ["写真がカードの幅に収まっていません（画像は元の大きさで表示されます）"],
+    elements: { card: { rect: [0, 0, 280, 296.39], computed: {"max-width":"none"} }, photo: { rect: [13, 43.39, 480, 240], computed: {"max-width":"none"} } },
+  },
+  {
+    lesson: "image-max-width",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 183.39], computed: {"max-width":"none"} }, photo: { rect: [13, 43.39, 254, 127], computed: {"max-width":"100%"} } },
+  },
+  {
+    lesson: "image-max-width",
+    name: "max-width only",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.title {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.photo {\n  display: block;\n  max-width: 100%;\n}\n",
+    messages: ["写真が縦に引き伸ばされています（height 属性の 240px が残っています。height: auto で縦横比を保ちます）"],
+    elements: { card: { rect: [0, 0, 280, 296.39], computed: {"max-width":"none"} }, photo: { rect: [13, 43.39, 254, 240], computed: {"max-width":"100%"} } },
+  },
+  {
+    lesson: "image-max-width",
+    name: "width 100% and height auto",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.title {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.photo {\n  display: block;\n  width: 100%;\n  height: auto;\n}\n",
+    messages: ["width: 100% だと、枠より小さい画像まで引き伸ばされます。max-width: 100% で「枠より大きいときだけ縮める」にしましょう"],
+    elements: { card: { rect: [0, 0, 280, 183.39], computed: {"max-width":"none"} }, photo: { rect: [13, 43.39, 254, 127], computed: {"max-width":"none"} } },
+  },
+  {
+    lesson: "image-max-width",
+    name: "fixed 254px",
+    css: ".card {\n  width: 280px;\n  padding: 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n}\n.title {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.photo {\n  display: block;\n  width: 254px;\n  height: auto;\n}\n",
+    messages: ["width: 100% だと、枠より小さい画像まで引き伸ばされます。max-width: 100% で「枠より大きいときだけ縮める」にしましょう"],
+    elements: { card: { rect: [0, 0, 280, 183.39], computed: {"max-width":"none"} }, photo: { rect: [13, 43.39, 254, 127], computed: {"max-width":"none"} } },
+  },
+  {
+    lesson: "outline-selected",
+    name: "starter",
+    messages: ["選んだチップが大きくなっています（border は箱の大きさに含まれるので、太くすると隣のチップが押されます）"],
+    elements: { chips: { rect: [0, 0, 596, 33.59], computed: {"border-top-width":"0px","outline-style":"none","outline-width":"3px"} }, c1: { rect: [0, 0, 67.03, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c2: { rect: [75.03, 0, 72, 33.59], computed: {"border-top-width":"3px","outline-style":"none","outline-width":"3px"} }, c3: { rect: [155.03, 0, 66.75, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c4: { rect: [229.78, 0, 54, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} } },
+  },
+  {
+    lesson: "outline-selected",
+    name: "solution",
+    messages: [],
+    elements: { chips: { rect: [0, 0, 596, 29.59], computed: {"border-top-width":"0px","outline-style":"none","outline-width":"3px"} }, c1: { rect: [0, 0, 67.03, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c2: { rect: [75.03, 0, 68, 29.59], computed: {"border-top-width":"1px","outline-style":"solid","outline-width":"2px"} }, c3: { rect: [151.03, 0, 66.75, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c4: { rect: [225.78, 0, 54, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} } },
+  },
+  {
+    lesson: "outline-selected",
+    name: "outline with offset",
+    css: ".chips {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n}\n.chip {\n  padding: 4px 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 999px;\n  background: #fff;\n  font: inherit;\n  font-size: 14px;\n}\n.selected {\n  outline: 2px solid #2f5fd0;\n  outline-offset: 2px;\n}\n",
+    messages: [],
+    elements: { chips: { rect: [0, 0, 596, 29.59], computed: {"border-top-width":"0px","outline-style":"none","outline-width":"3px"} }, c1: { rect: [0, 0, 67.03, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c2: { rect: [75.03, 0, 68, 29.59], computed: {"border-top-width":"1px","outline-style":"solid","outline-width":"2px"} }, c3: { rect: [151.03, 0, 66.75, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c4: { rect: [225.78, 0, 54, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} } },
+  },
+  {
+    lesson: "outline-selected",
+    name: "box-shadow ring",
+    css: ".chips {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n}\n.chip {\n  padding: 4px 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 999px;\n  background: #fff;\n  font: inherit;\n  font-size: 14px;\n}\n.selected {\n  box-shadow: 0 0 0 2px #2f5fd0;\n}\n",
+    messages: ["選んだチップに outline で 2px 以上の線を引きましょう（box-shadow の輪でも大きさは変わりませんが、ここでは outline を使います）"],
+    elements: { chips: { rect: [0, 0, 596, 29.59], computed: {"border-top-width":"0px","outline-style":"none","outline-width":"3px"} }, c1: { rect: [0, 0, 67.03, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c2: { rect: [75.03, 0, 68, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c3: { rect: [151.03, 0, 66.75, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c4: { rect: [225.78, 0, 54, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} } },
+  },
+  {
+    lesson: "outline-selected",
+    name: "outline 1px",
+    css: ".chips {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n}\n.chip {\n  padding: 4px 12px;\n  border: 1px solid #9fb2e6;\n  border-radius: 999px;\n  background: #fff;\n  font: inherit;\n  font-size: 14px;\n}\n.selected {\n  outline: 1px solid #2f5fd0;\n}\n",
+    messages: ["選んだチップに outline で 2px 以上の線を引きましょう（box-shadow の輪でも大きさは変わりませんが、ここでは outline を使います）"],
+    elements: { chips: { rect: [0, 0, 596, 29.59], computed: {"border-top-width":"0px","outline-style":"none","outline-width":"3px"} }, c1: { rect: [0, 0, 67.03, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c2: { rect: [75.03, 0, 68, 29.59], computed: {"border-top-width":"1px","outline-style":"solid","outline-width":"1px"} }, c3: { rect: [151.03, 0, 66.75, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} }, c4: { rect: [225.78, 0, 54, 29.59], computed: {"border-top-width":"1px","outline-style":"none","outline-width":"3px"} } },
+  },
+  {
+    lesson: "layered-shadow",
+    name: "starter",
+    messages: ["カードに影が付いていません（box-shadow）"],
+    elements: { card: { rect: [16, 16, 240, 77.98], computed: {"box-shadow":"none"} } },
+  },
+  {
+    lesson: "layered-shadow",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [16, 16, 240, 77.98], computed: {"box-shadow":"rgba(24, 32, 58, 0.2) 0px 1px 2px 0px, rgba(24, 32, 58, 0.15) 0px 8px 24px 0px"} } },
+  },
+  {
+    lesson: "layered-shadow",
+    name: "hsl colours",
+    css: ".card {\n  width: 240px;\n  margin: 16px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #fff;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0;\n  font-size: 14px;\n}\n.card {\n  box-shadow: 0 1px 3px hsl(228 40% 16% / 0.25), 0 10px 30px hsl(228 40% 16% / 0.12);\n}\n",
+    messages: [],
+    elements: { card: { rect: [16, 16, 240, 77.98], computed: {"box-shadow":"rgba(24, 31, 57, 0.25) 0px 1px 3px 0px, rgba(24, 31, 57, 0.12) 0px 10px 30px 0px"} } },
+  },
+  {
+    lesson: "layered-shadow",
+    name: "single shadow",
+    css: ".card {\n  width: 240px;\n  margin: 16px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #fff;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0;\n  font-size: 14px;\n}\n.card {\n  box-shadow: 0 8px 24px rgb(24 32 58 / 0.15);\n}\n",
+    messages: ["影が 1 枚です。カンマで区切って 2 枚重ねましょう（短く濃い影と、遠くまで広がる薄い影）"],
+    elements: { card: { rect: [16, 16, 240, 77.98], computed: {"box-shadow":"rgba(24, 32, 58, 0.15) 0px 8px 24px 0px"} } },
+  },
+  {
+    lesson: "layered-shadow",
+    name: "a shadow without blur",
+    css: ".card {\n  width: 240px;\n  margin: 16px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #fff;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0;\n  font-size: 14px;\n}\n.card {\n  box-shadow: 0 1px 0 rgb(24 32 58 / 0.2), 0 8px 24px rgb(24 32 58 / 0.15);\n}\n",
+    messages: ["どちらの影も、下向きにずらして（2 つめの値）ぼかしましょう（3 つめの値）"],
+    elements: { card: { rect: [16, 16, 240, 77.98], computed: {"box-shadow":"rgba(24, 32, 58, 0.2) 0px 1px 0px 0px, rgba(24, 32, 58, 0.15) 0px 8px 24px 0px"} } },
+  },
+  {
+    lesson: "border-radius-shapes",
+    name: "starter",
+    messages: ["写真が円になっていません（正方形に border-radius: 50%）"],
+    elements: { avatar: { rect: [0, 0, 64, 64], computed: {"border-top-left-radius":"0px"} }, follow: { rect: [80, 14, 136, 36], computed: {"border-top-left-radius":"0px"} } },
+  },
+  {
+    lesson: "border-radius-shapes",
+    name: "solution",
+    messages: [],
+    elements: { avatar: { rect: [0, 0, 64, 64], computed: {"border-top-left-radius":"50%"} }, follow: { rect: [80, 14, 136, 36], computed: {"border-top-left-radius":"999px"} } },
+  },
+  {
+    lesson: "border-radius-shapes",
+    name: "32px avatar and 18px pill",
+    css: ".profile {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n.avatar {\n  display: block;\n  border-radius: 32px;\n}\n.follow {\n  height: 36px;\n  padding: 0 20px;\n  border: 0;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n  border-radius: 18px;\n}\n",
+    messages: [],
+    elements: { avatar: { rect: [0, 0, 64, 64], computed: {"border-top-left-radius":"32px"} }, follow: { rect: [80, 14, 136, 36], computed: {"border-top-left-radius":"18px"} } },
+  },
+  {
+    lesson: "border-radius-shapes",
+    name: "50% on the button",
+    css: ".profile {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n.avatar {\n  display: block;\n  border-radius: 50%;\n}\n.follow {\n  height: 36px;\n  padding: 0 20px;\n  border: 0;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n  border-radius: 50%;\n}\n",
+    messages: ["ボタンがピル形になっていません（高さ 36px の半分の 18px 以上を px などの長さで。横長の箱に 50% だと楕円になります）"],
+    elements: { avatar: { rect: [0, 0, 64, 64], computed: {"border-top-left-radius":"50%"} }, follow: { rect: [80, 14, 136, 36], computed: {"border-top-left-radius":"50%"} } },
+  },
+  {
+    lesson: "border-radius-shapes",
+    name: "rounded corners only",
+    css: ".profile {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n.avatar {\n  display: block;\n  border-radius: 8px;\n}\n.follow {\n  height: 36px;\n  padding: 0 20px;\n  border: 0;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n  border-radius: 999px;\n}\n",
+    messages: ["写真が円になっていません（正方形に border-radius: 50%）"],
+    elements: { avatar: { rect: [0, 0, 64, 64], computed: {"border-top-left-radius":"8px"} }, follow: { rect: [80, 14, 136, 36], computed: {"border-top-left-radius":"999px"} } },
+  },
+  {
+    lesson: "flex-ratio",
+    name: "starter",
+    messages: ["本文の幅が、サイドのちょうど 2 倍になっていません（flex: 2 と flex: 1 で 2:1 に分けます）","幅 320px で、本文の幅がサイドの 2 倍になっていません（幅を決め打ちすると、画面の幅が変わったときに崩れます）"],
+    elements: { layout: { rect: [0, 0, 560, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 274, 46.39], computed: {"flex-grow":"1"} }, side: { rect: [286, 0, 274, 46.39], computed: {"flex-grow":"1"} } },
+    states: { 320: { layout: { rect: [0, 0, 320, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 154, 46.39], computed: {"flex-grow":"1"} }, side: { rect: [166, 0, 154, 46.39], computed: {"flex-grow":"1"} } } },
+  },
+  {
+    lesson: "flex-ratio",
+    name: "solution",
+    messages: [],
+    elements: { layout: { rect: [0, 0, 560, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 365.33, 46.39], computed: {"flex-grow":"2"} }, side: { rect: [377.33, 0, 182.67, 46.39], computed: {"flex-grow":"1"} } },
+    states: { 320: { layout: { rect: [0, 0, 320, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 205.33, 46.39], computed: {"flex-grow":"2"} }, side: { rect: [217.33, 0, 102.67, 46.39], computed: {"flex-grow":"1"} } } },
+  },
+  {
+    lesson: "flex-ratio",
+    name: "flex-grow 2 on the base of flex: 1",
+    css: ".layout {\n  display: flex;\n  gap: 12px;\n}\n.main,\n.side {\n  flex: 1;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.side {\n  background: #eef1f8;\n}\n.layout p {\n  margin: 0;\n  padding: 12px;\n}\n.main {\n  flex-grow: 2;\n}\n",
+    messages: [],
+    elements: { layout: { rect: [0, 0, 560, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 365.33, 46.39], computed: {"flex-grow":"2"} }, side: { rect: [377.33, 0, 182.67, 46.39], computed: {"flex-grow":"1"} } },
+    states: { 320: { layout: { rect: [0, 0, 320, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 205.33, 46.39], computed: {"flex-grow":"2"} }, side: { rect: [217.33, 0, 102.67, 46.39], computed: {"flex-grow":"1"} } } },
+  },
+  {
+    lesson: "flex-ratio",
+    name: "sidebar at 0.5",
+    css: ".layout {\n  display: flex;\n  gap: 12px;\n}\n.main,\n.side {\n  flex: 1;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.side {\n  background: #eef1f8;\n}\n.layout p {\n  margin: 0;\n  padding: 12px;\n}\n.side {\n  flex: 0.5;\n}\n",
+    messages: [],
+    elements: { layout: { rect: [0, 0, 560, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 365.33, 46.39], computed: {"flex-grow":"1"} }, side: { rect: [377.33, 0, 182.67, 46.39], computed: {"flex-grow":"0.5"} } },
+    states: { 320: { layout: { rect: [0, 0, 320, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 205.33, 46.39], computed: {"flex-grow":"1"} }, side: { rect: [217.33, 0, 102.67, 46.39], computed: {"flex-grow":"0.5"} } } },
+  },
+  {
+    lesson: "flex-ratio",
+    name: "widths fixed for 560px",
+    css: ".layout {\n  display: flex;\n  gap: 12px;\n}\n.main,\n.side {\n  flex: 1;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.side {\n  background: #eef1f8;\n}\n.layout p {\n  margin: 0;\n  padding: 12px;\n}\n.main {\n  flex: none;\n  width: 365.33px;\n}\n.side {\n  flex: none;\n  width: 182.67px;\n}\n",
+    messages: ["幅を % や px で決めるのではなく、flex の数（flex-grow）の比で分けましょう","幅 320px で、本文の幅がサイドの 2 倍になっていません（幅を決め打ちすると、画面の幅が変わったときに崩れます）"],
+    elements: { layout: { rect: [0, 0, 560, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 365.33, 46.39], computed: {"flex-grow":"0"} }, side: { rect: [377.33, 0, 182.66, 46.39], computed: {"flex-grow":"0"} } },
+    states: { 320: { layout: { rect: [0, 0, 320, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 365.33, 46.39], computed: {"flex-grow":"0"} }, side: { rect: [377.33, 0, 182.66, 46.39], computed: {"flex-grow":"0"} } } },
+  },
+  {
+    lesson: "flex-ratio",
+    name: "percentage bases",
+    css: ".layout {\n  display: flex;\n  gap: 12px;\n}\n.main,\n.side {\n  flex: 1;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.side {\n  background: #eef1f8;\n}\n.layout p {\n  margin: 0;\n  padding: 12px;\n}\n.main {\n  flex: 0 0 calc((100% - 12px) * 2 / 3);\n}\n.side {\n  flex: 0 0 calc((100% - 12px) / 3);\n}\n",
+    messages: ["幅を % や px で決めるのではなく、flex の数（flex-grow）の比で分けましょう"],
+    elements: { layout: { rect: [0, 0, 560, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 365.33, 46.39], computed: {"flex-grow":"0"} }, side: { rect: [377.33, 0, 182.66, 46.39], computed: {"flex-grow":"0"} } },
+    states: { 320: { layout: { rect: [0, 0, 320, 46.39], computed: {"flex-grow":"0"} }, main: { rect: [0, 0, 205.33, 46.39], computed: {"flex-grow":"0"} }, side: { rect: [217.33, 0, 102.66, 46.39], computed: {"flex-grow":"0"} } } },
+  },
+  {
+    lesson: "flex-basis-wrap",
+    name: "starter",
+    messages: ["幅 560px で、各行がカードで端まで埋まっていません（1 行に 3 枚、最後の行は 2 枚が伸びて埋めます）","幅 320px で、1 行に 2 枚並んで端まで埋まっていません（基準の幅は 140px のまま）"],
+    elements: { cards: { rect: [0, 0, 560, 104.78], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 140, 46.39], computed: {"flex-grow":"0"} }, c2: { rect: [152, 0, 140, 46.39], computed: {"flex-grow":"0"} }, c3: { rect: [304, 0, 140, 46.39], computed: {"flex-grow":"0"} }, c4: { rect: [0, 58.39, 140, 46.39], computed: {"flex-grow":"0"} }, c5: { rect: [152, 58.39, 140, 46.39], computed: {"flex-grow":"0"} } },
+    states: { 320: { cards: { rect: [0, 0, 320, 163.17], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 140, 46.39], computed: {"flex-grow":"0"} }, c2: { rect: [152, 0, 140, 46.39], computed: {"flex-grow":"0"} }, c3: { rect: [0, 58.39, 140, 46.39], computed: {"flex-grow":"0"} }, c4: { rect: [152, 58.39, 140, 46.39], computed: {"flex-grow":"0"} }, c5: { rect: [0, 116.78, 140, 46.39], computed: {"flex-grow":"0"} } } },
+  },
+  {
+    lesson: "flex-basis-wrap",
+    name: "solution",
+    messages: [],
+    elements: { cards: { rect: [0, 0, 560, 104.78], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 178.66, 46.39], computed: {"flex-grow":"1"} }, c2: { rect: [190.66, 0, 178.67, 46.39], computed: {"flex-grow":"1"} }, c3: { rect: [381.33, 0, 178.67, 46.39], computed: {"flex-grow":"1"} }, c4: { rect: [0, 58.39, 274, 46.39], computed: {"flex-grow":"1"} }, c5: { rect: [286, 58.39, 274, 46.39], computed: {"flex-grow":"1"} } },
+    states: { 320: { cards: { rect: [0, 0, 320, 163.17], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 154, 46.39], computed: {"flex-grow":"1"} }, c2: { rect: [166, 0, 154, 46.39], computed: {"flex-grow":"1"} }, c3: { rect: [0, 58.39, 154, 46.39], computed: {"flex-grow":"1"} }, c4: { rect: [166, 58.39, 154, 46.39], computed: {"flex-grow":"1"} }, c5: { rect: [0, 116.78, 320, 46.39], computed: {"flex-grow":"1"} } } },
+  },
+  {
+    lesson: "flex-basis-wrap",
+    name: "flex-grow with the 140px width",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  width: 140px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.card {\n  flex-grow: 1;\n}\n",
+    messages: [],
+    elements: { cards: { rect: [0, 0, 560, 104.78], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 178.66, 46.39], computed: {"flex-grow":"1"} }, c2: { rect: [190.66, 0, 178.67, 46.39], computed: {"flex-grow":"1"} }, c3: { rect: [381.33, 0, 178.67, 46.39], computed: {"flex-grow":"1"} }, c4: { rect: [0, 58.39, 274, 46.39], computed: {"flex-grow":"1"} }, c5: { rect: [286, 58.39, 274, 46.39], computed: {"flex-grow":"1"} } },
+    states: { 320: { cards: { rect: [0, 0, 320, 163.17], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 154, 46.39], computed: {"flex-grow":"1"} }, c2: { rect: [166, 0, 154, 46.39], computed: {"flex-grow":"1"} }, c3: { rect: [0, 58.39, 154, 46.39], computed: {"flex-grow":"1"} }, c4: { rect: [166, 58.39, 154, 46.39], computed: {"flex-grow":"1"} }, c5: { rect: [0, 116.78, 320, 46.39], computed: {"flex-grow":"1"} } } },
+  },
+  {
+    lesson: "flex-basis-wrap",
+    name: "flex 1 1 160px",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  flex: 1 1 160px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["幅 320px で、1 行に 2 枚並んで端まで埋まっていません（基準の幅は 140px のまま）"],
+    elements: { cards: { rect: [0, 0, 560, 104.78], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 178.66, 46.39], computed: {"flex-grow":"1"} }, c2: { rect: [190.66, 0, 178.67, 46.39], computed: {"flex-grow":"1"} }, c3: { rect: [381.33, 0, 178.67, 46.39], computed: {"flex-grow":"1"} }, c4: { rect: [0, 58.39, 274, 46.39], computed: {"flex-grow":"1"} }, c5: { rect: [286, 58.39, 274, 46.39], computed: {"flex-grow":"1"} } },
+    states: { 320: { cards: { rect: [0, 0, 320, 279.95], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 320, 46.39], computed: {"flex-grow":"1"} }, c2: { rect: [0, 58.39, 320, 46.39], computed: {"flex-grow":"1"} }, c3: { rect: [0, 116.78, 320, 46.39], computed: {"flex-grow":"1"} }, c4: { rect: [0, 175.17, 320, 46.39], computed: {"flex-grow":"1"} }, c5: { rect: [0, 233.56, 320, 46.39], computed: {"flex-grow":"1"} } } },
+  },
+  {
+    lesson: "flex-basis-wrap",
+    name: "flex: 1",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  flex: 1;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["幅 560px で、各行がカードで端まで埋まっていません（1 行に 3 枚、最後の行は 2 枚が伸びて埋めます）","幅 320px で、1 行に 2 枚並んで端まで埋まっていません（基準の幅は 140px のまま）"],
+    elements: { cards: { rect: [0, 0, 560, 46.39], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 102.39, 46.39], computed: {"flex-grow":"1"} }, c2: { rect: [114.39, 0, 102.41, 46.39], computed: {"flex-grow":"1"} }, c3: { rect: [228.8, 0, 102.39, 46.39], computed: {"flex-grow":"1"} }, c4: { rect: [343.19, 0, 102.41, 46.39], computed: {"flex-grow":"1"} }, c5: { rect: [457.59, 0, 102.41, 46.39], computed: {"flex-grow":"1"} } },
+    states: { 320: { cards: { rect: [0, 0, 320, 68.78], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 54.39, 68.78], computed: {"flex-grow":"1"} }, c2: { rect: [66.39, 0, 54.41, 68.78], computed: {"flex-grow":"1"} }, c3: { rect: [132.8, 0, 54.39, 68.78], computed: {"flex-grow":"1"} }, c4: { rect: [199.19, 0, 54.41, 68.78], computed: {"flex-grow":"1"} }, c5: { rect: [265.59, 0, 54.41, 68.78], computed: {"flex-grow":"1"} } } },
+  },
+  {
+    lesson: "flex-basis-wrap",
+    name: "grid auto-fill",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  width: 140px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.cards {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));\n}\n.card {\n  width: auto;\n}\n",
+    messages: ["幅 560px で、各行がカードで端まで埋まっていません（1 行に 3 枚、最後の行は 2 枚が伸びて埋めます）"],
+    elements: { cards: { rect: [0, 0, 560, 104.78], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 178.66, 46.39], computed: {"flex-grow":"0"} }, c2: { rect: [190.66, 0, 178.67, 46.39], computed: {"flex-grow":"0"} }, c3: { rect: [381.33, 0, 178.67, 46.39], computed: {"flex-grow":"0"} }, c4: { rect: [0, 58.39, 178.66, 46.39], computed: {"flex-grow":"0"} }, c5: { rect: [190.66, 58.39, 178.67, 46.39], computed: {"flex-grow":"0"} } },
+    states: { 320: { cards: { rect: [0, 0, 320, 163.17], computed: {"flex-grow":"0"} }, c1: { rect: [0, 0, 154, 46.39], computed: {"flex-grow":"0"} }, c2: { rect: [166, 0, 154, 46.39], computed: {"flex-grow":"0"} }, c3: { rect: [0, 58.39, 154, 46.39], computed: {"flex-grow":"0"} }, c4: { rect: [166, 58.39, 154, 46.39], computed: {"flex-grow":"0"} }, c5: { rect: [0, 116.78, 154, 46.39], computed: {"flex-grow":"0"} } } },
+  },
+  {
+    lesson: "flex-order",
+    name: "starter",
+    messages: ["「いち押し」が左端に来ていないか、ほかの 2 つの順番が変わっています（row-reverse では全体が逆になります）"],
+    elements: { row: { rect: [0, 0, 596, 46.39], computed: {"order":"0"} }, a: { rect: [0, 0, 75.3, 46.39], computed: {"order":"0"} }, b: { rect: [83.3, 0, 77.53, 46.39], computed: {"order":"0"} }, hot: { rect: [168.83, 0, 96, 46.39], computed: {"order":"0"} } },
+  },
+  {
+    lesson: "flex-order",
+    name: "solution",
+    messages: [],
+    elements: { row: { rect: [0, 0, 596, 46.39], computed: {"order":"0"} }, a: { rect: [104, 0, 75.3, 46.39], computed: {"order":"0"} }, b: { rect: [187.3, 0, 77.53, 46.39], computed: {"order":"0"} }, hot: { rect: [0, 0, 96, 46.39], computed: {"order":"-1"} } },
+  },
+  {
+    lesson: "flex-order",
+    name: "the others after",
+    css: ".row {\n  display: flex;\n  gap: 8px;\n}\n.item {\n  padding: 12px 16px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.hot {\n  background: #fff3c4;\n}\n.item {\n  order: 1;\n}\n.row .hot {\n  order: 0;\n}\n",
+    messages: [],
+    elements: { row: { rect: [0, 0, 596, 46.39], computed: {"order":"0"} }, a: { rect: [104, 0, 75.3, 46.39], computed: {"order":"1"} }, b: { rect: [187.3, 0, 77.53, 46.39], computed: {"order":"1"} }, hot: { rect: [0, 0, 96, 46.39], computed: {"order":"0"} } },
+  },
+  {
+    lesson: "flex-order",
+    name: "row-reverse",
+    css: ".row {\n  display: flex;\n  gap: 8px;\n}\n.item {\n  padding: 12px 16px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.hot {\n  background: #fff3c4;\n}\n.row {\n  flex-direction: row-reverse;\n  justify-content: flex-end;\n}\n",
+    messages: ["「いち押し」が左端に来ていないか、ほかの 2 つの順番が変わっています（row-reverse では全体が逆になります）"],
+    elements: { row: { rect: [0, 0, 596, 46.39], computed: {"order":"0"} }, a: { rect: [189.53, 0, 75.3, 46.39], computed: {"order":"0"} }, b: { rect: [104, 0, 77.53, 46.39], computed: {"order":"0"} }, hot: { rect: [0, 0, 96, 46.39], computed: {"order":"0"} } },
+  },
+  {
+    lesson: "flex-order",
+    name: "order on the wrong item",
+    css: ".row {\n  display: flex;\n  gap: 8px;\n}\n.item {\n  padding: 12px 16px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.hot {\n  background: #fff3c4;\n}\n.item:first-child {\n  order: -1;\n}\n",
+    messages: ["「いち押し」が左端に来ていないか、ほかの 2 つの順番が変わっています（row-reverse では全体が逆になります）"],
+    elements: { row: { rect: [0, 0, 596, 46.39], computed: {"order":"0"} }, a: { rect: [0, 0, 75.3, 46.39], computed: {"order":"-1"} }, b: { rect: [83.3, 0, 77.53, 46.39], computed: {"order":"0"} }, hot: { rect: [168.83, 0, 96, 46.39], computed: {"order":"0"} } },
+  },
+  {
+    lesson: "grid-span",
+    name: "starter",
+    messages: ["1 枚目が横 2 列・縦 2 行ぶん（184 × 152px）になっていません"],
+    elements: { gallery: { rect: [0, 0, 280, 152] }, t1: { rect: [0, 0, 88, 72] }, t2: { rect: [96, 0, 88, 72] }, t3: { rect: [192, 0, 88, 72] }, t4: { rect: [0, 80, 88, 72] }, t5: { rect: [96, 80, 88, 72] } },
+  },
+  {
+    lesson: "grid-span",
+    name: "solution",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 280, 232] }, t1: { rect: [0, 0, 184, 152] }, t2: { rect: [192, 0, 88, 72] }, t3: { rect: [192, 80, 88, 72] }, t4: { rect: [0, 160, 88, 72] }, t5: { rect: [96, 160, 88, 72] } },
+  },
+  {
+    lesson: "grid-span",
+    name: "grid-area spans",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  grid-auto-rows: 72px;\n  gap: 8px;\n  width: 280px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n.featured {\n  background: #fff3c4;\n  grid-area: span 2 / span 2;\n}\n",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 280, 232] }, t1: { rect: [0, 0, 184, 152] }, t2: { rect: [192, 0, 88, 72] }, t3: { rect: [192, 80, 88, 72] }, t4: { rect: [0, 160, 88, 72] }, t5: { rect: [96, 160, 88, 72] } },
+  },
+  {
+    lesson: "grid-span",
+    name: "width and height instead",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  grid-auto-rows: 72px;\n  gap: 8px;\n  width: 280px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n.featured {\n  background: #fff3c4;\n  width: 184px;\n  height: 152px;\n}\n",
+    messages: ["ほかのタイルが、大きくした 1 枚目と重なっているか、右の列に縦に並んでいません（width や height で大きくしても、マスはまたぎません）"],
+    elements: { gallery: { rect: [0, 0, 280, 152] }, t1: { rect: [0, 0, 184, 152] }, t2: { rect: [192, 0, 40, 72] }, t3: { rect: [240, 0, 40, 72] }, t4: { rect: [0, 80, 184, 72] }, t5: { rect: [192, 80, 40, 72] } },
+  },
+  {
+    lesson: "grid-span",
+    name: "columns only",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  grid-auto-rows: 72px;\n  gap: 8px;\n  width: 280px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n.featured {\n  background: #fff3c4;\n  grid-column: span 2;\n}\n",
+    messages: ["1 枚目が横 2 列・縦 2 行ぶん（184 × 152px）になっていません"],
+    elements: { gallery: { rect: [0, 0, 280, 152] }, t1: { rect: [0, 0, 184, 72] }, t2: { rect: [192, 0, 88, 72] }, t3: { rect: [0, 80, 88, 72] }, t4: { rect: [96, 80, 88, 72] }, t5: { rect: [192, 80, 88, 72] } },
+  },
+  {
+    lesson: "grid-dense",
+    name: "starter",
+    messages: ["1 行目の右端のすき間が埋まっていません（4 枚目が、すき間に入るはずです）"],
+    elements: { gallery: { rect: [0, 0, 280, 184], computed: {"grid-auto-flow":"row"} }, d1: { rect: [0, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d2: { rect: [96, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d3: { rect: [0, 64, 184, 56], computed: {"grid-auto-flow":"row"} }, d4: { rect: [192, 64, 88, 56], computed: {"grid-auto-flow":"row"} }, d5: { rect: [0, 128, 88, 56], computed: {"grid-auto-flow":"row"} } },
+  },
+  {
+    lesson: "grid-dense",
+    name: "solution",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 280, 120], computed: {"grid-auto-flow":"dense"} }, d1: { rect: [0, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d2: { rect: [96, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d3: { rect: [0, 64, 184, 56], computed: {"grid-auto-flow":"row"} }, d4: { rect: [192, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d5: { rect: [192, 64, 88, 56], computed: {"grid-auto-flow":"row"} } },
+  },
+  {
+    lesson: "grid-dense",
+    name: "row dense",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  grid-auto-rows: 56px;\n  gap: 8px;\n  width: 280px;\n  grid-auto-flow: row dense;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n.wide {\n  grid-column: span 2;\n  background: #fff3c4;\n}\n",
+    messages: [],
+    elements: { gallery: { rect: [0, 0, 280, 120], computed: {"grid-auto-flow":"dense"} }, d1: { rect: [0, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d2: { rect: [96, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d3: { rect: [0, 64, 184, 56], computed: {"grid-auto-flow":"row"} }, d4: { rect: [192, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d5: { rect: [192, 64, 88, 56], computed: {"grid-auto-flow":"row"} } },
+  },
+  {
+    lesson: "grid-dense",
+    name: "fourth tile placed by hand",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  grid-auto-rows: 56px;\n  gap: 8px;\n  width: 280px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n.wide {\n  grid-column: span 2;\n  background: #fff3c4;\n}\n[data-id=\"d4\"] {\n  grid-column: 3;\n  grid-row: 1;\n}\n",
+    messages: ["1 枚ずつ置き場所を指定するのではなく、grid-auto-flow: dense で自動ですき間を埋めましょう（タイルが増えても埋まります）"],
+    elements: { gallery: { rect: [0, 0, 280, 120], computed: {"grid-auto-flow":"row"} }, d1: { rect: [0, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d2: { rect: [96, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d3: { rect: [0, 64, 184, 56], computed: {"grid-auto-flow":"row"} }, d4: { rect: [192, 0, 88, 56], computed: {"grid-auto-flow":"row"} }, d5: { rect: [192, 64, 88, 56], computed: {"grid-auto-flow":"row"} } },
+  },
+  {
+    lesson: "grid-dense",
+    name: "column dense",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  grid-auto-rows: 56px;\n  gap: 8px;\n  width: 280px;\n  grid-auto-flow: column dense;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n.wide {\n  grid-column: span 2;\n  background: #fff3c4;\n}\n",
+    messages: ["1 行目の右端のすき間が埋まっていません（4 枚目が、すき間に入るはずです）"],
+    elements: { gallery: { rect: [0, 0, 280, 56], computed: {"grid-auto-flow":"column dense"} }, d1: { rect: [0, 0, 73, 56], computed: {"grid-auto-flow":"row"} }, d2: { rect: [81, 0, 73, 56], computed: {"grid-auto-flow":"row"} }, d3: { rect: [162, 0, 81, 56], computed: {"grid-auto-flow":"row"} }, d4: { rect: [251, 0, 10.69, 56], computed: {"grid-auto-flow":"row"} }, d5: { rect: [269.69, 0, 10.31, 56], computed: {"grid-auto-flow":"row"} } },
+  },
+  {
+    lesson: "grid-overlap",
+    name: "starter",
+    messages: ["キャプションが、写真の下端に重なっていません（写真とキャプションを同じマスに置き、align-self: end で下端にそろえます。そろえないと、マス全体に引き伸ばされます）"],
+    elements: { card: { rect: [0, 0, 240, 185.59], computed: {"position":"static"} }, photo: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, cap: { rect: [0, 150, 240, 35.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "grid-overlap",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, photo: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, cap: { rect: [0, 114.41, 240, 35.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "grid-overlap",
+    name: "grid-row and grid-column",
+    css: ".card {\n  display: grid;\n  width: 240px;\n  margin: 0;\n}\n.photo {\n  display: block;\n  width: 100%;\n  height: auto;\n}\n.cap {\n  padding: 8px 12px;\n  background: rgb(24 32 58 / 0.7);\n  color: #fff;\n  font-size: 14px;\n}\n.photo,\n.cap {\n  grid-row: 1;\n  grid-column: 1;\n}\n.cap {\n  align-self: end;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, photo: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, cap: { rect: [0, 114.41, 240, 35.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "grid-overlap",
+    name: "absolute caption",
+    css: ".card {\n  display: grid;\n  width: 240px;\n  margin: 0;\n}\n.photo {\n  display: block;\n  width: 100%;\n  height: auto;\n}\n.cap {\n  padding: 8px 12px;\n  background: rgb(24 32 58 / 0.7);\n  color: #fff;\n  font-size: 14px;\n}\n.card {\n  position: relative;\n}\n.cap {\n  position: absolute;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n",
+    messages: ["position: absolute でも重なりますが、ここではグリッドの同じマスに置いて重ねましょう（キャプションが長くなっても、枠からはみ出しません）"],
+    elements: { card: { rect: [0, 0, 240, 150], computed: {"position":"relative"} }, photo: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, cap: { rect: [0, 114.41, 240, 35.59], computed: {"position":"absolute"} } },
+  },
+  {
+    lesson: "grid-overlap",
+    name: "same cell, caption at the top",
+    css: ".card {\n  display: grid;\n  width: 240px;\n  margin: 0;\n}\n.photo {\n  display: block;\n  width: 100%;\n  height: auto;\n}\n.cap {\n  padding: 8px 12px;\n  background: rgb(24 32 58 / 0.7);\n  color: #fff;\n  font-size: 14px;\n}\n.photo,\n.cap {\n  grid-area: 1 / 1;\n}\n",
+    messages: ["キャプションが、写真の下端に重なっていません（写真とキャプションを同じマスに置き、align-self: end で下端にそろえます。そろえないと、マス全体に引き伸ばされます）"],
+    elements: { card: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, photo: { rect: [0, 0, 240, 150], computed: {"position":"static"} }, cap: { rect: [0, 0, 240, 150], computed: {"position":"static"} } },
+  },
+];
+
+describe("sizing, outlines and shadows, flex sizing and grid placement: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 12 lessons", () => {
+    expect([...new Set(SIZING_CASES.map((c) => c.lesson))].sort()).toEqual([...SIZING_LESSONS].sort());
+    for (const id of SIZING_LESSONS) {
+      const names = SIZING_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  for (const c of SIZING_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message per checked width and passes each solution", () => {
+    for (const id of SIZING_LESSONS) {
+      const { challenge } = lessonById(id)!;
+      const starter = SIZING_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = SIZING_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1 + (challenge.states?.length ?? 0));
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the measurements the lessons are about", () => {
+    const rect = (id: string, name: string, el: string): readonly number[] =>
+      SIZING_CASES.find((c) => c.lesson === id && c.name === name)!.elements[el]!.rect!;
+    // A 3px border makes the picked chip taller than the others; an outline does not.
+    expect(rect("outline-selected", "starter", "c2")[3]).toBeGreaterThan(rect("outline-selected", "starter", "c1")[3]);
+    expect(rect("outline-selected", "solution", "c2")[3]).toBe(rect("outline-selected", "solution", "c1")[3]);
+    // max-width alone keeps the height attribute's 240px; height: auto brings back the 2:1 ratio.
+    expect(rect("image-max-width", "max-width only", "photo")[3]).toBe(240);
+    expect(rect("image-max-width", "solution", "photo").slice(2)).toEqual([254, 127]);
+    // flex: 2 against flex: 1 is exactly twice as wide.
+    const [, , mainW] = rect("flex-ratio", "solution", "main");
+    const [, , sideW] = rect("flex-ratio", "solution", "side");
+    expect(Math.abs(mainW - 2 * sideW)).toBeLessThan(1);
+  });
+});
