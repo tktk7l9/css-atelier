@@ -105,7 +105,7 @@ export const relativeUnitsTrack: Track = {
               },
               {
                 kind: "sourceMatches",
-                pattern: "font-size\\s*:\\s*[\\d.]+rem",
+                pattern: "font-size\\s*:[^;}]*\\drem\\b",
                 message: "14px と固定してもそろいますが、rem にしましょう（利用者がブラウザで文字を大きくすると、それに合わせて大きくなります）",
               },
             ],

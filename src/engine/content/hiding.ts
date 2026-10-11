@@ -150,8 +150,10 @@ export const hidingTrack: Track = {
                 of: [
                   { kind: "sizeApprox", id: "label", w: 1, h: 1, tol: 1 },
                   { kind: "computedMatches", id: "label", prop: "clip-path", pattern: "^inset\\(50%\\)$" },
+                  // Moved far off to the left, the other classic way.
+                  { kind: "offset", a: "label", b: "search", edgeA: "right", edgeB: "left", min: 100 },
                 ],
-                message: "ラベルが、まだ見えています（1px の大きさに切り詰めるか、clip-path: inset(50%) で切り抜きます）",
+                message: "ラベルが、まだ見えています（1px の大きさに切り詰めるか、clip-path: inset(50%) で切り抜くか、画面の外へ出します）",
               },
             ],
           },

@@ -2583,3 +2583,597 @@ describe("flex and grid patterns, keyframes and generated content: recorded answ
     expect(frames("keyframes-fill-mode", "solution")).toEqual([50, 150, 200]);
   });
 });
+
+// The combinator, unit, inheritance and hiding lessons, recorded the same way
+// (headless Chrome 155, the lesson viewport only: none of them fixes one).
+const FUNDAMENTAL_LESSONS = [
+  "child-combinator",
+  "next-sibling",
+  "subsequent-sibling",
+  "calc-columns",
+  "rem-nested",
+  "dvh-height",
+  "inherit-font",
+  "current-color",
+  "revert-reset",
+  "visibility-hidden",
+  "hidden-attribute",
+  "visually-hidden",
+];
+
+const FUNDAMENTAL_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "child-combinator",
+    name: "starter",
+    messages: ["入れ子の「新着」「セール」にも線や背景が付いています（.menu li は、孫の li まで選びます）"],
+    elements: { menu: { rect: [0, 4, 596, 159.95], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m1: { rect: [0, 4, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, m2: { rect: [0, 38.39, 596, 91.17], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, s1: { rect: [28, 68.78, 560, 26.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, s2: { rect: [28, 99.17, 560, 26.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, m3: { rect: [0, 133.56, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "child-combinator",
+    name: "solution",
+    messages: [],
+    elements: { menu: { rect: [0, 4, 596, 151.95], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m1: { rect: [0, 4, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, m2: { rect: [0, 38.39, 596, 83.17], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, s1: { rect: [28, 64.78, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [28, 91.17, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m3: { rect: [0, 125.56, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "child-combinator",
+    name: "ul.menu > li",
+    css: ".menu,\n.sub {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.sub {\n  margin-left: 16px;\n}\nul.menu > li {\n  margin-top: 4px;\n  padding: 4px 8px;\n  border-left: 4px solid #2f5fd0;\n  background: #dbe4fb;\n}\n.sub li {\n  padding: 2px 0;\n}\n",
+    messages: [],
+    elements: { menu: { rect: [0, 4, 596, 151.95], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m1: { rect: [0, 4, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, m2: { rect: [0, 38.39, 596, 83.17], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, s1: { rect: [28, 64.78, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [28, 91.17, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m3: { rect: [0, 125.56, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "child-combinator",
+    name: "override the nested items",
+    css: ".menu,\n.sub {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.sub {\n  margin-left: 16px;\n}\n.menu li {\n  margin-top: 4px;\n  padding: 4px 8px;\n  border-left: 4px solid #2f5fd0;\n  background: #dbe4fb;\n}\n.sub li {\n  padding: 2px 0;\n}\n.sub li {\n  margin-top: 0;\n  border-left: 0;\n  background: none;\n}\n",
+    messages: ["入れ子の項目を上書きして消すのではなく、.menu > li で直下の子だけを選びましょう"],
+    elements: { menu: { rect: [0, 4, 596, 151.95], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m1: { rect: [0, 4, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, m2: { rect: [0, 38.39, 596, 83.17], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, s1: { rect: [28, 64.78, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [28, 91.17, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m3: { rect: [0, 125.56, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "child-combinator",
+    name: "override only the border",
+    css: ".menu,\n.sub {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.sub {\n  margin-left: 16px;\n}\n.menu li {\n  margin-top: 4px;\n  padding: 4px 8px;\n  border-left: 4px solid #2f5fd0;\n  background: #dbe4fb;\n}\n.sub li {\n  padding: 2px 0;\n}\n.sub li {\n  border-left: 0;\n}\n",
+    messages: ["入れ子の「新着」「セール」にも線や背景が付いています（.menu li は、孫の li まで選びます）"],
+    elements: { menu: { rect: [0, 4, 596, 159.95], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m1: { rect: [0, 4, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, m2: { rect: [0, 38.39, 596, 91.17], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, s1: { rect: [28, 68.78, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgb(219, 228, 251)"} }, s2: { rect: [28, 99.17, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgb(219, 228, 251)"} }, m3: { rect: [0, 133.56, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "child-combinator",
+    name: ":not(.sub li)",
+    css: ".menu,\n.sub {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.sub {\n  margin-left: 16px;\n}\n.menu li:not(.sub li) {\n  margin-top: 4px;\n  padding: 4px 8px;\n  border-left: 4px solid #2f5fd0;\n  background: #dbe4fb;\n}\n.sub li {\n  padding: 2px 0;\n}\n",
+    messages: ["入れ子の項目を上書きして消すのではなく、.menu > li で直下の子だけを選びましょう"],
+    elements: { menu: { rect: [0, 4, 596, 151.95], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m1: { rect: [0, 4, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, m2: { rect: [0, 38.39, 596, 83.17], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} }, s1: { rect: [28, 64.78, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [28, 91.17, 560, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m3: { rect: [0, 125.56, 596, 30.39], computed: {"border-left-width":"4px","background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "child-combinator",
+    name: "bar removed from every item",
+    css: ".menu,\n.sub {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.sub {\n  margin-left: 16px;\n}\n.menu-item {\n  margin-top: 4px;\n  padding: 4px 8px;\n  border-left: 4px solid #2f5fd0;\n  background: #dbe4fb;\n}\n.sub li {\n  padding: 2px 0;\n}\n",
+    messages: ["上の段の項目（ホーム・お問い合わせ）に、左の線が付いていません"],
+    elements: { menu: { rect: [0, 0, 596, 119.95], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m1: { rect: [0, 0, 596, 22.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m2: { rect: [0, 22.39, 596, 75.17], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, s1: { rect: [16, 44.78, 580, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [16, 71.17, 580, 26.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} }, m3: { rect: [0, 97.56, 596, 22.39], computed: {"border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "next-sibling",
+    name: "starter",
+    messages: ["見出しのすぐ後の段落が、見出しから離れたままです（上の余白を 4px に詰めます）"],
+    elements: { post: { rect: [0, 0, 596, 222.34] }, h1: { rect: [0, 0, 596, 22.39] }, p1: { rect: [0, 38.39, 596, 22.39] }, p2: { rect: [0, 76.78, 596, 22.39] }, h2: { rect: [0, 123.17, 596, 22.39] }, p3: { rect: [0, 161.56, 596, 22.39] }, p4: { rect: [0, 199.95, 596, 22.39] } },
+  },
+  {
+    lesson: "next-sibling",
+    name: "solution",
+    messages: [],
+    elements: { post: { rect: [0, 0, 596, 198.34] }, h1: { rect: [0, 0, 596, 22.39] }, p1: { rect: [0, 26.39, 596, 22.39] }, p2: { rect: [0, 64.78, 596, 22.39] }, h2: { rect: [0, 111.17, 596, 22.39] }, p3: { rect: [0, 137.56, 596, 22.39] }, p4: { rect: [0, 175.95, 596, 22.39] } },
+  },
+  {
+    lesson: "next-sibling",
+    name: "h3+p without spaces",
+    css: ".post h3 {\n  margin: 24px 0 0;\n  font-size: 16px;\n}\n.post h3:first-child {\n  margin-top: 0;\n}\n.post p {\n  margin: 16px 0 0;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.post h3+p {\n  margin-top: 4px;\n}\n",
+    messages: [],
+    elements: { post: { rect: [0, 0, 596, 198.34] }, h1: { rect: [0, 0, 596, 22.39] }, p1: { rect: [0, 26.39, 596, 22.39] }, p2: { rect: [0, 64.78, 596, 22.39] }, h2: { rect: [0, 111.17, 596, 22.39] }, p3: { rect: [0, 137.56, 596, 22.39] }, p4: { rect: [0, 175.95, 596, 22.39] } },
+  },
+  {
+    lesson: "next-sibling",
+    name: "h3 ~ p",
+    css: ".post h3 {\n  margin: 24px 0 0;\n  font-size: 16px;\n}\n.post h3:first-child {\n  margin-top: 0;\n}\n.post p {\n  margin: 16px 0 0;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.post h3 ~ p {\n  margin-top: 4px;\n}\n",
+    messages: ["段落どうしの間まで詰まっています（~ は後ろのすべての兄弟を選びます。+ なら直後の 1 つだけです）"],
+    elements: { post: { rect: [0, 0, 596, 174.34] }, h1: { rect: [0, 0, 596, 22.39] }, p1: { rect: [0, 26.39, 596, 22.39] }, p2: { rect: [0, 52.78, 596, 22.39] }, h2: { rect: [0, 99.17, 596, 22.39] }, p3: { rect: [0, 125.56, 596, 22.39] }, p4: { rect: [0, 151.95, 596, 22.39] } },
+  },
+  {
+    lesson: "next-sibling",
+    name: "p:first-of-type",
+    css: ".post h3 {\n  margin: 24px 0 0;\n  font-size: 16px;\n}\n.post h3:first-child {\n  margin-top: 0;\n}\n.post p {\n  margin: 16px 0 0;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.post p:first-of-type {\n  margin-top: 4px;\n}\n",
+    messages: ["見出しのすぐ後の段落が、見出しから離れたままです（上の余白を 4px に詰めます）"],
+    elements: { post: { rect: [0, 0, 596, 210.34] }, h1: { rect: [0, 0, 596, 22.39] }, p1: { rect: [0, 26.39, 596, 22.39] }, p2: { rect: [0, 64.78, 596, 22.39] }, h2: { rect: [0, 111.17, 596, 22.39] }, p3: { rect: [0, 149.56, 596, 22.39] }, p4: { rect: [0, 187.95, 596, 22.39] } },
+  },
+  {
+    lesson: "next-sibling",
+    name: "negative margin under the headings",
+    css: ".post h3 {\n  margin: 24px 0 0;\n  font-size: 16px;\n}\n.post h3:first-child {\n  margin-top: 0;\n}\n.post p {\n  margin: 16px 0 0;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.post h3 {\n  margin-bottom: -12px;\n}\n",
+    messages: ["見出しのすぐ次の段落を選ぶ h3 + p を使いましょう（段落を足しても、見出しの直後だけに効きます）"],
+    elements: { post: { rect: [0, 0, 596, 198.34] }, h1: { rect: [0, 0, 596, 22.39] }, p1: { rect: [0, 26.39, 596, 22.39] }, p2: { rect: [0, 64.78, 596, 22.39] }, h2: { rect: [0, 111.17, 596, 22.39] }, p3: { rect: [0, 137.56, 596, 22.39] }, p4: { rect: [0, 175.95, 596, 22.39] } },
+  },
+  {
+    lesson: "next-sibling",
+    name: "counted with nth-child",
+    css: ".post h3 {\n  margin: 24px 0 0;\n  font-size: 16px;\n}\n.post h3:first-child {\n  margin-top: 0;\n}\n.post p {\n  margin: 16px 0 0;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.post p:nth-child(2),\n.post p:nth-child(5) {\n  margin-top: 4px;\n}\n",
+    messages: ["見出しのすぐ次の段落を選ぶ h3 + p を使いましょう（段落を足しても、見出しの直後だけに効きます）"],
+    elements: { post: { rect: [0, 0, 596, 198.34] }, h1: { rect: [0, 0, 596, 22.39] }, p1: { rect: [0, 26.39, 596, 22.39] }, p2: { rect: [0, 64.78, 596, 22.39] }, h2: { rect: [0, 111.17, 596, 22.39] }, p3: { rect: [0, 137.56, 596, 22.39] }, p4: { rect: [0, 175.95, 596, 22.39] } },
+  },
+  {
+    lesson: "subsequent-sibling",
+    name: "starter",
+    messages: ["「確認」が薄くなっていません（opacity: 0.4）"],
+    elements: { steps: { rect: [0, 0, 596, 35.59], computed: {"opacity":"1"} }, st1: { rect: [4, 4, 62, 27.59], computed: {"opacity":"1"} }, st2: { rect: [74, 4, 76, 27.59], computed: {"opacity":"1"} }, st3: { rect: [158, 4, 76, 27.59], computed: {"opacity":"1"} }, st4: { rect: [242, 4, 48, 27.59], computed: {"opacity":"1"} }, st5: { rect: [298, 4, 48, 27.59], computed: {"opacity":"1"} } },
+  },
+  {
+    lesson: "subsequent-sibling",
+    name: "solution",
+    messages: [],
+    elements: { steps: { rect: [0, 0, 596, 35.59], computed: {"opacity":"1"} }, st1: { rect: [4, 4, 62, 27.59], computed: {"opacity":"1"} }, st2: { rect: [74, 4, 76, 27.59], computed: {"opacity":"1"} }, st3: { rect: [158, 4, 76, 27.59], computed: {"opacity":"1"} }, st4: { rect: [242, 4, 48, 27.59], computed: {"opacity":"0.4"} }, st5: { rect: [298, 4, 48, 27.59], computed: {"opacity":"0.4"} } },
+  },
+  {
+    lesson: "subsequent-sibling",
+    name: ".current ~ *",
+    css: ".steps {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  margin: 0;\n  padding: 4px;\n  list-style: none;\n}\n.step {\n  padding: 4px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.current {\n  outline: 3px solid #f5c400;\n}\n.current ~ * {\n  opacity: 0.4;\n}\n",
+    messages: [],
+    elements: { steps: { rect: [0, 0, 596, 35.59], computed: {"opacity":"1"} }, st1: { rect: [4, 4, 62, 27.59], computed: {"opacity":"1"} }, st2: { rect: [74, 4, 76, 27.59], computed: {"opacity":"1"} }, st3: { rect: [158, 4, 76, 27.59], computed: {"opacity":"1"} }, st4: { rect: [242, 4, 48, 27.59], computed: {"opacity":"0.4"} }, st5: { rect: [298, 4, 48, 27.59], computed: {"opacity":"0.4"} } },
+  },
+  {
+    lesson: "subsequent-sibling",
+    name: "+ instead of ~",
+    css: ".steps {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  margin: 0;\n  padding: 4px;\n  list-style: none;\n}\n.step {\n  padding: 4px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.current {\n  outline: 3px solid #f5c400;\n}\n.current + .step {\n  opacity: 0.4;\n}\n",
+    messages: ["「完了」が薄くなっていません（+ は直後の 1 つだけを選びます。後ろのすべての兄弟は ~ で選びます）"],
+    elements: { steps: { rect: [0, 0, 596, 35.59], computed: {"opacity":"1"} }, st1: { rect: [4, 4, 62, 27.59], computed: {"opacity":"1"} }, st2: { rect: [74, 4, 76, 27.59], computed: {"opacity":"1"} }, st3: { rect: [158, 4, 76, 27.59], computed: {"opacity":"1"} }, st4: { rect: [242, 4, 48, 27.59], computed: {"opacity":"0.4"} }, st5: { rect: [298, 4, 48, 27.59], computed: {"opacity":"1"} } },
+  },
+  {
+    lesson: "subsequent-sibling",
+    name: "counted with nth-child",
+    css: ".steps {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  margin: 0;\n  padding: 4px;\n  list-style: none;\n}\n.step {\n  padding: 4px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.current {\n  outline: 3px solid #f5c400;\n}\n.step:nth-child(n + 4) {\n  opacity: 0.4;\n}\n",
+    messages: ["何番目かで選ぶのではなく、.current ~ .step で「いまの段階より後ろ」を選びましょう（いまの段階が変わっても書き直しが要りません）"],
+    elements: { steps: { rect: [0, 0, 596, 35.59], computed: {"opacity":"1"} }, st1: { rect: [4, 4, 62, 27.59], computed: {"opacity":"1"} }, st2: { rect: [74, 4, 76, 27.59], computed: {"opacity":"1"} }, st3: { rect: [158, 4, 76, 27.59], computed: {"opacity":"1"} }, st4: { rect: [242, 4, 48, 27.59], computed: {"opacity":"0.4"} }, st5: { rect: [298, 4, 48, 27.59], computed: {"opacity":"0.4"} } },
+  },
+  {
+    lesson: "subsequent-sibling",
+    name: ".step ~ .step",
+    css: ".steps {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  margin: 0;\n  padding: 4px;\n  list-style: none;\n}\n.step {\n  padding: 4px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.current {\n  outline: 3px solid #f5c400;\n}\n.step ~ .step {\n  opacity: 0.4;\n}\n",
+    messages: ["「お支払い」とその前の段階は、薄くしません"],
+    elements: { steps: { rect: [0, 0, 596, 35.59], computed: {"opacity":"1"} }, st1: { rect: [4, 4, 62, 27.59], computed: {"opacity":"1"} }, st2: { rect: [74, 4, 76, 27.59], computed: {"opacity":"0.4"} }, st3: { rect: [158, 4, 76, 27.59], computed: {"opacity":"0.4"} }, st4: { rect: [242, 4, 48, 27.59], computed: {"opacity":"0.4"} }, st5: { rect: [298, 4, 48, 27.59], computed: {"opacity":"0.4"} } },
+  },
+  {
+    lesson: "calc-columns",
+    name: "starter",
+    messages: ["1 行に 3 枚並んでいません（4 枚目が 2 行目の先頭に来るはずです）"],
+    elements: { cards: { rect: [0, 0, 596, 154.78] }, c1: { rect: [0, 0, 198.66, 43.59] }, c2: { rect: [210.66, 0, 198.66, 43.59] }, c3: { rect: [0, 55.59, 198.66, 43.59] }, c4: { rect: [210.66, 55.59, 198.66, 43.59] }, c5: { rect: [0, 111.19, 198.66, 43.59] }, c6: { rect: [210.66, 111.19, 198.66, 43.59] } },
+  },
+  {
+    lesson: "calc-columns",
+    name: "solution",
+    messages: [],
+    elements: { cards: { rect: [0, 0, 596, 99.19] }, c1: { rect: [0, 0, 190.66, 43.59] }, c2: { rect: [202.66, 0, 190.66, 43.59] }, c3: { rect: [405.31, 0, 190.66, 43.59] }, c4: { rect: [0, 55.59, 190.66, 43.59] }, c5: { rect: [202.66, 55.59, 190.66, 43.59] }, c6: { rect: [405.31, 55.59, 190.66, 43.59] } },
+  },
+  {
+    lesson: "calc-columns",
+    name: "calc(33.333% - 8px)",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  width: calc(33.333% - 8px);\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n",
+    messages: [],
+    elements: { cards: { rect: [0, 0, 596, 99.19] }, c1: { rect: [0, 0, 190.66, 43.59] }, c2: { rect: [202.66, 0, 190.66, 43.59] }, c3: { rect: [405.31, 0, 190.66, 43.59] }, c4: { rect: [0, 55.59, 190.66, 43.59] }, c5: { rect: [202.66, 55.59, 190.66, 43.59] }, c6: { rect: [405.31, 55.59, 190.66, 43.59] } },
+  },
+  {
+    lesson: "calc-columns",
+    name: "flex basis calc",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  flex: 0 0 calc((100% - 24px) / 3);\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n",
+    messages: [],
+    elements: { cards: { rect: [0, 0, 596, 99.19] }, c1: { rect: [0, 0, 190.66, 43.59] }, c2: { rect: [202.66, 0, 190.66, 43.59] }, c3: { rect: [405.31, 0, 190.66, 43.59] }, c4: { rect: [0, 55.59, 190.66, 43.59] }, c5: { rect: [202.66, 55.59, 190.66, 43.59] }, c6: { rect: [405.31, 55.59, 190.66, 43.59] } },
+  },
+  {
+    lesson: "calc-columns",
+    name: "width 31%",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  width: 31%;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n",
+    messages: ["3 枚で行の幅ぴったりになっていません（gap の 24px を引いてから 3 で割ります）"],
+    elements: { cards: { rect: [0, 0, 596, 99.19] }, c1: { rect: [0, 0, 184.75, 43.59] }, c2: { rect: [196.75, 0, 184.75, 43.59] }, c3: { rect: [393.5, 0, 184.75, 43.59] }, c4: { rect: [0, 55.59, 184.75, 43.59] }, c5: { rect: [196.75, 55.59, 184.75, 43.59] }, c6: { rect: [393.5, 55.59, 184.75, 43.59] } },
+  },
+  {
+    lesson: "calc-columns",
+    name: "flex 1 1 30%",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  flex: 1 1 30%;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n",
+    messages: ["ほかの方法でも 3 列にできますが、ここでは .card の幅を calc((100% - 24px) / 3) で計算しましょう（gap を引いて 3 等分するので、幅が変わってもぴったり収まります）"],
+    elements: { cards: { rect: [0, 0, 596, 99.19] }, c1: { rect: [0, 0, 190.66, 43.59] }, c2: { rect: [202.66, 0, 190.67, 43.59] }, c3: { rect: [405.33, 0, 190.67, 43.59] }, c4: { rect: [0, 55.59, 190.66, 43.59] }, c5: { rect: [202.66, 55.59, 190.67, 43.59] }, c6: { rect: [405.33, 55.59, 190.67, 43.59] } },
+  },
+  {
+    lesson: "calc-columns",
+    name: "three-column grid",
+    css: ".cards {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.card {\n  width: 33.333%;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-size: 14px;\n}\n.cards {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n}\n",
+    messages: ["3 枚で行の幅ぴったりになっていません（gap の 24px を引いてから 3 で割ります）"],
+    elements: { cards: { rect: [0, 0, 596, 99.19] }, c1: { rect: [0, 0, 63.55, 43.59] }, c2: { rect: [202.66, 0, 63.55, 43.59] }, c3: { rect: [405.33, 0, 63.55, 43.59] }, c4: { rect: [0, 55.59, 63.55, 43.59] }, c5: { rect: [202.66, 55.59, 63.55, 43.59] }, c6: { rect: [405.33, 55.59, 63.55, 43.59] } },
+  },
+  {
+    lesson: "rem-nested",
+    name: "starter",
+    messages: ["入れ子の項目の文字が 14px にそろっていません（em は親の文字の大きさが基準なので、階層ごとに 0.875 倍されます）"],
+    elements: { i1: { rect: [16, 0, 580, 59.13], computed: {"font-size":"14px"} }, i2: { rect: [32, 22.39, 564, 36.73], computed: {"font-size":"12.25px"} }, i3: { rect: [48, 41.98, 548, 17.14], computed: {"font-size":"10.7188px"} } },
+  },
+  {
+    lesson: "rem-nested",
+    name: "solution",
+    messages: [],
+    elements: { i1: { rect: [16, 0, 580, 67.17], computed: {"font-size":"14px"} }, i2: { rect: [32, 22.39, 564, 44.78], computed: {"font-size":"14px"} }, i3: { rect: [48, 44.78, 548, 22.39], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "rem-nested",
+    name: "calc with rem",
+    css: ".tree,\n.tree ul {\n  margin: 0;\n  padding-left: 16px;\n}\n.tree li {\n  font-size: calc(14 / 16 * 1rem);\n  line-height: 1.6;\n}\n",
+    messages: [],
+    elements: { i1: { rect: [16, 0, 580, 67.17], computed: {"font-size":"14px"} }, i2: { rect: [32, 22.39, 564, 44.78], computed: {"font-size":"14px"} }, i3: { rect: [48, 44.78, 548, 22.39], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "rem-nested",
+    name: "14px",
+    css: ".tree,\n.tree ul {\n  margin: 0;\n  padding-left: 16px;\n}\n.tree li {\n  font-size: 14px;\n  line-height: 1.6;\n}\n",
+    messages: ["14px と固定してもそろいますが、rem にしましょう（利用者がブラウザで文字を大きくすると、それに合わせて大きくなります）"],
+    elements: { i1: { rect: [16, 0, 580, 67.17], computed: {"font-size":"14px"} }, i2: { rect: [32, 22.39, 564, 44.78], computed: {"font-size":"14px"} }, i3: { rect: [48, 44.78, 548, 22.39], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "rem-nested",
+    name: "1em on the nested items",
+    css: ".tree,\n.tree ul {\n  margin: 0;\n  padding-left: 16px;\n}\n.tree li {\n  font-size: 0.875em;\n  line-height: 1.6;\n}\n.tree li li {\n  font-size: 1em;\n}\n",
+    messages: ["14px と固定してもそろいますが、rem にしましょう（利用者がブラウザで文字を大きくすると、それに合わせて大きくなります）"],
+    elements: { i1: { rect: [16, 0, 580, 67.17], computed: {"font-size":"14px"} }, i2: { rect: [32, 22.39, 564, 44.78], computed: {"font-size":"14px"} }, i3: { rect: [48, 44.78, 548, 22.39], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "rem-nested",
+    name: "87.5%",
+    css: ".tree,\n.tree ul {\n  margin: 0;\n  padding-left: 16px;\n}\n.tree li {\n  font-size: 87.5%;\n  line-height: 1.6;\n}\n",
+    messages: ["入れ子の項目の文字が 14px にそろっていません（em は親の文字の大きさが基準なので、階層ごとに 0.875 倍されます）"],
+    elements: { i1: { rect: [16, 0, 580, 59.13], computed: {"font-size":"14px"} }, i2: { rect: [32, 22.39, 564, 36.73], computed: {"font-size":"12.25px"} }, i3: { rect: [48, 41.98, 548, 17.14], computed: {"font-size":"10.7188px"} } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "starter",
+    messages: ["メインの高さが、画面の残り（280px − 56px ＝ 224px）になっていません"],
+    elements: { head: { rect: [0, 0, 596, 56] }, main: { rect: [0, 56, 596, 54.39] } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "solution",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 56] }, main: { rect: [0, 56, 596, 224] } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "vh",
+    css: ".head {\n  height: 56px;\n  padding: 16px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  height: 100%;\n  padding: 16px;\n  background: #eef1f8;\n  min-height: calc(100vh - 56px);\n}\n",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 56] }, main: { rect: [0, 56, 596, 224] } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "svh",
+    css: ".head {\n  height: 56px;\n  padding: 16px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  height: 100%;\n  padding: 16px;\n  background: #eef1f8;\n  min-height: calc(100svh - 56px);\n}\n",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 56] }, main: { rect: [0, 56, 596, 224] } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "height instead of min-height",
+    css: ".head {\n  height: 56px;\n  padding: 16px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  height: 100%;\n  padding: 16px;\n  background: #eef1f8;\n}\n.main {\n  height: calc(100dvh - 56px);\n}\n",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 56] }, main: { rect: [0, 56, 596, 224] } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "flex column on the body",
+    css: ".head {\n  height: 56px;\n  padding: 16px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  height: 100%;\n  padding: 16px;\n  background: #eef1f8;\n}\nbody {\n  display: flex;\n  flex-direction: column;\n  min-height: 100dvh;\n}\n.main {\n  flex: 1;\n}\n",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 56] }, main: { rect: [0, 56, 596, 224] } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "224px",
+    css: ".head {\n  height: 56px;\n  padding: 16px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  height: 100%;\n  padding: 16px;\n  background: #eef1f8;\n}\n.main {\n  height: 224px;\n}\n",
+    messages: ["224px と固定すると、画面の高さが変わったときに合いません。100dvh（画面の高さ）から 56px を引きましょう"],
+    elements: { head: { rect: [0, 0, 596, 56] }, main: { rect: [0, 56, 596, 224] } },
+  },
+  {
+    lesson: "dvh-height",
+    name: "100dvh without the header",
+    css: ".head {\n  height: 56px;\n  padding: 16px;\n  background: #18203a;\n  color: #fff;\n}\n.main {\n  height: 100%;\n  padding: 16px;\n  background: #eef1f8;\n}\n.main {\n  min-height: 100dvh;\n}\n",
+    messages: ["メインの高さが、画面の残り（280px − 56px ＝ 224px）になっていません"],
+    elements: { head: { rect: [0, 0, 581, 56] }, main: { rect: [0, 56, 581, 280] } },
+  },
+  {
+    lesson: "inherit-font",
+    name: "starter",
+    messages: ["入力欄とボタンの文字が 18px になっていません（フォームの部品は、親の文字の設定を受け継ぎません）"],
+    elements: { card: { rect: [0, 0, 596, 93.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, text: { rect: [12, 12, 572, 28.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, field: { rect: [12, 51.8, 165, 27], computed: {"font-size":"13.3333px","font-family":"Arial"} }, btn: { rect: [177, 48.8, 81.33, 33], computed: {"font-size":"13.3333px","font-family":"Arial"} } },
+  },
+  {
+    lesson: "inherit-font",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 596, 101.59], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, text: { rect: [12, 12, 572, 28.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, field: { rect: [12, 48.8, 226, 40.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, btn: { rect: [238, 48.8, 100, 40.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} } },
+  },
+  {
+    lesson: "inherit-font",
+    name: "font-family inherit and font-size 100%",
+    css: ".card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n  font: 18px/1.6 \"Hiragino Sans\", \"Noto Sans JP\", sans-serif;\n}\n.card p {\n  margin: 0 0 8px;\n}\n.card input {\n  padding: 4px 8px;\n}\n.card button {\n  padding: 4px 12px;\n}\n.card input,\n.card button {\n  font-family: inherit;\n  font-size: 100%;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 596, 99.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, text: { rect: [12, 12, 572, 28.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, field: { rect: [12, 48.8, 226, 39], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, btn: { rect: [238, 48.8, 100, 39], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} } },
+  },
+  {
+    lesson: "inherit-font",
+    name: "font-size 18px only",
+    css: ".card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n  font: 18px/1.6 \"Hiragino Sans\", \"Noto Sans JP\", sans-serif;\n}\n.card p {\n  margin: 0 0 8px;\n}\n.card input {\n  padding: 4px 8px;\n}\n.card button {\n  padding: 4px 12px;\n}\n.card input,\n.card button {\n  font-size: 18px;\n}\n",
+    messages: ["大きさだけでなく、書体（font-family）も受け継ぎましょう（font: inherit なら、まとめて親と同じになります）"],
+    elements: { card: { rect: [0, 0, 596, 99.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, text: { rect: [12, 12, 572, 28.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, field: { rect: [12, 52.8, 207, 33], computed: {"font-size":"18px","font-family":"Arial"} }, btn: { rect: [219, 48.8, 100, 39], computed: {"font-size":"18px","font-family":"Arial"} } },
+  },
+  {
+    lesson: "inherit-font",
+    name: "values copied by hand",
+    css: ".card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n  font: 18px/1.6 \"Hiragino Sans\", \"Noto Sans JP\", sans-serif;\n}\n.card p {\n  margin: 0 0 8px;\n}\n.card input {\n  padding: 4px 8px;\n}\n.card button {\n  padding: 4px 12px;\n}\n.card input,\n.card button {\n  font-size: 18px;\n  font-family: \"Hiragino Sans\", \"Noto Sans JP\", sans-serif;\n}\n",
+    messages: ["値を書き写すのではなく、inherit で親から受け継ぎましょう（カードの文字を変えても、部品がついてきます）"],
+    elements: { card: { rect: [0, 0, 596, 99.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, text: { rect: [12, 12, 572, 28.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, field: { rect: [12, 48.8, 226, 39], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, btn: { rect: [238, 48.8, 100, 39], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} } },
+  },
+  {
+    lesson: "inherit-font",
+    name: "button only",
+    css: ".card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n  font: 18px/1.6 \"Hiragino Sans\", \"Noto Sans JP\", sans-serif;\n}\n.card p {\n  margin: 0 0 8px;\n}\n.card input {\n  padding: 4px 8px;\n}\n.card button {\n  padding: 4px 12px;\n}\n.card button {\n  font: inherit;\n}\n",
+    messages: ["入力欄とボタンの文字が 18px になっていません（フォームの部品は、親の文字の設定を受け継ぎません）"],
+    elements: { card: { rect: [0, 0, 596, 101.59], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, text: { rect: [12, 12, 572, 28.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} }, field: { rect: [12, 57.8, 165, 27], computed: {"font-size":"13.3333px","font-family":"Arial"} }, btn: { rect: [177, 48.8, 100, 40.8], computed: {"font-size":"18px","font-family":"\"Hiragino Sans\", \"Noto Sans JP\", sans-serif"} } },
+  },
+  {
+    lesson: "current-color",
+    name: "starter",
+    messages: ["削除ボタンの枠線が赤くなっていません（.btn の枠線の色を currentColor に）"],
+    elements: { save: { rect: [0, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "save-icon": { rect: [14, 11.19, 16, 16], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(47, 95, 208)"} }, del: { rect: [86.19, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "del-icon": { rect: [100.19, 11.19, 16, 16], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "current-color",
+    name: "solution",
+    messages: [],
+    elements: { save: { rect: [0, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "save-icon": { rect: [14, 11.19, 16, 16], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(47, 95, 208)"} }, del: { rect: [86.19, 0, 82, 38.39], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(0, 0, 0)"} }, "del-icon": { rect: [100.19, 11.19, 16, 16], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(217, 54, 54)"} } },
+  },
+  {
+    lesson: "current-color",
+    name: "border without a colour",
+    css: ".btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 2px solid;\n  border-radius: 8px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: currentColor;\n}\n.danger {\n  color: #d93636;\n}\n",
+    messages: [],
+    elements: { save: { rect: [0, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "save-icon": { rect: [14, 11.19, 16, 16], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(47, 95, 208)"} }, del: { rect: [86.19, 0, 82, 38.39], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(0, 0, 0)"} }, "del-icon": { rect: [100.19, 11.19, 16, 16], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(217, 54, 54)"} } },
+  },
+  {
+    lesson: "current-color",
+    name: "lowercase currentcolor longhands",
+    css: ".btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 2px solid #2f5fd0;\n  border-radius: 8px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: #2f5fd0;\n}\n.danger {\n  color: #d93636;\n}\n.btn {\n  border-color: currentcolor;\n}\n.icon {\n  fill: currentcolor;\n}\n",
+    messages: [],
+    elements: { save: { rect: [0, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "save-icon": { rect: [14, 11.19, 16, 16], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(47, 95, 208)"} }, del: { rect: [86.19, 0, 82, 38.39], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(0, 0, 0)"} }, "del-icon": { rect: [100.19, 11.19, 16, 16], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(217, 54, 54)"} } },
+  },
+  {
+    lesson: "current-color",
+    name: "red written for the danger button",
+    css: ".btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 2px solid #2f5fd0;\n  border-radius: 8px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: #2f5fd0;\n}\n.danger {\n  color: #d93636;\n}\n.danger {\n  border-color: #d93636;\n}\n.danger .icon {\n  fill: #d93636;\n}\n",
+    messages: ["赤を書き足すのではなく、currentColor で文字の色を使いましょう（色の種類が増えても、color を変えるだけで済みます）"],
+    elements: { save: { rect: [0, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "save-icon": { rect: [14, 11.19, 16, 16], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(47, 95, 208)"} }, del: { rect: [86.19, 0, 82, 38.39], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(0, 0, 0)"} }, "del-icon": { rect: [100.19, 11.19, 16, 16], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(217, 54, 54)"} } },
+  },
+  {
+    lesson: "current-color",
+    name: "border only",
+    css: ".btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 2px solid currentColor;\n  border-radius: 8px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: #2f5fd0;\n}\n.danger {\n  color: #d93636;\n}\n",
+    messages: ["削除ボタンのアイコンが赤くなっていません（.icon の fill を currentColor に）"],
+    elements: { save: { rect: [0, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "save-icon": { rect: [14, 11.19, 16, 16], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(47, 95, 208)"} }, del: { rect: [86.19, 0, 82, 38.39], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(0, 0, 0)"} }, "del-icon": { rect: [100.19, 11.19, 16, 16], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "current-color",
+    name: "fill: inherit",
+    css: ".btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 2px solid currentColor;\n  border-radius: 8px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: inherit;\n}\n.danger {\n  color: #d93636;\n}\n",
+    messages: ["削除ボタンのアイコンが赤くなっていません（.icon の fill を currentColor に）"],
+    elements: { save: { rect: [0, 0, 82, 38.39], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, "save-icon": { rect: [14, 11.19, 16, 16], computed: {"border-top-color":"rgb(47, 95, 208)","fill":"rgb(0, 0, 0)"} }, del: { rect: [86.19, 0, 82, 38.39], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(0, 0, 0)"} }, "del-icon": { rect: [100.19, 11.19, 16, 16], computed: {"border-top-color":"rgb(217, 54, 54)","fill":"rgb(0, 0, 0)"} } },
+  },
+  {
+    lesson: "revert-reset",
+    name: "starter",
+    messages: ["記事の箇条書きに、黒丸が戻っていません"],
+    elements: { nav: { rect: [0, 0, 596, 22.39], computed: {"list-style-type":"none"} }, n1: { rect: [0, 0, 47.2, 22.39], computed: {"list-style-type":"none"} }, n2: { rect: [63.2, 0, 47.38, 22.39], computed: {"list-style-type":"none"} }, prose: { rect: [0, 30.39, 596, 67.17], computed: {"list-style-type":"disc"} }, list: { rect: [0, 52.78, 596, 44.78], computed: {"list-style-type":"none"} }, i1: { rect: [0, 52.78, 596, 22.39], computed: {"list-style-type":"none"} }, "i1-text": { rect: [0, 54.78, 32, 18], computed: {"list-style-type":"none"} }, i2: { rect: [0, 75.17, 596, 22.39], computed: {"list-style-type":"none"} }, "i2-text": { rect: [0, 77.17, 32, 18], computed: {"list-style-type":"none"} } },
+  },
+  {
+    lesson: "revert-reset",
+    name: "solution",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 596, 22.39], computed: {"list-style-type":"none"} }, n1: { rect: [0, 0, 47.2, 22.39], computed: {"list-style-type":"none"} }, n2: { rect: [63.2, 0, 47.38, 22.39], computed: {"list-style-type":"none"} }, prose: { rect: [0, 30.39, 596, 83.17], computed: {"list-style-type":"disc"} }, list: { rect: [0, 68.78, 596, 44.78], computed: {"list-style-type":"disc"} }, i1: { rect: [40, 68.78, 556, 22.39], computed: {"list-style-type":"disc"} }, "i1-text": { rect: [40, 70.78, 32, 18], computed: {"list-style-type":"disc"} }, i2: { rect: [40, 91.17, 556, 22.39], computed: {"list-style-type":"disc"} }, "i2-text": { rect: [40, 93.17, 32, 18], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "revert-reset",
+    name: "all: revert",
+    css: "/* サイト全体のリセット */\nul {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.nav {\n  display: flex;\n  gap: 16px;\n}\n.prose p {\n  margin: 8px 0 0;\n}\n.prose ul {\n  all: revert;\n}\n",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 596, 22.39], computed: {"list-style-type":"none"} }, n1: { rect: [0, 0, 47.2, 22.39], computed: {"list-style-type":"none"} }, n2: { rect: [63.2, 0, 47.38, 22.39], computed: {"list-style-type":"none"} }, prose: { rect: [0, 30.39, 596, 83.17], computed: {"list-style-type":"disc"} }, list: { rect: [0, 68.78, 596, 44.78], computed: {"list-style-type":"disc"} }, i1: { rect: [40, 68.78, 556, 22.39], computed: {"list-style-type":"disc"} }, "i1-text": { rect: [40, 70.78, 32, 18], computed: {"list-style-type":"disc"} }, i2: { rect: [40, 91.17, 556, 22.39], computed: {"list-style-type":"disc"} }, "i2-text": { rect: [40, 93.17, 32, 18], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "revert-reset",
+    name: "padding and list-style only",
+    css: "/* サイト全体のリセット */\nul {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.nav {\n  display: flex;\n  gap: 16px;\n}\n.prose p {\n  margin: 8px 0 0;\n}\n.prose ul {\n  padding: revert;\n  list-style: revert;\n}\n",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 596, 22.39], computed: {"list-style-type":"none"} }, n1: { rect: [0, 0, 47.2, 22.39], computed: {"list-style-type":"none"} }, n2: { rect: [63.2, 0, 47.38, 22.39], computed: {"list-style-type":"none"} }, prose: { rect: [0, 30.39, 596, 67.17], computed: {"list-style-type":"disc"} }, list: { rect: [0, 52.78, 596, 44.78], computed: {"list-style-type":"disc"} }, i1: { rect: [40, 52.78, 556, 22.39], computed: {"list-style-type":"disc"} }, "i1-text": { rect: [40, 54.78, 32, 18], computed: {"list-style-type":"disc"} }, i2: { rect: [40, 75.17, 556, 22.39], computed: {"list-style-type":"disc"} }, "i2-text": { rect: [40, 77.17, 32, 18], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "revert-reset",
+    name: "unset",
+    css: "/* サイト全体のリセット */\nul {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.nav {\n  display: flex;\n  gap: 16px;\n}\n.prose p {\n  margin: 8px 0 0;\n}\n.prose ul {\n  padding: unset;\n  list-style: unset;\n}\n",
+    messages: ["記事の箇条書きの字下げ（40px）が戻っていません（unset は初期値の 0 になります。revert ならブラウザの既定に戻ります）"],
+    elements: { nav: { rect: [0, 0, 596, 22.39], computed: {"list-style-type":"none"} }, n1: { rect: [0, 0, 47.2, 22.39], computed: {"list-style-type":"none"} }, n2: { rect: [63.2, 0, 47.38, 22.39], computed: {"list-style-type":"none"} }, prose: { rect: [0, 30.39, 596, 67.17], computed: {"list-style-type":"disc"} }, list: { rect: [0, 52.78, 596, 44.78], computed: {"list-style-type":"disc"} }, i1: { rect: [0, 52.78, 596, 22.39], computed: {"list-style-type":"disc"} }, "i1-text": { rect: [0, 54.78, 32, 18], computed: {"list-style-type":"disc"} }, i2: { rect: [0, 75.17, 596, 22.39], computed: {"list-style-type":"disc"} }, "i2-text": { rect: [0, 77.17, 32, 18], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "revert-reset",
+    name: "40px and disc by hand",
+    css: "/* サイト全体のリセット */\nul {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.nav {\n  display: flex;\n  gap: 16px;\n}\n.prose p {\n  margin: 8px 0 0;\n}\n.prose ul {\n  padding-left: 40px;\n  list-style: disc;\n}\n",
+    messages: ["40px や disc を書き直しても戻せますが、revert で「ブラウザの既定」に戻しましょう（値を覚えておく必要がありません）"],
+    elements: { nav: { rect: [0, 0, 596, 22.39], computed: {"list-style-type":"none"} }, n1: { rect: [0, 0, 47.2, 22.39], computed: {"list-style-type":"none"} }, n2: { rect: [63.2, 0, 47.38, 22.39], computed: {"list-style-type":"none"} }, prose: { rect: [0, 30.39, 596, 67.17], computed: {"list-style-type":"disc"} }, list: { rect: [0, 52.78, 596, 44.78], computed: {"list-style-type":"disc"} }, i1: { rect: [40, 52.78, 556, 22.39], computed: {"list-style-type":"disc"} }, "i1-text": { rect: [40, 54.78, 32, 18], computed: {"list-style-type":"disc"} }, i2: { rect: [40, 75.17, 556, 22.39], computed: {"list-style-type":"disc"} }, "i2-text": { rect: [40, 77.17, 32, 18], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "revert-reset",
+    name: "every ul reverted",
+    css: "/* サイト全体のリセット */\nul {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.nav {\n  display: flex;\n  gap: 16px;\n}\n.prose p {\n  margin: 8px 0 0;\n}\nul {\n  padding: revert;\n  list-style: revert;\n}\n",
+    messages: ["ナビゲーションまで元に戻っています（.prose の中の ul だけを選びます）"],
+    elements: { nav: { rect: [0, 0, 596, 22.39], computed: {"list-style-type":"disc"} }, n1: { rect: [40, 0, 47.2, 22.39], computed: {"list-style-type":"disc"} }, n2: { rect: [103.2, 0, 47.38, 22.39], computed: {"list-style-type":"disc"} }, prose: { rect: [0, 30.39, 596, 67.17], computed: {"list-style-type":"disc"} }, list: { rect: [0, 52.78, 596, 44.78], computed: {"list-style-type":"disc"} }, i1: { rect: [40, 52.78, 556, 22.39], computed: {"list-style-type":"disc"} }, "i1-text": { rect: [40, 54.78, 32, 18], computed: {"list-style-type":"disc"} }, i2: { rect: [40, 75.17, 556, 22.39], computed: {"list-style-type":"disc"} }, "i2-text": { rect: [40, 77.17, 32, 18], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "visibility-hidden",
+    name: "starter",
+    messages: ["削除ボタンの場所が詰められ、共有ボタンが左にずれています（display: none は場所ごと取り除きます）"],
+    elements: { bar: { rect: [0, 0, 596, 36.39], computed: {"visibility":"visible","opacity":"1"} }, edit: { rect: [0, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} }, del: { rect: [0, 0, 0, 0], computed: {"visibility":"visible","opacity":"1"} }, share: { rect: [70, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} } },
+  },
+  {
+    lesson: "visibility-hidden",
+    name: "solution",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 36.39], computed: {"visibility":"visible","opacity":"1"} }, edit: { rect: [0, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} }, del: { rect: [70, 0, 62, 36.39], computed: {"visibility":"hidden","opacity":"1"} }, share: { rect: [140, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} } },
+  },
+  {
+    lesson: "visibility-hidden",
+    name: "opacity 0",
+    css: ".toolbar {\n  display: flex;\n  gap: 8px;\n}\n.tool {\n  padding: 6px 14px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n  background: #fff;\n  font: inherit;\n}\n.delete {\n  opacity: 0;\n}\n",
+    messages: ["opacity: 0 では見えないだけで、クリックやキーボードのフォーカスはできてしまいます。visibility: hidden にしましょう"],
+    elements: { bar: { rect: [0, 0, 596, 36.39], computed: {"visibility":"visible","opacity":"1"} }, edit: { rect: [0, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} }, del: { rect: [70, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"0"} }, share: { rect: [140, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} } },
+  },
+  {
+    lesson: "visibility-hidden",
+    name: "not hidden at all",
+    css: ".toolbar {\n  display: flex;\n  gap: 8px;\n}\n.tool {\n  padding: 6px 14px;\n  border: 1px solid #9fb2e6;\n  border-radius: 8px;\n  background: #fff;\n  font: inherit;\n}\n.delete {\n  color: inherit;\n}\n",
+    messages: ["削除ボタンが見えたままです（場所を残したまま隠します）"],
+    elements: { bar: { rect: [0, 0, 596, 36.39], computed: {"visibility":"visible","opacity":"1"} }, edit: { rect: [0, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} }, del: { rect: [70, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} }, share: { rect: [140, 0, 62, 36.39], computed: {"visibility":"visible","opacity":"1"} } },
+  },
+  {
+    lesson: "hidden-attribute",
+    name: "starter",
+    messages: ["hidden の付いた「保存できませんでした」が表示されたままです（hidden 属性で選んで display: none にします）"],
+    elements: { n1: { rect: [0, 0, 596, 35.59], computed: {"display":"flex"} }, n2: { rect: [0, 43.59, 596, 35.59], computed: {"display":"flex"} }, n3: { rect: [0, 87.19, 596, 35.59], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "hidden-attribute",
+    name: "solution",
+    messages: [],
+    elements: { n1: { rect: [0, 0, 596, 35.59], computed: {"display":"flex"} }, n2: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, n3: { rect: [0, 43.59, 596, 35.59], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "hidden-attribute",
+    name: "[hidden] after .notice without !important",
+    css: ".notice {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-bottom: 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #e3f4ea;\n  font-size: 14px;\n}\n.error {\n  background: #fde8e8;\n}\n[hidden] {\n  display: none;\n}\n",
+    messages: [],
+    elements: { n1: { rect: [0, 0, 596, 35.59], computed: {"display":"flex"} }, n2: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, n3: { rect: [0, 43.59, 596, 35.59], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "hidden-attribute",
+    name: ".notice[hidden]",
+    css: ".notice {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-bottom: 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #e3f4ea;\n  font-size: 14px;\n}\n.error {\n  background: #fde8e8;\n}\n.notice[hidden] {\n  display: none;\n}\n",
+    messages: [],
+    elements: { n1: { rect: [0, 0, 596, 35.59], computed: {"display":"flex"} }, n2: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, n3: { rect: [0, 43.59, 596, 35.59], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "hidden-attribute",
+    name: ".error hidden",
+    css: ".notice {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-bottom: 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #e3f4ea;\n  font-size: 14px;\n}\n.error {\n  background: #fde8e8;\n}\n.error {\n  display: none;\n}\n",
+    messages: ["表示するお知らせまで消えたり、display: flex でなくなったりしています（hidden の付いた要素だけを選びます）"],
+    elements: { n1: { rect: [0, 0, 596, 35.59], computed: {"display":"flex"} }, n2: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, n3: { rect: [0, 0, 0, 0], computed: {"display":"none"} } },
+  },
+  {
+    lesson: "hidden-attribute",
+    name: "[hidden] with visibility",
+    css: ".notice {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-bottom: 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #e3f4ea;\n  font-size: 14px;\n}\n.error {\n  background: #fde8e8;\n}\n[hidden] {\n  visibility: hidden;\n}\n",
+    messages: ["hidden の付いた「保存できませんでした」が表示されたままです（hidden 属性で選んで display: none にします）"],
+    elements: { n1: { rect: [0, 0, 596, 35.59], computed: {"display":"flex"} }, n2: { rect: [0, 43.59, 596, 35.59], computed: {"display":"flex"} }, n3: { rect: [0, 87.19, 596, 35.59], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "hidden-attribute",
+    name: "display: flex removed",
+    css: ".notice {\n  align-items: center;\n  gap: 8px;\n  margin-bottom: 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #e3f4ea;\n  font-size: 14px;\n}\n.error {\n  background: #fde8e8;\n}\n",
+    messages: ["表示するお知らせまで消えたり、display: flex でなくなったりしています（hidden の付いた要素だけを選びます）"],
+    elements: { n1: { rect: [0, 0, 596, 35.59], computed: {"display":"block"} }, n2: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, n3: { rect: [0, 43.59, 596, 35.59], computed: {"display":"block"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "starter",
+    messages: ["ラベルが、まだボタンの中で場所を取っています（position: absolute で流れから外します）"],
+    elements: { search: { rect: [0, 0, 70, 38.39], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 11.19, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [30, 8, 32, 22.39], computed: {"display":"block","visibility":"visible","clip-path":"none"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "solution",
+    messages: [],
+    elements: { search: { rect: [0, 0, 32, 32], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 8, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [8, 15.5, 1, 1], computed: {"display":"block","visibility":"visible","clip-path":"inset(50%)"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "clip-path only",
+    css: ".icon-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2;\n}\n.label {\n  position: absolute;\n  clip-path: inset(50%);\n}\n",
+    messages: [],
+    elements: { search: { rect: [0, 0, 32, 32], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 8, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [8, 4.8, 32, 22.39], computed: {"display":"block","visibility":"visible","clip-path":"inset(50%)"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "moved off screen",
+    css: ".icon-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2;\n}\n.label {\n  position: absolute;\n  left: -9999px;\n}\n",
+    messages: [],
+    elements: { search: { rect: [0, 0, 32, 32], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 8, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [-9999, 4.8, 32, 22.39], computed: {"display":"block","visibility":"visible","clip-path":"none"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "display none",
+    css: ".icon-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2;\n}\n.label {\n  display: none;\n}\n",
+    messages: ["display: none や visibility: hidden では、読み上げソフトからも消えてしまいます（見た目だけを消します）"],
+    elements: { search: { rect: [0, 0, 32, 32], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 8, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [0, 0, 0, 0], computed: {"display":"none","visibility":"visible","clip-path":"none"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "visibility hidden",
+    css: ".icon-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2;\n}\n.label {\n  visibility: hidden;\n}\n",
+    messages: ["display: none や visibility: hidden では、読み上げソフトからも消えてしまいます（見た目だけを消します）"],
+    elements: { search: { rect: [0, 0, 70, 38.39], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 11.19, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [30, 8, 32, 22.39], computed: {"display":"block","visibility":"hidden","clip-path":"none"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "font-size 0",
+    css: ".icon-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2;\n}\n.label {\n  font-size: 0;\n}\n",
+    messages: ["ラベルが、まだボタンの中で場所を取っています（position: absolute で流れから外します）"],
+    elements: { search: { rect: [0, 0, 38, 32], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 8, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [30, 16, 0, 0], computed: {"display":"block","visibility":"visible","clip-path":"none"} } },
+  },
+  {
+    lesson: "visually-hidden",
+    name: "absolute but still visible",
+    css: ".icon-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2;\n}\n.label {\n  position: absolute;\n}\n",
+    messages: ["ラベルが、まだ見えています（1px の大きさに切り詰めるか、clip-path: inset(50%) で切り抜くか、画面の外へ出します）"],
+    elements: { search: { rect: [0, 0, 32, 32], computed: {"display":"inline-flex","visibility":"visible","clip-path":"none"} }, icon: { rect: [8, 8, 16, 16], computed: {"display":"block","visibility":"visible","clip-path":"none"} }, label: { rect: [8, 4.8, 32, 22.39], computed: {"display":"block","visibility":"visible","clip-path":"none"} } },
+  },
+];
+
+describe("combinators, units, inheritance and hiding: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 12 lessons", () => {
+    expect([...new Set(FUNDAMENTAL_CASES.map((c) => c.lesson))].sort()).toEqual([...FUNDAMENTAL_LESSONS].sort());
+    for (const id of FUNDAMENTAL_LESSONS) {
+      const names = FUNDAMENTAL_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  for (const c of FUNDAMENTAL_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its message" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of FUNDAMENTAL_LESSONS) {
+      const starter = FUNDAMENTAL_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = FUNDAMENTAL_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the hidden button's box with visibility, and takes the visually hidden label out of its button", () => {
+    const box = (id: string, name: string, el: string): readonly number[] =>
+      FUNDAMENTAL_CASES.find((c) => c.lesson === id && c.name === name)!.elements[el]!.rect!;
+    // display: none removes the delete button's box; visibility: hidden keeps it, so "share" stays put.
+    expect(box("visibility-hidden", "starter", "del")[2]).toBe(0);
+    expect(box("visibility-hidden", "solution", "share")[0]).toBeGreaterThan(box("visibility-hidden", "starter", "share")[0]);
+    // The icon button shrinks to the icon and its padding, whichever way the label is hidden.
+    for (const name of ["solution", "clip-path only", "moved off screen"]) {
+      expect(box("visually-hidden", name, "search")[2], name).toBe(32);
+    }
+  });
+});
