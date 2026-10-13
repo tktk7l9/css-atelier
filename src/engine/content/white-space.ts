@@ -6,8 +6,9 @@ import type { Track } from "./types.js";
 // inline box's rect starts at its leftmost fragment and its first line, so a
 // span that merely wraps still reads as starting on the first line). The
 // price is one 24px line when it does not wrap, and the tabbed line starts a
-// little way in, not eight spaces in. Computed values make sure the lesson's
-// property did the work (display: block on the spans would also break lines).
+// little way in, not eight spaces in (about two spaces of the monospace font,
+// whichever element carries tab-size). The address lesson also reads the
+// computed white-space, since display: block on the spans would break lines too.
 
 const ADDRESS_HTML =
   '<p data-id="address" class="address">〒150-0001\n<span data-id="l2">東京都渋谷区神宮前 1-2-3</span>\n<span data-id="l3">アトリエビル 4 階</span></p>';
@@ -19,7 +20,7 @@ const ITEM_HTML =
   '<article data-id="row" class="row"><h3 data-id="name" class="name">手織りのリネン ストール（ネイビー）</h3><p data-id="price" class="price">¥12,800（税込）</p></article>';
 
 const ITEM_CSS = (extra: string): string =>
-  `.row {\n  display: flex;\n  gap: 12px;\n  align-items: flex-start;\n  width: 260px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.name {\n  flex: 1;\n  margin: 0;\n  font-size: 16px;\n  line-height: 24px;\n}\n.price {\n  margin: 0;\n  line-height: 24px;\n  font-weight: 700;\n${extra}}\n`;
+  `.row {\n  display: flex;\n  gap: 12px;\n  align-items: flex-start;\n  width: 260px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.name {\n  margin: 0;\n  font-size: 16px;\n  line-height: 24px;\n}\n.price {\n  margin: 0;\n  line-height: 24px;\n  font-weight: 700;\n${extra}}\n`;
 
 const CODE_HTML =
   '<pre data-id="code" class="code"><code>if (open) {\n\t<span data-id="body">showMenu();</span>\n}</code></pre>';
@@ -27,12 +28,13 @@ const CODE_HTML =
 const CODE_CSS = (extra: string): string =>
   `.code {\n  margin: 0;\n  padding: 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #e6ecff;\n  font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace;\n${extra}}\n`;
 
-/** The span starts its own line `line` (1-based) at the left edge of the address. */
+/** The span starts its own line `line` (1-based, 24px each) at the left edge of the address. */
 const ownLine = (id: string, line: number): ValidatorSpec => ({
   kind: "allOf",
   of: [
     { kind: "offset", a: "address", b: id, edgeA: "left", edgeB: "left", min: -0.5, max: 0.5 },
-    { kind: "offset", a: "address", b: id, edgeA: "top", edgeB: "top", min: (line - 1) * 24 - 0.5, max: (line - 1) * 24 + 0.5 },
+    // The span's box is the text's height, centred in the 24px line.
+    { kind: "offset", a: "address", b: id, edgeA: "top", edgeB: "top", min: (line - 1) * 24 - 0.5, max: (line - 1) * 24 + 6 },
   ],
 });
 
@@ -81,7 +83,7 @@ export const whiteSpaceTrack: Track = {
       id: "white-space-nowrap",
       title: "値段を途中で折り返さない: white-space: nowrap",
       explanation:
-        "<p>日本語の文章は、ほとんどの文字のあいだで折り返せます。flex で商品名と値段を横に並べると、値段の箱も縮められ、「¥12,800（税込）」が途中で 2 行に分かれてしまいます。</p><p>値段に <code>white-space: nowrap</code> を指定すると、<b>中で折り返さなくなり</b>、1 行の幅より縮まなくなります。そのぶん、残りの幅に収まるよう商品名のほうが折り返されます。ただし、長い文章に使うと枠からはみ出すので、短いまとまりにだけ使います。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
+        "<p>日本語の文章は、単語の区切りがなくても文字のあいだで折り返されます。flex で商品名と値段を横に並べると、値段の箱も縮められ、「¥12,800（税込）」が途中で 2 行に分かれてしまいます。</p><p>値段に <code>white-space: nowrap</code> を指定すると、<b>中で折り返さなくなり</b>、1 行の幅より縮まなくなります。そのぶん、残りの幅に収まるよう商品名のほうが折り返されます。ただし、長い文章に使うと枠からはみ出すので、短いまとまりにだけ使います。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/white-space",
       viz: { concept: "none" },
       challenge: {
@@ -98,7 +100,7 @@ export const whiteSpaceTrack: Track = {
                 id: "price",
                 h: 24,
                 tol: 0.5,
-                message: "値段が 1 行になっていません（日本語はどこでも折り返せます。値段に white-space: nowrap）",
+                message: "値段が 1 行になっていません（日本語は文字のあいだで折り返されます。値段に white-space: nowrap）",
               },
               {
                 kind: "offset",
@@ -107,7 +109,7 @@ export const whiteSpaceTrack: Track = {
                 edgeA: "right",
                 edgeB: "right",
                 min: 11.5,
-                message: "値段が枠からはみ出しています（商品名を flex: 1 のまま縮めて、折り返させます）",
+                message: "値段が枠からはみ出しています（商品名のほうを縮めて、折り返させます）",
               },
             ],
           },
@@ -127,29 +129,17 @@ export const whiteSpaceTrack: Track = {
         starterHTML: CODE_HTML,
         starterCSS: CODE_CSS(""),
         task: "コードの 2 行目の字下げ（タブ）が、スペース 8 つ分と広すぎます。タブの幅をスペース 2 つ分にしよう。",
-        snapshot: { props: ["tab-size"] },
+        snapshot: { props: [] },
         validators: [
           {
-            kind: "allOf",
-            of: [
-              {
-                kind: "offset",
-                a: "code",
-                b: "body",
-                edgeA: "left",
-                edgeB: "left",
-                min: 20,
-                max: 40,
-                message: "2 行目の字下げが、スペース 2 つ分ほどになっていません（タブの幅は初期値で 8 つ分です。tab-size: 2）",
-              },
-              {
-                kind: "computedEquals",
-                id: "code",
-                prop: "tab-size",
-                value: "2",
-                message: "字下げの幅は、tab-size: 2 で決めましょう（HTML のタブはそのままです）",
-              },
-            ],
+            kind: "offset",
+            a: "code",
+            b: "body",
+            edgeA: "left",
+            edgeB: "left",
+            min: 20,
+            max: 40,
+            message: "2 行目の字下げが、スペース 2 つ分ほどになっていません（タブの幅は初期値で 8 つ分です。tab-size: 2）",
           },
         ],
         hints: ["タブの幅を、スペースの数で指定するプロパティがあります", ".code { tab-size: 2; }"],

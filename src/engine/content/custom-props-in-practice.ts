@@ -4,7 +4,8 @@ import type { Track } from "./types.js";
 // colours, and for the spacing scale the measured padding and gaps) on the
 // elements that should change and on the ones that should not. Because the
 // same look can be written without variables, each lesson also reads the
-// source for the variable being set where the lesson asks, with a reason.
+// source for the variable being set where the lesson asks, with a reason (any
+// value there: the computed results already say whether it is the right one).
 
 const BLUE = "rgb(47, 95, 208)";
 const RED = "rgb(198, 40, 40)";
@@ -69,10 +70,8 @@ export const customPropsInPracticeTrack: Track = {
                 message: "「保存する」ボタンの色まで変わっています（危険な操作のボタンだけを変えます）",
               },
               {
-                kind: "declarationMatches",
-                selector: ".btn.is-danger",
-                prop: "--btn-color",
-                pattern: "#c62828",
+                kind: "sourceMatches",
+                pattern: "\\.is-danger\\s*\\{[^}]*--btn-color\\s*:",
                 message: ".btn.is-danger の中で、--btn-color を #c62828 に上書きしましょう（枠線と文字色を 1 つずつ書くのではなく）",
               },
             ],
@@ -114,10 +113,8 @@ export const customPropsInPracticeTrack: Track = {
                 message: "ほかの区画のカードの色まで変わっています（.warm の中だけを変えます）",
               },
               {
-                kind: "declarationMatches",
-                selector: ".warm",
-                prop: "--accent",
-                pattern: "#b9791b",
+                kind: "sourceMatches",
+                pattern: "\\.warm\\s*\\{[^}]*--accent\\s*:",
                 message: "カードのルールではなく、区画（.warm）に --accent: #b9791b を置きましょう（中の要素がまとめて受け継ぎます）",
               },
             ],
@@ -160,10 +157,8 @@ export const customPropsInPracticeTrack: Track = {
                 message: "上のパネルの余白まで変わっています（.compact の中だけを詰めます）",
               },
               {
-                kind: "declarationMatches",
-                selector: ".compact",
-                prop: "--space",
-                pattern: "^4px$",
+                kind: "sourceMatches",
+                pattern: "\\.compact\\s*\\{[^}]*--space\\s*:",
                 message: "padding や gap を 1 つずつ書き直すのではなく、.compact で --space を 4px に上書きしましょう",
               },
             ],
