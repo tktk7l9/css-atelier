@@ -59,7 +59,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * (after generated content, whose external-link lesson uses one); logical
  * properties in practice follow writing modes, whose vertical text they
  * share; and the overflow clipping track follows sticky and scroll snap: its
- * sticky lesson scrolls the same way.
+ * sticky lesson scrolls the same way. Icons beside text follow the flex sizing
+ * track (their buttons are inline-flex); fixed positioning follows absolute
+ * positioning, whose containing blocks it contrasts; and sticky in practice
+ * follows the sticky basics, with the same scroll set-up.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -450,6 +453,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "icon-alignment",
+    title: "アイコンと文字（inline-flex・em・1 行目にそろえる）",
+    summary: "inline-flex と align-items: center でボタンのアイコンと文字の中心をそろえ、1em でアイコンを文字の大きさに合わせ、複数行の文では 1 行目の真ん中にアイコンを置く。",
+    emoji: "🔔",
+    lessons: [
+      { id: "inline-flex-icon", title: "アイコンと文字の中心をそろえる: inline-flex" },
+      { id: "icon-em", title: "アイコンを文字の大きさに合わせる: 1em" },
+      { id: "icon-first-line", title: "複数行の文の 1 行目にそろえる: flex-start と 1lh" },
+    ],
+  },
+  {
     id: "grid",
     title: "Grid",
     summary: "2次元レイアウト。行と列のトラックで自在に配置する。",
@@ -603,6 +617,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "fixed-position",
+    title: "画面に固定する（fixed・will-change の落とし穴・固定ヘッダーの下）",
+    summary: "position: fixed で購入バーを画面の下端に固定し、will-change: transform の祖先に閉じ込められたバーを外に出し、固定ヘッダーの下から本文を始める。",
+    emoji: "🧷",
+    lessons: [
+      { id: "fixed-bar", title: "画面の下に固定する: position: fixed" },
+      { id: "fixed-will-change", title: "fixed が箱に閉じ込められる: will-change と transform" },
+      { id: "fixed-header-offset", title: "固定ヘッダーの下から本文を始める: padding-top" },
+    ],
+  },
+  {
     id: "hiding",
     title: "隠し方の使い分け（visibility・hidden・visually-hidden）",
     summary: "visibility で場所を残して隠し、hidden 属性を display で打ち消さないようにし、読み上げには残して見た目だけ消す。",
@@ -731,6 +756,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "sticky-header", title: "見出しを上に残す: position: sticky" },
       { id: "sticky-column", title: "表の 1 列目を残す: left: 0" },
       { id: "sticky-sidebar", title: "グリッドの中で追従させる: align-self" },
+    ],
+  },
+  {
+    id: "sticky-in-practice",
+    title: "スクロール追従の応用（下に貼り付ける・2 段の見出し・親の箱）",
+    summary: "bottom: 0 で合計を下に貼り付け、top に上の見出しの高さを書いて 2 段に重ね、sticky が親の箱の中でしか動けないことを知って、横並びの箱ごと貼り付ける。",
+    emoji: "🗒️",
+    lessons: [
+      { id: "sticky-bottom", title: "下に貼り付ける: position: sticky と bottom: 0" },
+      { id: "sticky-stacked", title: "2 段に重ねる: top に上の見出しの高さ" },
+      { id: "sticky-parent-box", title: "親の箱が小さいと止まらない: 横並びの箱ごと貼り付ける" },
     ],
   },
   {
@@ -1005,6 +1041,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   flexbox: () => import("./flexbox.js").then((m) => m.flexboxTrack),
   "flex-patterns": () => import("./flex-patterns.js").then((m) => m.flexPatternsTrack),
   "flex-sizing": () => import("./flex-sizing.js").then((m) => m.flexSizingTrack),
+  "icon-alignment": () => import("./icon-alignment.js").then((m) => m.iconAlignmentTrack),
   grid: () => import("./grid.js").then((m) => m.gridTrack),
   "grid-alignment": () => import("./grid-alignment.js").then((m) => m.gridAlignmentTrack),
   "grid-patterns": () => import("./grid-patterns.js").then((m) => m.gridPatternsTrack),
@@ -1020,6 +1057,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "logical-props-in-practice": () =>
     import("./logical-props-in-practice.js").then((m) => m.logicalPropsInPracticeTrack),
   positioning: () => import("./positioning.js").then((m) => m.positioningTrack),
+  "fixed-position": () => import("./fixed-position.js").then((m) => m.fixedPositionTrack),
   hiding: () => import("./hiding.js").then((m) => m.hidingTrack),
   stacking: () => import("./stacking.js").then((m) => m.stackingTrack),
   "hit-areas": () => import("./hit-areas.js").then((m) => m.hitAreasTrack),
@@ -1032,6 +1070,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "anchor-positioning": () => import("./anchor-positioning.js").then((m) => m.anchorPositioningTrack),
   "scroll-areas": () => import("./scroll-areas.js").then((m) => m.scrollAreasTrack),
   sticky: () => import("./sticky.js").then((m) => m.stickyTrack),
+  "sticky-in-practice": () => import("./sticky-in-practice.js").then((m) => m.stickyInPracticeTrack),
   "scroll-snap": () => import("./scroll-snap.js").then((m) => m.scrollSnapTrack),
   "overflow-clip": () => import("./overflow-clip.js").then((m) => m.overflowClipTrack),
   "media-queries": () => import("./media-queries.js").then((m) => m.mediaQueriesTrack),
