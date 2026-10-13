@@ -5288,3 +5288,545 @@ describe("stacking, click areas and form states: recorded answers", () => {
     expect(top("tap-target", "solution", "i1", -0.5)).toBe("b1");
   });
 });
+
+const PRESS_LESSONS = [
+  "scale-stacking",
+  "opacity-stacking",
+  "opacity-zero-click",
+  "block-links",
+  "button-over-link",
+  "inline-link-padding",
+  "aria-current",
+  "aria-expanded",
+  "aria-pressed",
+  "text-shadow",
+  "text-emphasis",
+  "text-transform",
+];
+
+const PRESS_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "scale-stacking",
+    name: "starter",
+    messages: ["KM のアバターの右側が、次のアバターの下に隠れています（大きくしても重なり順は変わりません。KM のアバターに z-index を）"],
+    elements: { team: { rect: [0, 0, 596, 80], computed: {"scale":"none"} }, a1: { rect: [16, 16, 48, 48], computed: {"scale":"none"} }, a2: { rect: [46, 10, 60, 60], computed: {"scale":"1.25"} }, a3: { rect: [88, 16, 48, 48], computed: {"scale":"none"} }, a4: { rect: [124, 16, 48, 48], computed: {"scale":"none"} } },
+    hits: [{"at":"a2","fx":0.9,"fy":0.5,"top":"a3"}],
+  },
+  {
+    lesson: "scale-stacking",
+    name: "solution",
+    messages: [],
+    elements: { team: { rect: [0, 0, 596, 80], computed: {"scale":"none"} }, a1: { rect: [16, 16, 48, 48], computed: {"scale":"none"} }, a2: { rect: [46, 10, 60, 60], computed: {"scale":"1.25"} }, a3: { rect: [88, 16, 48, 48], computed: {"scale":"none"} }, a4: { rect: [124, 16, 48, 48], computed: {"scale":"none"} } },
+    hits: [{"at":"a2","fx":0.9,"fy":0.5,"top":"a2"}],
+  },
+  {
+    lesson: "scale-stacking",
+    name: "position and z-index written",
+    css: ".team {\n  display: flex;\n  padding: 16px;\n}\n/* 少しずつ重ねたアバター */\n.avatar {\n  position: relative;\n  display: grid;\n  place-items: center;\n  width: 48px;\n  height: 48px;\n  margin-left: -12px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #dbe4fb;\n  color: #18203a;\n  font-size: 14px;\n  font-weight: 700;\n}\n.avatar:first-child {\n  margin-left: 0;\n}\n/* オンラインの印 */\n.dot {\n  position: absolute;\n  right: -2px;\n  bottom: -2px;\n  width: 12px;\n  height: 12px;\n  border: 2px solid #fff;\n  border-radius: 50%;\n  background: #2f9d5b;\n}\n/* いま話している人を大きく */\n.is-active {\n  scale: 1.25;\n  background: #fff3c4;\n}\n.avatar.is-active {\n  position: relative;\n  z-index: 2;\n}\n",
+    messages: [],
+    elements: { team: { rect: [0, 0, 596, 80], computed: {"scale":"none"} }, a1: { rect: [16, 16, 48, 48], computed: {"scale":"none"} }, a2: { rect: [46, 10, 60, 60], computed: {"scale":"1.25"} }, a3: { rect: [88, 16, 48, 48], computed: {"scale":"none"} }, a4: { rect: [124, 16, 48, 48], computed: {"scale":"none"} } },
+    hits: [{"at":"a2","fx":0.9,"fy":0.5,"top":"a2"}],
+  },
+  {
+    lesson: "scale-stacking",
+    name: "scale removed",
+    css: ".team {\n  display: flex;\n  padding: 16px;\n}\n/* 少しずつ重ねたアバター */\n.avatar {\n  position: relative;\n  display: grid;\n  place-items: center;\n  width: 48px;\n  height: 48px;\n  margin-left: -12px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #dbe4fb;\n  color: #18203a;\n  font-size: 14px;\n  font-weight: 700;\n}\n.avatar:first-child {\n  margin-left: 0;\n}\n/* オンラインの印 */\n.dot {\n  position: absolute;\n  right: -2px;\n  bottom: -2px;\n  width: 12px;\n  height: 12px;\n  border: 2px solid #fff;\n  border-radius: 50%;\n  background: #2f9d5b;\n}\n/* いま話している人を大きく */\n.is-active {\n  scale: 1.25;\n  background: #fff3c4;\n}\n.is-active {\n  scale: none;\n}\n",
+    messages: ["KM のアバターの右側が、次のアバターの下に隠れています（大きくしても重なり順は変わりません。KM のアバターに z-index を）"],
+    elements: { team: { rect: [0, 0, 596, 80], computed: {"scale":"none"} }, a1: { rect: [16, 16, 48, 48], computed: {"scale":"none"} }, a2: { rect: [52, 16, 48, 48], computed: {"scale":"none"} }, a3: { rect: [88, 16, 48, 48], computed: {"scale":"none"} }, a4: { rect: [124, 16, 48, 48], computed: {"scale":"none"} } },
+    hits: [{"at":"a2","fx":0.9,"fy":0.5,"top":"a3"}],
+  },
+  {
+    lesson: "scale-stacking",
+    name: "z-index on every avatar",
+    css: ".team {\n  display: flex;\n  padding: 16px;\n}\n/* 少しずつ重ねたアバター */\n.avatar {\n  position: relative;\n  display: grid;\n  place-items: center;\n  width: 48px;\n  height: 48px;\n  margin-left: -12px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #dbe4fb;\n  color: #18203a;\n  font-size: 14px;\n  font-weight: 700;\n}\n.avatar:first-child {\n  margin-left: 0;\n}\n/* オンラインの印 */\n.dot {\n  position: absolute;\n  right: -2px;\n  bottom: -2px;\n  width: 12px;\n  height: 12px;\n  border: 2px solid #fff;\n  border-radius: 50%;\n  background: #2f9d5b;\n}\n/* いま話している人を大きく */\n.is-active {\n  scale: 1.25;\n  background: #fff3c4;\n}\n.avatar {\n  z-index: 1;\n}\n",
+    messages: ["KM のアバターの右側が、次のアバターの下に隠れています（大きくしても重なり順は変わりません。KM のアバターに z-index を）"],
+    elements: { team: { rect: [0, 0, 596, 80], computed: {"scale":"none"} }, a1: { rect: [16, 16, 48, 48], computed: {"scale":"none"} }, a2: { rect: [46, 10, 60, 60], computed: {"scale":"1.25"} }, a3: { rect: [88, 16, 48, 48], computed: {"scale":"none"} }, a4: { rect: [124, 16, 48, 48], computed: {"scale":"none"} } },
+    hits: [{"at":"a2","fx":0.9,"fy":0.5,"top":"a3"}],
+  },
+  {
+    lesson: "opacity-stacking",
+    name: "starter",
+    messages: ["吹き出しが、下の商品の下に隠れています（opacity: 0.55 の箱が重ね合わせコンテキストを作るので、吹き出しの z-index: 10 は箱の中でしか比べられません）"],
+    elements: { sold: { rect: [0, 0, 280, 81.39], computed: {"opacity":"0.55"} }, name: { rect: [12, 12, 256, 22.39], computed: {"opacity":"1"} }, tip: { rect: [12, 73.39, 253.48, 30.19], computed: {"opacity":"1"} }, next: { rect: [0, 93.39, 280, 81.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"tip","fx":0.5,"fy":0.7,"top":"next"}],
+  },
+  {
+    lesson: "opacity-stacking",
+    name: "solution",
+    messages: [],
+    elements: { sold: { rect: [0, 0, 280, 81.39], computed: {"opacity":"1"} }, name: { rect: [12, 12, 256, 22.39], computed: {"opacity":"0.55"} }, tip: { rect: [12, 73.39, 253.48, 30.19], computed: {"opacity":"1"} }, next: { rect: [0, 93.39, 280, 81.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"tip","fx":0.5,"fy":0.7,"top":"tip"}],
+  },
+  {
+    lesson: "opacity-stacking",
+    name: "the dim item raised",
+    css: ".list {\n  display: grid;\n  gap: 12px;\n  width: 280px;\n}\n.item {\n  position: relative;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.item p {\n  margin: 0 0 8px;\n}\n/* 売り切れの商品は薄く */\n.sold {\n  opacity: 0.55;\n}\n/* 売り切れの商品の吹き出し */\n.tip {\n  position: absolute;\n  z-index: 10;\n  top: calc(100% - 8px);\n  left: 12px;\n  padding: 6px 10px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n  font-size: 13px;\n}\n.sold {\n  z-index: 1;\n}\n",
+    messages: [],
+    elements: { sold: { rect: [0, 0, 280, 81.39], computed: {"opacity":"0.55"} }, name: { rect: [12, 12, 256, 22.39], computed: {"opacity":"1"} }, tip: { rect: [12, 73.39, 253.48, 30.19], computed: {"opacity":"1"} }, next: { rect: [0, 93.39, 280, 81.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"tip","fx":0.5,"fy":0.7,"top":"tip"}],
+  },
+  {
+    lesson: "opacity-stacking",
+    name: "tip z-index 999",
+    css: ".list {\n  display: grid;\n  gap: 12px;\n  width: 280px;\n}\n.item {\n  position: relative;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.item p {\n  margin: 0 0 8px;\n}\n/* 売り切れの商品は薄く */\n.sold {\n  opacity: 0.55;\n}\n/* 売り切れの商品の吹き出し */\n.tip {\n  position: absolute;\n  z-index: 999;\n  top: calc(100% - 8px);\n  left: 12px;\n  padding: 6px 10px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n  font-size: 13px;\n}\n",
+    messages: ["吹き出しが、下の商品の下に隠れています（opacity: 0.55 の箱が重ね合わせコンテキストを作るので、吹き出しの z-index: 10 は箱の中でしか比べられません）"],
+    elements: { sold: { rect: [0, 0, 280, 81.39], computed: {"opacity":"0.55"} }, name: { rect: [12, 12, 256, 22.39], computed: {"opacity":"1"} }, tip: { rect: [12, 73.39, 253.48, 30.19], computed: {"opacity":"1"} }, next: { rect: [0, 93.39, 280, 81.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"tip","fx":0.5,"fy":0.7,"top":"next"}],
+  },
+  {
+    lesson: "opacity-stacking",
+    name: "dimming removed",
+    css: ".list {\n  display: grid;\n  gap: 12px;\n  width: 280px;\n}\n.item {\n  position: relative;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.item p {\n  margin: 0 0 8px;\n}\n/* 売り切れの商品は薄く */\n.sold {\n  opacity: 0.55;\n}\n/* 売り切れの商品の吹き出し */\n.tip {\n  position: absolute;\n  z-index: 10;\n  top: calc(100% - 8px);\n  left: 12px;\n  padding: 6px 10px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n  font-size: 13px;\n}\n.sold {\n  opacity: 1;\n}\n",
+    messages: ["売り切れの商品が薄くなくなっています（箱か、中の文字を opacity で薄くしたままにします）"],
+    elements: { sold: { rect: [0, 0, 280, 81.39], computed: {"opacity":"1"} }, name: { rect: [12, 12, 256, 22.39], computed: {"opacity":"1"} }, tip: { rect: [12, 73.39, 253.48, 30.19], computed: {"opacity":"1"} }, next: { rect: [0, 93.39, 280, 81.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"tip","fx":0.5,"fy":0.7,"top":"tip"}],
+  },
+  {
+    lesson: "opacity-zero-click",
+    name: "starter",
+    messages: ["「申し込む」ボタンを押すと、透明なメニューが反応してしまいます（opacity: 0 の要素も押せます。閉じたメニューに visibility: hidden を）"],
+    elements: { menu: { rect: [434, 48.39, 150, 113.17], computed: {"opacity":"0"} }, card: { rect: [0, 60.39, 596, 70.39], computed: {"opacity":"1"} }, buy: { rect: [484, 76.39, 96, 38.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"buy","fx":0.5,"fy":0.5,"top":"menu"},{"at":"card","fx":0.9,"fy":0.12,"top":"menu"}],
+  },
+  {
+    lesson: "opacity-zero-click",
+    name: "solution",
+    messages: [],
+    elements: { menu: { rect: [434, 48.39, 150, 113.17], computed: {"opacity":"0"} }, card: { rect: [0, 60.39, 596, 70.39], computed: {"opacity":"1"} }, buy: { rect: [484, 76.39, 96, 38.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"buy","fx":0.5,"fy":0.5,"top":"buy"},{"at":"card","fx":0.9,"fy":0.12,"top":"card"}],
+  },
+  {
+    lesson: "opacity-zero-click",
+    name: "pointer-events: none",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n.toggle {\n  padding: 4px 10px;\n  border: 1px solid #fff;\n  border-radius: 6px;\n  background: none;\n  color: inherit;\n  font: inherit;\n}\n/* 閉じているメニュー（開くと opacity: 1 でふわっと出す） */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n  opacity: 0;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.toggle[aria-expanded=\"true\"] + .menu {\n  opacity: 1;\n}\n.card {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-top: 12px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card p {\n  margin: 0;\n}\n.buy {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.menu {\n  pointer-events: none;\n}\n",
+    messages: [],
+    elements: { menu: { rect: [434, 48.39, 150, 113.17], computed: {"opacity":"0"} }, card: { rect: [0, 60.39, 596, 70.39], computed: {"opacity":"1"} }, buy: { rect: [484, 76.39, 96, 38.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"buy","fx":0.5,"fy":0.5,"top":"buy"},{"at":"card","fx":0.9,"fy":0.12,"top":"card"}],
+  },
+  {
+    lesson: "opacity-zero-click",
+    name: "display: none",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n.toggle {\n  padding: 4px 10px;\n  border: 1px solid #fff;\n  border-radius: 6px;\n  background: none;\n  color: inherit;\n  font: inherit;\n}\n/* 閉じているメニュー（開くと opacity: 1 でふわっと出す） */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n  opacity: 0;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.toggle[aria-expanded=\"true\"] + .menu {\n  opacity: 1;\n}\n.card {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-top: 12px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card p {\n  margin: 0;\n}\n.buy {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.menu {\n  display: none;\n}\n",
+    messages: [],
+    elements: { menu: { rect: [0, 0, 0, 0], computed: {"opacity":"0"} }, card: { rect: [0, 60.39, 596, 70.39], computed: {"opacity":"1"} }, buy: { rect: [484, 76.39, 96, 38.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"buy","fx":0.5,"fy":0.5,"top":"buy"},{"at":"card","fx":0.9,"fy":0.12,"top":"card"}],
+  },
+  {
+    lesson: "opacity-zero-click",
+    name: "button raised instead",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n.toggle {\n  padding: 4px 10px;\n  border: 1px solid #fff;\n  border-radius: 6px;\n  background: none;\n  color: inherit;\n  font: inherit;\n}\n/* 閉じているメニュー（開くと opacity: 1 でふわっと出す） */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n  opacity: 0;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.toggle[aria-expanded=\"true\"] + .menu {\n  opacity: 1;\n}\n.card {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-top: 12px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card p {\n  margin: 0;\n}\n.buy {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.buy {\n  position: relative;\n  z-index: 1;\n}\n",
+    messages: ["閉じたメニューが重なっている部分を押すと、透明なメニューが反応してしまいます（ボタンだけを前に出すのではなく、閉じたメニューが押されないようにします）"],
+    elements: { menu: { rect: [434, 48.39, 150, 113.17], computed: {"opacity":"0"} }, card: { rect: [0, 60.39, 596, 70.39], computed: {"opacity":"1"} }, buy: { rect: [484, 76.39, 96, 38.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"buy","fx":0.5,"fy":0.5,"top":"buy"},{"at":"card","fx":0.9,"fy":0.12,"top":"menu"}],
+  },
+  {
+    lesson: "opacity-zero-click",
+    name: "visibility but opacity back to 1",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n.toggle {\n  padding: 4px 10px;\n  border: 1px solid #fff;\n  border-radius: 6px;\n  background: none;\n  color: inherit;\n  font: inherit;\n}\n/* 閉じているメニュー（開くと opacity: 1 でふわっと出す） */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n  opacity: 0;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.toggle[aria-expanded=\"true\"] + .menu {\n  opacity: 1;\n}\n.card {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-top: 12px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card p {\n  margin: 0;\n}\n.buy {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.menu {\n  visibility: hidden;\n  opacity: 1;\n}\n",
+    messages: ["閉じたメニューの opacity が 0 ではなくなっています（opacity: 0 は残して、押されないようにだけします）"],
+    elements: { menu: { rect: [434, 48.39, 150, 113.17], computed: {"opacity":"1"} }, card: { rect: [0, 60.39, 596, 70.39], computed: {"opacity":"1"} }, buy: { rect: [484, 76.39, 96, 38.39], computed: {"opacity":"1"} } },
+    hits: [{"at":"buy","fx":0.5,"fy":0.5,"top":"buy"},{"at":"card","fx":0.9,"fy":0.12,"top":"card"}],
+  },
+  {
+    lesson: "block-links",
+    name: "starter",
+    messages: ["行の右側を押しても、リンクが反応しません（リンクを display: block にして、行の幅いっぱいに広げます）"],
+    elements: { row1: { rect: [1, 1, 238, 43.39] }, l1: { rect: [13, 13, 47.2, 18] }, row2: { rect: [1, 44.39, 238, 43.39] }, l2: { rect: [13, 56.39, 80, 18] }, row3: { rect: [1, 87.78, 238, 42.39] }, l3: { rect: [13, 99.78, 96, 18] } },
+    hits: [{"at":"row2","fx":0.85,"fy":0.5,"top":"row2"},{"at":"row2","fx":0.03,"fy":0.15,"top":"row2"}],
+  },
+  {
+    lesson: "block-links",
+    name: "solution",
+    messages: [],
+    elements: { row1: { rect: [1, 1, 238, 43.39] }, l1: { rect: [1, 1, 238, 42.39] }, row2: { rect: [1, 44.39, 238, 43.39] }, l2: { rect: [1, 44.39, 238, 42.39] }, row3: { rect: [1, 87.78, 238, 42.39] }, l3: { rect: [1, 87.78, 238, 42.39] } },
+    hits: [{"at":"row2","fx":0.85,"fy":0.5,"top":"l2"},{"at":"row2","fx":0.03,"fy":0.15,"top":"l2"}],
+  },
+  {
+    lesson: "block-links",
+    name: "padding-block and padding-inline",
+    css: ".nav {\n  width: 240px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.nav li {\n  border-bottom: 1px solid #e3e8f4;\n}\n.nav li:last-child {\n  border-bottom: 0;\n}\n.nav a {\n  display: block;\n  padding-block: 10px;\n  padding-inline: 12px;\n  color: #18203a;\n  text-decoration: none;\n}\n",
+    messages: [],
+    elements: { row1: { rect: [1, 1, 238, 43.39] }, l1: { rect: [1, 1, 238, 42.39] }, row2: { rect: [1, 44.39, 238, 43.39] }, l2: { rect: [1, 44.39, 238, 42.39] }, row3: { rect: [1, 87.78, 238, 42.39] }, l3: { rect: [1, 87.78, 238, 42.39] } },
+    hits: [{"at":"row2","fx":0.85,"fy":0.5,"top":"l2"},{"at":"row2","fx":0.03,"fy":0.15,"top":"l2"}],
+  },
+  {
+    lesson: "block-links",
+    name: "block link, padding kept on the row",
+    css: ".nav {\n  width: 240px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.nav li {\n  padding: 10px 12px;\n  border-bottom: 1px solid #e3e8f4;\n}\n.nav li:last-child {\n  border-bottom: 0;\n}\n.nav a {\n  color: #18203a;\n  text-decoration: none;\n}\n.nav a {\n  display: block;\n}\n",
+    messages: ["行の端の余白を押しても、リンクが反応しません（余白を li からリンクの padding に移します）"],
+    elements: { row1: { rect: [1, 1, 238, 43.39] }, l1: { rect: [13, 11, 214, 22.39] }, row2: { rect: [1, 44.39, 238, 43.39] }, l2: { rect: [13, 54.39, 214, 22.39] }, row3: { rect: [1, 87.78, 238, 42.39] }, l3: { rect: [13, 97.78, 214, 22.39] } },
+    hits: [{"at":"row2","fx":0.85,"fy":0.5,"top":"l2"},{"at":"row2","fx":0.03,"fy":0.15,"top":"row2"}],
+  },
+  {
+    lesson: "block-links",
+    name: "padding moved, link still inline",
+    css: ".nav {\n  width: 240px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.nav li {\n  border-bottom: 1px solid #e3e8f4;\n}\n.nav li:last-child {\n  border-bottom: 0;\n}\n.nav a {\n  padding: 10px 12px;\n  color: #18203a;\n  text-decoration: none;\n}\n",
+    messages: ["行の右側を押しても、リンクが反応しません（リンクを display: block にして、行の幅いっぱいに広げます）"],
+    elements: { row1: { rect: [1, 1, 238, 23.39] }, l1: { rect: [1, -7, 71.2, 38] }, row2: { rect: [1, 24.39, 238, 23.39] }, l2: { rect: [1, 16.39, 104, 38] }, row3: { rect: [1, 47.78, 238, 22.39] }, l3: { rect: [1, 39.78, 120, 38] } },
+    hits: [{"at":"row2","fx":0.85,"fy":0.5,"top":"row2"},{"at":"row2","fx":0.03,"fy":0.15,"top":"l2"}],
+  },
+  {
+    lesson: "button-over-link",
+    name: "starter",
+    messages: ["保存ボタンを押すと、記事へのリンクが反応してしまいます（ボタンに position: relative と z-index: 1 を指定して、広げたリンクより手前に出します）"],
+    elements: { card: { rect: [0, 0, 280, 241.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, fav: { rect: [17, 188.97, 36, 36] } },
+    hits: [{"at":"fav","fx":0.5,"fy":0.5,"top":"link"},{"at":"photo","fx":0.5,"fy":0.5,"top":"link"}],
+  },
+  {
+    lesson: "button-over-link",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 241.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, fav: { rect: [17, 188.97, 36, 36] } },
+    hits: [{"at":"fav","fx":0.5,"fy":0.5,"top":"fav"},{"at":"photo","fx":0.5,"fy":0.5,"top":"link"}],
+  },
+  {
+    lesson: "button-over-link",
+    name: "z-index: 2",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n/* カード全体を記事へのリンクに */\n.card a::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n}\n/* 保存ボタン */\n.fav {\n  margin-top: 8px;\n  width: 36px;\n  height: 36px;\n  border: 1px solid #c5cde0;\n  border-radius: 50%;\n  background: #fff;\n  font: inherit;\n  position: relative;\n  z-index: 2;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 241.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, fav: { rect: [17, 188.97, 36, 36] } },
+    hits: [{"at":"fav","fx":0.5,"fy":0.5,"top":"fav"},{"at":"photo","fx":0.5,"fy":0.5,"top":"link"}],
+  },
+  {
+    lesson: "button-over-link",
+    name: "z-index without position",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n/* カード全体を記事へのリンクに */\n.card a::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n}\n/* 保存ボタン */\n.fav {\n  margin-top: 8px;\n  width: 36px;\n  height: 36px;\n  border: 1px solid #c5cde0;\n  border-radius: 50%;\n  background: #fff;\n  font: inherit;\n}\n.fav {\n  z-index: 1;\n}\n",
+    messages: ["保存ボタンを押すと、記事へのリンクが反応してしまいます（ボタンに position: relative と z-index: 1 を指定して、広げたリンクより手前に出します）"],
+    elements: { card: { rect: [0, 0, 280, 241.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, fav: { rect: [17, 188.97, 36, 36] } },
+    hits: [{"at":"fav","fx":0.5,"fy":0.5,"top":"link"},{"at":"photo","fx":0.5,"fy":0.5,"top":"link"}],
+  },
+  {
+    lesson: "button-over-link",
+    name: "stretched link removed",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n/* カード全体を記事へのリンクに */\n.card a::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n}\n/* 保存ボタン */\n.fav {\n  margin-top: 8px;\n  width: 36px;\n  height: 36px;\n  border: 1px solid #c5cde0;\n  border-radius: 50%;\n  background: #fff;\n  font: inherit;\n}\n.card a::after {\n  content: none;\n}\n",
+    messages: ["写真を押しても、記事へのリンクが反応しなくなっています（::after でカード全体に広げたリンクは残します）"],
+    elements: { card: { rect: [0, 0, 280, 241.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, fav: { rect: [17, 188.97, 36, 36] } },
+    hits: [{"at":"fav","fx":0.5,"fy":0.5,"top":"fav"},{"at":"photo","fx":0.5,"fy":0.5,"top":"photo"}],
+  },
+  {
+    lesson: "inline-link-padding",
+    name: "starter",
+    messages: ["リンクの文字のすぐ上や下を押しても、リンクが反応しません（リンクに上下の padding を付けます）"],
+    elements: { para: { rect: [0, 0, 280, 28] }, link: { rect: [0, 5, 64, 18] }, next: { rect: [0, 28, 280, 56] } },
+    hits: [{"at":"para","fx":0.05,"fy":0.07,"top":"para"},{"at":"para","fx":0.05,"fy":0.93,"top":"para"}],
+  },
+  {
+    lesson: "inline-link-padding",
+    name: "solution",
+    messages: [],
+    elements: { para: { rect: [0, 0, 280, 28] }, link: { rect: [0, -1, 64, 30] }, next: { rect: [0, 28, 280, 56] } },
+    hits: [{"at":"para","fx":0.05,"fy":0.07,"top":"link"},{"at":"para","fx":0.05,"fy":0.93,"top":"link"}],
+  },
+  {
+    lesson: "inline-link-padding",
+    name: "padding: 6px 0",
+    css: ".para {\n  width: 280px;\n  margin: 0;\n  line-height: 28px;\n}\n.para a {\n  color: #2f5fd0;\n}\n.para a {\n  padding: 6px 0;\n}\n",
+    messages: [],
+    elements: { para: { rect: [0, 0, 280, 28] }, link: { rect: [0, -1, 64, 30] }, next: { rect: [0, 28, 280, 56] } },
+    hits: [{"at":"para","fx":0.05,"fy":0.07,"top":"link"},{"at":"para","fx":0.05,"fy":0.93,"top":"link"}],
+  },
+  {
+    lesson: "inline-link-padding",
+    name: "inline-block",
+    css: ".para {\n  width: 280px;\n  margin: 0;\n  line-height: 28px;\n}\n.para a {\n  color: #2f5fd0;\n}\n.para a {\n  display: inline-block;\n  padding-block: 6px;\n}\n",
+    messages: ["行の高さが 28px から変わっています（display はインラインのまま、上下の padding だけを付けます）"],
+    elements: { para: { rect: [0, 0, 280, 40] }, link: { rect: [0, 0, 64, 40] }, next: { rect: [0, 40, 280, 56] } },
+    hits: [{"at":"para","fx":0.05,"fy":0.07,"top":"link"},{"at":"para","fx":0.05,"fy":0.93,"top":"link"}],
+  },
+  {
+    lesson: "inline-link-padding",
+    name: "taller lines",
+    css: ".para {\n  width: 280px;\n  margin: 0;\n  line-height: 28px;\n}\n.para a {\n  color: #2f5fd0;\n}\n.para {\n  line-height: 40px;\n}\n",
+    messages: ["リンクの文字のすぐ上や下を押しても、リンクが反応しません（リンクに上下の padding を付けます）"],
+    elements: { para: { rect: [0, 0, 280, 40] }, link: { rect: [0, 11, 64, 18] }, next: { rect: [0, 40, 280, 80] } },
+    hits: [{"at":"para","fx":0.05,"fy":0.07,"top":"para"},{"at":"para","fx":0.05,"fy":0.93,"top":"para"}],
+  },
+  {
+    lesson: "inline-link-padding",
+    name: "padding 1px",
+    css: ".para {\n  width: 280px;\n  margin: 0;\n  line-height: 28px;\n}\n.para a {\n  color: #2f5fd0;\n}\n.para a {\n  padding-block: 1px;\n}\n",
+    messages: ["リンクの文字のすぐ上や下を押しても、リンクが反応しません（リンクに上下の padding を付けます）"],
+    elements: { para: { rect: [0, 0, 280, 28] }, link: { rect: [0, 4, 64, 20] }, next: { rect: [0, 28, 280, 56] } },
+    hits: [{"at":"para","fx":0.05,"fy":0.07,"top":"para"},{"at":"para","fx":0.05,"fy":0.93,"top":"para"}],
+  },
+  {
+    lesson: "aria-current",
+    name: "starter",
+    messages: ["いまのページ（特集）に、下線と太字の印が付いていません（HTML にはクラスがなく、aria-current=\"page\" だけが付いています）"],
+    elements: { t1: { rect: [0, 0, 70.89, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} }, t2: { rect: [74.89, 0, 56, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} }, t3: { rect: [134.89, 0, 88, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} } },
+  },
+  {
+    lesson: "aria-current",
+    name: "solution",
+    messages: [],
+    elements: { t1: { rect: [0, 0, 70.89, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} }, t2: { rect: [74.89, 0, 56, 41.39], computed: {"border-bottom-color":"rgb(47, 95, 208)","font-weight":"700"} }, t3: { rect: [134.89, 0, 88, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} } },
+  },
+  {
+    lesson: "aria-current",
+    name: "[aria-current] alone",
+    css: ".tabs {\n  display: flex;\n  gap: 4px;\n  border-bottom: 1px solid #c5cde0;\n}\n.tabs a {\n  padding: 8px 12px;\n  border-bottom: 3px solid transparent;\n  color: #5c6680;\n  text-decoration: none;\n}\n/* いま開いているページ */\n.tabs [aria-current] {\n  border-bottom-color: #2f5fd0;\n  color: #18203a;\n  font-weight: 700;\n}\n",
+    messages: [],
+    elements: { t1: { rect: [0, 0, 70.89, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} }, t2: { rect: [74.89, 0, 56, 41.39], computed: {"border-bottom-color":"rgb(47, 95, 208)","font-weight":"700"} }, t3: { rect: [134.89, 0, 88, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} } },
+  },
+  {
+    lesson: "aria-current",
+    name: ":nth-child(2)",
+    css: ".tabs {\n  display: flex;\n  gap: 4px;\n  border-bottom: 1px solid #c5cde0;\n}\n.tabs a {\n  padding: 8px 12px;\n  border-bottom: 3px solid transparent;\n  color: #5c6680;\n  text-decoration: none;\n}\n/* いま開いているページ */\n.tabs a:nth-child(2) {\n  border-bottom-color: #2f5fd0;\n  color: #18203a;\n  font-weight: 700;\n}\n",
+    messages: ["何番目かやクラスではなく、[aria-current=\"page\"] で選びましょう（見た目と読み上げが同じ属性からそろいます）"],
+    elements: { t1: { rect: [0, 0, 70.89, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} }, t2: { rect: [74.89, 0, 56, 41.39], computed: {"border-bottom-color":"rgb(47, 95, 208)","font-weight":"700"} }, t3: { rect: [134.89, 0, 88, 41.39], computed: {"border-bottom-color":"rgba(0, 0, 0, 0)","font-weight":"400"} } },
+  },
+  {
+    lesson: "aria-current",
+    name: "every link",
+    css: ".tabs {\n  display: flex;\n  gap: 4px;\n  border-bottom: 1px solid #c5cde0;\n}\n.tabs a {\n  padding: 8px 12px;\n  border-bottom: 3px solid transparent;\n  color: #5c6680;\n  text-decoration: none;\n}\n/* いま開いているページ */\n.tabs a {\n  border-bottom-color: #2f5fd0;\n  color: #18203a;\n  font-weight: 700;\n}\n",
+    messages: ["ほかのリンクにも印が付いています（いまのページだけに付けます）"],
+    elements: { t1: { rect: [0, 0, 70.89, 41.39], computed: {"border-bottom-color":"rgb(47, 95, 208)","font-weight":"700"} }, t2: { rect: [74.89, 0, 56, 41.39], computed: {"border-bottom-color":"rgb(47, 95, 208)","font-weight":"700"} }, t3: { rect: [134.89, 0, 88, 41.39], computed: {"border-bottom-color":"rgb(47, 95, 208)","font-weight":"700"} } },
+  },
+  {
+    lesson: "aria-expanded",
+    name: "starter",
+    messages: ["閉じている質問（aria-expanded=\"false\"）の答えが、場所を取ったまま残っています（.q[aria-expanded=\"false\"] + .a を display: none で隠します）"],
+    elements: { q1: { rect: [1, 1, 278, 42.39], computed: {"rotate":"none","transform":"none"} }, c1: { rect: [259.77, 11, 7.23, 22.39], computed: {"rotate":"none","transform":"none"} }, a1: { rect: [1, 43.39, 278, 32.39], computed: {"rotate":"none","transform":"none"} }, q2: { rect: [1, 75.78, 278, 43.39], computed: {"rotate":"none","transform":"none"} }, c2: { rect: [259.77, 86.78, 7.23, 22.39], computed: {"rotate":"none","transform":"none"} }, a2: { rect: [1, 119.17, 278, 54.78], computed: {"rotate":"none","transform":"none"} } },
+  },
+  {
+    lesson: "aria-expanded",
+    name: "solution",
+    messages: [],
+    elements: { q1: { rect: [1, 1, 278, 42.39], computed: {"rotate":"none","transform":"none"} }, c1: { rect: [259.77, 11, 7.23, 22.39], computed: {"rotate":"180deg","transform":"none"} }, a1: { rect: [1, 43.39, 278, 32.39], computed: {"rotate":"none","transform":"none"} }, q2: { rect: [1, 75.78, 278, 43.39], computed: {"rotate":"none","transform":"none"} }, c2: { rect: [259.77, 86.78, 7.23, 22.39], computed: {"rotate":"none","transform":"none"} }, a2: { rect: [0, 0, 0, 0], computed: {"rotate":"none","transform":"none"} } },
+  },
+  {
+    lesson: "aria-expanded",
+    name: "transform: rotate()",
+    css: ".faq {\n  width: 280px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.q {\n  display: flex;\n  justify-content: space-between;\n  width: 100%;\n  padding: 10px 12px;\n  border: 0;\n  border-top: 1px solid #e3e8f4;\n  background: none;\n  font: inherit;\n  text-align: left;\n}\n.q:first-child {\n  border-top: 0;\n}\n.chev {\n  display: inline-block;\n}\n.a {\n  padding: 0 12px 10px;\n  color: #3d4766;\n}\n/* 閉じている答えは隠す */\n.q[aria-expanded=\"false\"] + .a {\n  display: none;\n}\n/* 開いている質問の矢印は上向きに */\n.q[aria-expanded=\"true\"] .chev {\n  transform: rotate(180deg);\n}\n",
+    messages: [],
+    elements: { q1: { rect: [1, 1, 278, 42.39], computed: {"rotate":"none","transform":"none"} }, c1: { rect: [259.77, 11, 7.23, 22.39], computed: {"rotate":"none","transform":"matrix(-1, 0, 0, -1, 0, 0)"} }, a1: { rect: [1, 43.39, 278, 32.39], computed: {"rotate":"none","transform":"none"} }, q2: { rect: [1, 75.78, 278, 43.39], computed: {"rotate":"none","transform":"none"} }, c2: { rect: [259.77, 86.78, 7.23, 22.39], computed: {"rotate":"none","transform":"none"} }, a2: { rect: [0, 0, 0, 0], computed: {"rotate":"none","transform":"none"} } },
+  },
+  {
+    lesson: "aria-expanded",
+    name: "collapsed with height 0",
+    css: ".faq {\n  width: 280px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.q {\n  display: flex;\n  justify-content: space-between;\n  width: 100%;\n  padding: 10px 12px;\n  border: 0;\n  border-top: 1px solid #e3e8f4;\n  background: none;\n  font: inherit;\n  text-align: left;\n}\n.q:first-child {\n  border-top: 0;\n}\n.chev {\n  display: inline-block;\n}\n.a {\n  padding: 0 12px 10px;\n  color: #3d4766;\n}\n/* 閉じている答えは隠す */\n.q[aria-expanded=\"false\"] + .a {\n  height: 0;\n  padding: 0;\n  overflow: hidden;\n}\n/* 開いている質問の矢印は上向きに */\n.q[aria-expanded=\"true\"] .chev {\n  rotate: 180deg;\n}\n",
+    messages: [],
+    elements: { q1: { rect: [1, 1, 278, 42.39], computed: {"rotate":"none","transform":"none"} }, c1: { rect: [259.77, 11, 7.23, 22.39], computed: {"rotate":"180deg","transform":"none"} }, a1: { rect: [1, 43.39, 278, 32.39], computed: {"rotate":"none","transform":"none"} }, q2: { rect: [1, 75.78, 278, 43.39], computed: {"rotate":"none","transform":"none"} }, c2: { rect: [259.77, 86.78, 7.23, 22.39], computed: {"rotate":"none","transform":"none"} }, a2: { rect: [1, 119.17, 278, 0], computed: {"rotate":"none","transform":"none"} } },
+  },
+  {
+    lesson: "aria-expanded",
+    name: "visibility: hidden",
+    css: ".faq {\n  width: 280px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.q {\n  display: flex;\n  justify-content: space-between;\n  width: 100%;\n  padding: 10px 12px;\n  border: 0;\n  border-top: 1px solid #e3e8f4;\n  background: none;\n  font: inherit;\n  text-align: left;\n}\n.q:first-child {\n  border-top: 0;\n}\n.chev {\n  display: inline-block;\n}\n.a {\n  padding: 0 12px 10px;\n  color: #3d4766;\n}\n/* 閉じている答えは隠す */\n.q[aria-expanded=\"false\"] + .a {\n  visibility: hidden;\n}\n/* 開いている質問の矢印は上向きに */\n.q[aria-expanded=\"true\"] .chev {\n  rotate: 180deg;\n}\n",
+    messages: ["閉じている質問（aria-expanded=\"false\"）の答えが、場所を取ったまま残っています（.q[aria-expanded=\"false\"] + .a を display: none で隠します）"],
+    elements: { q1: { rect: [1, 1, 278, 42.39], computed: {"rotate":"none","transform":"none"} }, c1: { rect: [259.77, 11, 7.23, 22.39], computed: {"rotate":"180deg","transform":"none"} }, a1: { rect: [1, 43.39, 278, 32.39], computed: {"rotate":"none","transform":"none"} }, q2: { rect: [1, 75.78, 278, 43.39], computed: {"rotate":"none","transform":"none"} }, c2: { rect: [259.77, 86.78, 7.23, 22.39], computed: {"rotate":"none","transform":"none"} }, a2: { rect: [1, 119.17, 278, 54.78], computed: {"rotate":"none","transform":"none"} } },
+  },
+  {
+    lesson: "aria-expanded",
+    name: "every arrow turned",
+    css: ".faq {\n  width: 280px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.q {\n  display: flex;\n  justify-content: space-between;\n  width: 100%;\n  padding: 10px 12px;\n  border: 0;\n  border-top: 1px solid #e3e8f4;\n  background: none;\n  font: inherit;\n  text-align: left;\n}\n.q:first-child {\n  border-top: 0;\n}\n.chev {\n  display: inline-block;\n}\n.a {\n  padding: 0 12px 10px;\n  color: #3d4766;\n}\n/* 閉じている答えは隠す */\n.q[aria-expanded=\"false\"] + .a {\n  display: none;\n}\n/* 開いている質問の矢印は上向きに */\n.chev {\n  rotate: 180deg;\n}\n",
+    messages: ["閉じている質問の矢印まで回っています（開いている質問の矢印だけを回します）"],
+    elements: { q1: { rect: [1, 1, 278, 42.39], computed: {"rotate":"none","transform":"none"} }, c1: { rect: [259.77, 11, 7.23, 22.39], computed: {"rotate":"180deg","transform":"none"} }, a1: { rect: [1, 43.39, 278, 32.39], computed: {"rotate":"none","transform":"none"} }, q2: { rect: [1, 75.78, 278, 43.39], computed: {"rotate":"none","transform":"none"} }, c2: { rect: [259.77, 86.78, 7.23, 22.39], computed: {"rotate":"180deg","transform":"none"} }, a2: { rect: [0, 0, 0, 0], computed: {"rotate":"none","transform":"none"} } },
+  },
+  {
+    lesson: "aria-pressed",
+    name: "starter",
+    messages: ["押されている「写真のみ」が、塗りつぶされていません（[aria-pressed=\"true\"] で選び、背景を青、文字を白に）"],
+    elements: { b1: { rect: [0, 0, 94, 36.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(47, 95, 208)"} }, b2: { rect: [102, 0, 94, 36.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(47, 95, 208)"} }, b3: { rect: [204, 0, 93.38, 36.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "aria-pressed",
+    name: "solution",
+    messages: [],
+    elements: { b1: { rect: [0, 0, 94, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} }, b2: { rect: [102, 0, 94, 36.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(47, 95, 208)"} }, b3: { rect: [204, 0, 93.38, 36.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "aria-pressed",
+    name: "button[aria-pressed=true]",
+    css: ".toggles {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.toggle {\n  padding: 6px 14px;\n  border: 1px solid #2f5fd0;\n  border-radius: 999px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\nbutton[aria-pressed=\"true\"] {\n  border-color: #2f5fd0;\n  background: #2f5fd0;\n  color: #fff;\n}\n",
+    messages: [],
+    elements: { b1: { rect: [0, 0, 94, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} }, b2: { rect: [102, 0, 94, 36.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(47, 95, 208)"} }, b3: { rect: [204, 0, 93.38, 36.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "aria-pressed",
+    name: "every toggle filled",
+    css: ".toggles {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.toggle {\n  padding: 6px 14px;\n  border: 1px solid #2f5fd0;\n  border-radius: 999px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n.toggle {\n  background: #2f5fd0;\n  color: #fff;\n}\n",
+    messages: ["押されていないボタンまで塗りつぶされています（aria-pressed=\"true\" のボタンだけを選びます）"],
+    elements: { b1: { rect: [0, 0, 94, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} }, b2: { rect: [102, 0, 94, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} }, b3: { rect: [204, 0, 93.38, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "aria-pressed",
+    name: "[aria-pressed] of any value",
+    css: ".toggles {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.toggle {\n  padding: 6px 14px;\n  border: 1px solid #2f5fd0;\n  border-radius: 999px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n.toggle[aria-pressed] {\n  background: #2f5fd0;\n  color: #fff;\n}\n",
+    messages: ["押されていないボタンまで塗りつぶされています（aria-pressed=\"true\" のボタンだけを選びます）"],
+    elements: { b1: { rect: [0, 0, 94, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} }, b2: { rect: [102, 0, 94, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} }, b3: { rect: [204, 0, 93.38, 36.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "text-shadow",
+    name: "starter",
+    messages: ["見出しと本文の文字に、ぼかした影が付いていません（text-shadow: 0 1px 3px rgb(24 32 58 / 0.6) など）"],
+    elements: { title: { rect: [20, 20, 240, 33.59], computed: {"text-shadow":"none"} }, lead: { rect: [20, 57.59, 240, 44.78], computed: {"text-shadow":"none"} } },
+  },
+  {
+    lesson: "text-shadow",
+    name: "solution",
+    messages: [],
+    elements: { title: { rect: [20, 20, 240, 33.59], computed: {"text-shadow":"rgba(24, 32, 58, 0.6) 0px 1px 3px"} }, lead: { rect: [20, 57.59, 240, 44.78], computed: {"text-shadow":"rgba(24, 32, 58, 0.6) 0px 1px 3px"} } },
+  },
+  {
+    lesson: "text-shadow",
+    name: "two shadows",
+    css: ".banner {\n  width: 280px;\n  padding: 20px;\n  border-radius: 12px;\n  background: linear-gradient(120deg, #fff6c2, #9fd3f5 60%, #e6f4ff);\n  color: #fff;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 24px;\n}\n.banner p {\n  margin: 0;\n}\n.banner {\n  text-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 0 12px rgb(24 32 58 / 0.4);\n}\n",
+    messages: [],
+    elements: { title: { rect: [20, 20, 240, 33.59], computed: {"text-shadow":"rgba(0, 0, 0, 0.5) 0px 1px 2px, rgba(24, 32, 58, 0.4) 0px 0px 12px"} }, lead: { rect: [20, 57.59, 240, 44.78], computed: {"text-shadow":"rgba(0, 0, 0, 0.5) 0px 1px 2px, rgba(24, 32, 58, 0.4) 0px 0px 12px"} } },
+  },
+  {
+    lesson: "text-shadow",
+    name: "shadow without a colour",
+    css: ".banner {\n  width: 280px;\n  padding: 20px;\n  border-radius: 12px;\n  background: linear-gradient(120deg, #fff6c2, #9fd3f5 60%, #e6f4ff);\n  color: #fff;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 24px;\n}\n.banner p {\n  margin: 0;\n}\n.banner {\n  text-shadow: 0 1px 3px;\n}\n",
+    messages: ["影の色が明るすぎます（白い文字の縁を際立たせるには、暗い色の影にします。色を書かないと、影の色はブラウザ任せになります）"],
+    elements: { title: { rect: [20, 20, 240, 33.59], computed: {"text-shadow":"rgb(255, 255, 255) 0px 1px 3px"} }, lead: { rect: [20, 57.59, 240, 44.78], computed: {"text-shadow":"rgb(255, 255, 255) 0px 1px 3px"} } },
+  },
+  {
+    lesson: "text-shadow",
+    name: "hard shadow",
+    css: ".banner {\n  width: 280px;\n  padding: 20px;\n  border-radius: 12px;\n  background: linear-gradient(120deg, #fff6c2, #9fd3f5 60%, #e6f4ff);\n  color: #fff;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 24px;\n}\n.banner p {\n  margin: 0;\n}\n.banner {\n  text-shadow: 0 1px 0 #18203a;\n}\n",
+    messages: ["見出しと本文の文字に、ぼかした影が付いていません（text-shadow: 0 1px 3px rgb(24 32 58 / 0.6) など）"],
+    elements: { title: { rect: [20, 20, 240, 33.59], computed: {"text-shadow":"rgb(24, 32, 58) 0px 1px 0px"} }, lead: { rect: [20, 57.59, 240, 44.78], computed: {"text-shadow":"rgb(24, 32, 58) 0px 1px 0px"} } },
+  },
+  {
+    lesson: "text-shadow",
+    name: "heading only",
+    css: ".banner {\n  width: 280px;\n  padding: 20px;\n  border-radius: 12px;\n  background: linear-gradient(120deg, #fff6c2, #9fd3f5 60%, #e6f4ff);\n  color: #fff;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 24px;\n}\n.banner p {\n  margin: 0;\n}\n.banner h2 {\n  text-shadow: 0 1px 3px rgb(24 32 58 / 0.6);\n}\n",
+    messages: ["見出しと本文の文字に、ぼかした影が付いていません（text-shadow: 0 1px 3px rgb(24 32 58 / 0.6) など）"],
+    elements: { title: { rect: [20, 20, 240, 33.59], computed: {"text-shadow":"rgba(24, 32, 58, 0.6) 0px 1px 3px"} }, lead: { rect: [20, 57.59, 240, 44.78], computed: {"text-shadow":"none"} } },
+  },
+  {
+    lesson: "text-emphasis",
+    name: "starter",
+    messages: ["「本日かぎり」に傍点（﹅）が付いていません（text-emphasis: filled sesame）"],
+    elements: { text: { rect: [0, 18, 596, 25.19], computed: {"text-emphasis-style":"none","font-style":"normal"} }, mark: { rect: [112.56, 20, 90, 21], computed: {"text-emphasis-style":"none","font-style":"italic"} } },
+  },
+  {
+    lesson: "text-emphasis",
+    name: "solution",
+    messages: [],
+    elements: { text: { rect: [0, 18, 596, 25.19], computed: {"text-emphasis-style":"none","font-style":"normal"} }, mark: { rect: [112.56, 20, 90, 21], computed: {"text-emphasis-style":"sesame","font-style":"normal"} } },
+  },
+  {
+    lesson: "text-emphasis",
+    name: "text-emphasis-style: sesame",
+    css: ".text {\n  font-size: 18px;\n}\n.text em {\n}\n.text em {\n  font-style: normal;\n  text-emphasis-style: sesame;\n}\n",
+    messages: [],
+    elements: { text: { rect: [0, 18, 596, 25.19], computed: {"text-emphasis-style":"none","font-style":"normal"} }, mark: { rect: [112.56, 20, 90, 21], computed: {"text-emphasis-style":"sesame","font-style":"normal"} } },
+  },
+  {
+    lesson: "text-emphasis",
+    name: "dots instead",
+    css: ".text {\n  font-size: 18px;\n}\n.text em {\n  font-style: normal;\n  text-emphasis: filled dot;\n}\n",
+    messages: ["「本日かぎり」に傍点（﹅）が付いていません（text-emphasis: filled sesame）"],
+    elements: { text: { rect: [0, 18, 596, 25.19], computed: {"text-emphasis-style":"none","font-style":"normal"} }, mark: { rect: [112.56, 20, 90, 21], computed: {"text-emphasis-style":"dot","font-style":"normal"} } },
+  },
+  {
+    lesson: "text-emphasis",
+    name: "italic kept",
+    css: ".text {\n  font-size: 18px;\n}\n.text em {\n  text-emphasis: filled sesame;\n}\n",
+    messages: ["「本日かぎり」が斜体のままです（em の初期設定の斜体を、font-style: normal でやめます）"],
+    elements: { text: { rect: [0, 18, 596, 25.19], computed: {"text-emphasis-style":"none","font-style":"normal"} }, mark: { rect: [112.56, 20, 90, 21], computed: {"text-emphasis-style":"sesame","font-style":"italic"} } },
+  },
+  {
+    lesson: "text-emphasis",
+    name: "whole sentence",
+    css: ".text {\n  font-size: 18px;\n}\n.text em {\n}\n.text {\n  text-emphasis: filled sesame;\n}\n.text em {\n  font-style: normal;\n}\n",
+    messages: ["傍点が文全体に付いています（強調したい語の em だけに付けます）"],
+    elements: { text: { rect: [0, 18, 596, 25.19], computed: {"text-emphasis-style":"sesame","font-style":"normal"} }, mark: { rect: [112.56, 20, 90, 21], computed: {"text-emphasis-style":"sesame","font-style":"normal"} } },
+  },
+  {
+    lesson: "text-transform",
+    name: "starter",
+    messages: ["ラベルが大文字になっていません（text-transform: uppercase。HTML の文字は変えません）"],
+    elements: { label: { rect: [16, 20, 71.02, 16], computed: {"text-transform":"none","letter-spacing":"normal"} }, title: { rect: [16, 42.39, 248, 26.2], computed: {"text-transform":"none","letter-spacing":"normal"} } },
+  },
+  {
+    lesson: "text-transform",
+    name: "solution",
+    messages: [],
+    elements: { label: { rect: [16, 20, 102.67, 16], computed: {"text-transform":"uppercase","letter-spacing":"1.04px"} }, title: { rect: [16, 42.39, 248, 26.2], computed: {"text-transform":"none","letter-spacing":"normal"} } },
+  },
+  {
+    lesson: "text-transform",
+    name: "0.1em",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n/* 英字の小見出し */\n.label {\n  color: #2f5fd0;\n  font-size: 13px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.1em;\n}\n.card h3 {\n  margin: 4px 0 0;\n}\n",
+    messages: [],
+    elements: { label: { rect: [16, 20, 105.53, 16], computed: {"text-transform":"uppercase","letter-spacing":"1.3px"} }, title: { rect: [16, 42.39, 248, 26.2], computed: {"text-transform":"none","letter-spacing":"normal"} } },
+  },
+  {
+    lesson: "text-transform",
+    name: "uppercase only",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n/* 英字の小見出し */\n.label {\n  color: #2f5fd0;\n  font-size: 13px;\n  font-weight: 700;\n  text-transform: uppercase;\n}\n.card h3 {\n  margin: 4px 0 0;\n}\n",
+    messages: ["ラベルの字間が、0.05em〜0.2em ほど広がっていません（letter-spacing: 0.08em など。13px の文字なら 1px ほどです）"],
+    elements: { label: { rect: [16, 20, 91.23, 16], computed: {"text-transform":"uppercase","letter-spacing":"normal"} }, title: { rect: [16, 42.39, 248, 26.2], computed: {"text-transform":"none","letter-spacing":"normal"} } },
+  },
+  {
+    lesson: "text-transform",
+    name: "0.5em",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n/* 英字の小見出し */\n.label {\n  color: #2f5fd0;\n  font-size: 13px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.5em;\n}\n.card h3 {\n  margin: 4px 0 0;\n}\n",
+    messages: ["ラベルの字間が、0.05em〜0.2em ほど広がっていません（letter-spacing: 0.08em など。13px の文字なら 1px ほどです）"],
+    elements: { label: { rect: [16, 20, 162.73, 16], computed: {"text-transform":"uppercase","letter-spacing":"6.5px"} }, title: { rect: [16, 42.39, 248, 26.2], computed: {"text-transform":"none","letter-spacing":"normal"} } },
+  },
+  {
+    lesson: "text-transform",
+    name: "whole card spaced",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n/* 英字の小見出し */\n.label {\n  color: #2f5fd0;\n  font-size: 13px;\n  font-weight: 700;\n}\n.card h3 {\n  margin: 4px 0 0;\n}\n.card {\n  letter-spacing: 0.08em;\n}\n.label {\n  text-transform: uppercase;\n}\n",
+    messages: ["見出しの字間まで変わっています（ラベルだけを広げます）"],
+    elements: { label: { rect: [16, 20, 105.31, 16], computed: {"text-transform":"uppercase","letter-spacing":"1.28px"} }, title: { rect: [16, 42.39, 248, 26.2], computed: {"text-transform":"none","letter-spacing":"1.28px"} } },
+  },
+];
+
+describe("stacking pitfalls, press comfort, ARIA states and text effects: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 12 lessons", () => {
+    expect([...new Set(PRESS_CASES.map((c) => c.lesson))].sort()).toEqual([...PRESS_LESSONS].sort());
+    for (const id of PRESS_LESSONS) {
+      const names = PRESS_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of PRESS_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of PRESS_LESSONS) {
+      const starter = PRESS_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = PRESS_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps what the pointer reached and the measurements the lessons are about", () => {
+    const find = (id: string, name: string): RecordedCase => PRESS_CASES.find((c) => c.lesson === id && c.name === name)!;
+    const top = (id: string, name: string, at: string, fx = 0.5, fy = 0.5): string | null | undefined =>
+      find(id, name).hits?.find((h) => h.at === at && h.fx === fx && h.fy === fy)?.top;
+    // Scaling does not lift the avatar over the next one; a z-index does.
+    expect(top("scale-stacking", "starter", "a2", 0.9)).toBe("a3");
+    expect(top("scale-stacking", "solution", "a2", 0.9)).toBe("a2");
+    // z-index 999 stays inside the dimmed item; dimming the contents instead frees it.
+    expect(top("opacity-stacking", "tip z-index 999", "tip", 0.5, 0.7)).toBe("next");
+    expect(top("opacity-stacking", "solution", "tip", 0.5, 0.7)).toBe("tip");
+    // A transparent menu still takes the press; a raised button only frees the button.
+    expect(top("opacity-zero-click", "starter", "buy")).toBe("menu");
+    expect(top("opacity-zero-click", "button raised instead", "buy")).toBe("buy");
+    expect(top("opacity-zero-click", "button raised instead", "card", 0.9, 0.12)).toBe("menu");
+    // An inline link leaves the rest of its row unclickable.
+    expect(top("block-links", "starter", "row2", 0.85)).toBe("row2");
+    expect(top("block-links", "solution", "row2", 0.85)).toBe("l2");
+    // The stretched link covers the static save button until the button is positioned.
+    expect(top("button-over-link", "z-index without position", "fav")).toBe("link");
+    // Vertical padding reaches above the text while the line stays 28px.
+    expect(top("inline-link-padding", "starter", "para", 0.05, 0.07)).toBe("para");
+    expect(top("inline-link-padding", "solution", "para", 0.05, 0.07)).toBe("link");
+    expect(find("inline-link-padding", "solution").elements.para!.rect![3]).toBe(28);
+    expect(find("inline-link-padding", "inline-block").elements.para!.rect![3]).toBeGreaterThan(28);
+    // The collapsed answer takes no space.
+    expect(find("aria-expanded", "solution").elements.a2!.rect!.slice(2)).toEqual([0, 0]);
+  });
+});
