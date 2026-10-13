@@ -6596,3 +6596,527 @@ describe("white space, structural patterns and custom properties in practice: re
     expect(rect("custom-prop-calc", "solution", "c1")[1]! - rect("custom-prop-calc", "solution", "compact")[1]!).toBeCloseTo(8, 1);
   });
 });
+
+const PAGE_LESSONS = [
+  "named-lines",
+  "auto-fit",
+  "sticky-footer",
+  "cq-units",
+  "container-name",
+  "inline-size-zero",
+  "push-footer",
+  "stretch-cards",
+  "last-row",
+];
+
+const PAGE_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "named-lines",
+    name: "starter",
+    messages: ["写真が、本文より左右 40px ずつ広い範囲に置かれていません（[wide-start] と [wide-end] ではさまれた範囲は、grid-column: wide で使えます）"],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [178, 45.59, 240, 72] }, text: { rect: [178, 129.59, 240, 44.78] }, band: { rect: [178, 186.38, 240, 38.39] } },
+  },
+  {
+    lesson: "named-lines",
+    name: "solution",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [138, 45.59, 320, 72] }, text: { rect: [178, 129.59, 240, 44.78] }, band: { rect: [0, 186.38, 596, 38.39] } },
+  },
+  {
+    lesson: "named-lines",
+    name: "line numbers",
+    css: ".page {\n  display: grid;\n  grid-template-columns:\n    [full-start] 1fr\n    [wide-start] 40px\n    [content-start] min(240px, 100% - 96px) [content-end]\n    40px [wide-end]\n    1fr [full-end];\n  row-gap: 12px;\n}\n/* ふだんは本文の幅に置く */\n.page > * {\n  grid-column: content;\n  margin: 0;\n}\n.hero {\n  height: 72px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.band {\n  padding: 8px 12px;\n  background: #fff3c4;\n}\n.hero {\n  grid-column: 2 / 5;\n}\n.band {\n  grid-column: 1 / -1;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [138, 45.59, 320, 72] }, text: { rect: [178, 129.59, 240, 44.78] }, band: { rect: [0, 186.38, 596, 38.39] } },
+  },
+  {
+    lesson: "named-lines",
+    name: "wide-start / wide-end",
+    css: ".page {\n  display: grid;\n  grid-template-columns:\n    [full-start] 1fr\n    [wide-start] 40px\n    [content-start] min(240px, 100% - 96px) [content-end]\n    40px [wide-end]\n    1fr [full-end];\n  row-gap: 12px;\n}\n/* ふだんは本文の幅に置く */\n.page > * {\n  grid-column: content;\n  margin: 0;\n}\n.hero {\n  height: 72px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.band {\n  padding: 8px 12px;\n  background: #fff3c4;\n}\n.hero {\n  grid-column: wide-start / wide-end;\n}\n.band {\n  grid-column: full-start / full-end;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [138, 45.59, 320, 72] }, text: { rect: [178, 129.59, 240, 44.78] }, band: { rect: [0, 186.38, 596, 38.39] } },
+  },
+  {
+    lesson: "named-lines",
+    name: "negative margins",
+    css: ".page {\n  display: grid;\n  grid-template-columns:\n    [full-start] 1fr\n    [wide-start] 40px\n    [content-start] min(240px, 100% - 96px) [content-end]\n    40px [wide-end]\n    1fr [full-end];\n  row-gap: 12px;\n}\n/* ふだんは本文の幅に置く */\n.page > * {\n  grid-column: content;\n  margin: 0;\n}\n.hero {\n  height: 72px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.band {\n  padding: 8px 12px;\n  background: #fff3c4;\n}\n.hero {\n  margin: 0 -40px;\n}\n.band {\n  grid-column: full;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [138, 45.59, 320, 72] }, text: { rect: [178, 129.59, 240, 44.78] }, band: { rect: [0, 186.38, 596, 38.39] } },
+  },
+  {
+    lesson: "named-lines",
+    name: "photo full",
+    css: ".page {\n  display: grid;\n  grid-template-columns:\n    [full-start] 1fr\n    [wide-start] 40px\n    [content-start] min(240px, 100% - 96px) [content-end]\n    40px [wide-end]\n    1fr [full-end];\n  row-gap: 12px;\n}\n/* ふだんは本文の幅に置く */\n.page > * {\n  grid-column: content;\n  margin: 0;\n}\n.hero {\n  height: 72px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.band {\n  padding: 8px 12px;\n  background: #fff3c4;\n}\n.hero {\n  grid-column: full;\n}\n.band {\n  grid-column: full;\n}\n",
+    messages: ["写真が、本文より左右 40px ずつ広い範囲に置かれていません（[wide-start] と [wide-end] ではさまれた範囲は、grid-column: wide で使えます）"],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [0, 45.59, 596, 72] }, text: { rect: [178, 129.59, 240, 44.78] }, band: { rect: [0, 186.38, 596, 38.39] } },
+  },
+  {
+    lesson: "named-lines",
+    name: "band wide",
+    css: ".page {\n  display: grid;\n  grid-template-columns:\n    [full-start] 1fr\n    [wide-start] 40px\n    [content-start] min(240px, 100% - 96px) [content-end]\n    40px [wide-end]\n    1fr [full-end];\n  row-gap: 12px;\n}\n/* ふだんは本文の幅に置く */\n.page > * {\n  grid-column: content;\n  margin: 0;\n}\n.hero {\n  height: 72px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.band {\n  padding: 8px 12px;\n  background: #fff3c4;\n}\n.hero {\n  grid-column: wide;\n}\n.band {\n  grid-column: wide;\n}\n",
+    messages: ["帯が、ページの端から端まで広がっていません（[full-start] と [full-end] ではさまれた範囲は、grid-column: full です）"],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [138, 45.59, 320, 72] }, text: { rect: [178, 129.59, 240, 44.78] }, band: { rect: [138, 186.38, 320, 38.39] } },
+  },
+  {
+    lesson: "named-lines",
+    name: "text wide too",
+    css: ".page {\n  display: grid;\n  grid-template-columns:\n    [full-start] 1fr\n    [wide-start] 40px\n    [content-start] min(240px, 100% - 96px) [content-end]\n    40px [wide-end]\n    1fr [full-end];\n  row-gap: 12px;\n}\n/* ふだんは本文の幅に置く */\n.page > * {\n  grid-column: wide;\n  margin: 0;\n}\n.hero {\n  height: 72px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.band {\n  padding: 8px 12px;\n  background: #fff3c4;\n}\n.hero {\n  grid-column: wide;\n}\n.band {\n  grid-column: full;\n}\n",
+    messages: ["写真が、本文より左右 40px ずつ広い範囲に置かれていません（[wide-start] と [wide-end] ではさまれた範囲は、grid-column: wide で使えます）"],
+    elements: { page: { rect: [0, 0, 596, 224.77] }, hero: { rect: [138, 45.59, 320, 72] }, text: { rect: [138, 129.59, 320, 44.78] }, band: { rect: [0, 186.38, 596, 38.39] } },
+  },
+  {
+    lesson: "auto-fit",
+    name: "starter",
+    messages: ["2 枚のカードが、行いっぱいに半分ずつ広がっていません（auto-fill は空いた列も残します。auto-fit なら、空いた列をたたみます）"],
+    elements: { list: { rect: [0, 0, 560, 46.39] }, c1: { rect: [0, 0, 134, 46.39] }, c2: { rect: [142, 0, 134, 46.39] } },
+    states: { 240: { list: { rect: [0, 0, 240, 100.78] }, c1: { rect: [0, 0, 240, 46.39] }, c2: { rect: [0, 54.39, 240, 46.39] } } },
+  },
+  {
+    lesson: "auto-fit",
+    name: "solution",
+    messages: [],
+    elements: { list: { rect: [0, 0, 560, 46.39] }, c1: { rect: [0, 0, 276, 46.39] }, c2: { rect: [284, 0, 276, 46.39] } },
+    states: { 240: { list: { rect: [0, 0, 240, 100.78] }, c1: { rect: [0, 0, 240, 46.39] }, c2: { rect: [0, 54.39, 240, 46.39] } } },
+  },
+  {
+    lesson: "auto-fit",
+    name: "flex wrap",
+    css: ".list {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));\n  gap: 8px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.list {\n  display: flex;\n  flex-wrap: wrap;\n}\n.card {\n  flex: 1 1 120px;\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 0, 560, 46.39] }, c1: { rect: [0, 0, 276, 46.39] }, c2: { rect: [284, 0, 276, 46.39] } },
+    states: { 240: { list: { rect: [0, 0, 240, 100.78] }, c1: { rect: [0, 0, 240, 46.39] }, c2: { rect: [0, 54.39, 240, 46.39] } } },
+  },
+  {
+    lesson: "auto-fit",
+    name: "repeat(2, 1fr)",
+    css: ".list {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 8px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["幅 240px で、カードが 1 列に並んでいません（repeat(2, 1fr) のように列の数を決めると、狭い画面でも 2 列のままです。auto-fit なら、入るだけの列になります）"],
+    elements: { list: { rect: [0, 0, 560, 46.39] }, c1: { rect: [0, 0, 276, 46.39] }, c2: { rect: [284, 0, 276, 46.39] } },
+    states: { 240: { list: { rect: [0, 0, 240, 46.39] }, c1: { rect: [0, 0, 116, 46.39] }, c2: { rect: [124, 0, 116, 46.39] } } },
+  },
+  {
+    lesson: "auto-fit",
+    name: "repeat(2, minmax(120px, 1fr))",
+    css: ".list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(120px, 1fr));\n  gap: 8px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["幅 240px で、カードが 1 列に並んでいません（repeat(2, 1fr) のように列の数を決めると、狭い画面でも 2 列のままです。auto-fit なら、入るだけの列になります）"],
+    elements: { list: { rect: [0, 0, 560, 46.39] }, c1: { rect: [0, 0, 276, 46.39] }, c2: { rect: [284, 0, 276, 46.39] } },
+    states: { 240: { list: { rect: [0, 0, 240, 46.39] }, c1: { rect: [0, 0, 120, 46.39] }, c2: { rect: [128, 0, 120, 46.39] } } },
+  },
+  {
+    lesson: "auto-fit",
+    name: "auto-fit minmax(0, 1fr)",
+    css: ".list {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));\n  gap: 8px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["幅 240px で、カードが 1 列に並んでいません（repeat(2, 1fr) のように列の数を決めると、狭い画面でも 2 列のままです。auto-fit なら、入るだけの列になります）"],
+    elements: { list: { rect: [0, 0, 560, 46.39] }, c1: { rect: [0, 0, 276, 46.39] }, c2: { rect: [284, 0, 276, 46.39] } },
+    states: { 240: { list: { rect: [0, 0, 240, 46.39] }, c1: { rect: [0, 0, 116, 46.39] }, c2: { rect: [124, 0, 116, 46.39] } } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "starter",
+    messages: ["フッターが、画面の下端に中身の高さのまま置かれていません"],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 38.39] }, main: { rect: [0, 38.39, 596, 46.39] }, foot: { rect: [0, 84.78, 596, 38.39] } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "solution",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 38.39] }, main: { rect: [0, 38.39, 596, 203.22] }, foot: { rect: [0, 241.61, 596, 38.39] } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "flex column, main flex: 1",
+    css: ".page {\n  min-height: 100dvh;\n  background: #dde3f0;\n}\n.head,\n.foot {\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 12px;\n  background: #fff;\n}\n.page {\n  display: flex;\n  flex-direction: column;\n}\n.main {\n  flex: 1;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 38.39] }, main: { rect: [0, 38.39, 596, 203.22] }, foot: { rect: [0, 241.61, 596, 38.39] } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "auto 1fr (footer implicit)",
+    css: ".page {\n  min-height: 100dvh;\n  background: #dde3f0;\n}\n.head,\n.foot {\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 12px;\n  background: #fff;\n}\n.page {\n  display: grid;\n  grid-template-rows: auto 1fr;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 38.39] }, main: { rect: [0, 38.39, 596, 203.22] }, foot: { rect: [0, 241.61, 596, 38.39] } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "display: grid only",
+    css: ".page {\n  min-height: 100dvh;\n  background: #dde3f0;\n}\n.head,\n.foot {\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 12px;\n  background: #fff;\n}\n.page {\n  display: grid;\n}\n",
+    messages: ["ヘッダーが、上端に中身の高さのまま置かれていません（行の高さを auto にすると、中身の高さになります。display: grid だけでは、余りがヘッダーにも配られます）","フッターが、画面の下端に中身の高さのまま置かれていません"],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 90.66] }, main: { rect: [0, 90.66, 596, 98.67] }, foot: { rect: [0, 189.33, 596, 90.67] } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "footer margin-top: auto",
+    css: ".page {\n  min-height: 100dvh;\n  background: #dde3f0;\n}\n.head,\n.foot {\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 12px;\n  background: #fff;\n}\n.page {\n  display: flex;\n  flex-direction: column;\n}\n.foot {\n  margin-top: auto;\n}\n",
+    messages: ["本文が、ヘッダーとフッターの間の高さをすべて使っていません（真ん中の行を 1fr にすると、残りの高さを本文が受け取ります）"],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 38.39] }, main: { rect: [0, 38.39, 596, 46.39] }, foot: { rect: [0, 241.61, 596, 38.39] } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "space-between",
+    css: ".page {\n  min-height: 100dvh;\n  background: #dde3f0;\n}\n.head,\n.foot {\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 12px;\n  background: #fff;\n}\n.page {\n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n}\n",
+    messages: ["本文が、ヘッダーとフッターの間の高さをすべて使っていません（真ん中の行を 1fr にすると、残りの高さを本文が受け取ります）"],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 38.39] }, main: { rect: [0, 116.81, 596, 46.39] }, foot: { rect: [0, 241.61, 596, 38.39] } },
+  },
+  {
+    lesson: "sticky-footer",
+    name: "footer absolute",
+    css: ".page {\n  min-height: 100dvh;\n  background: #dde3f0;\n}\n.head,\n.foot {\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 12px;\n  background: #fff;\n}\n.page {\n  position: relative;\n}\n.foot {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n}\n",
+    messages: ["本文が、ヘッダーとフッターの間の高さをすべて使っていません（真ん中の行を 1fr にすると、残りの高さを本文が受け取ります）"],
+    elements: { page: { rect: [0, 0, 596, 280] }, head: { rect: [0, 0, 596, 38.39] }, main: { rect: [0, 38.39, 596, 46.39] }, foot: { rect: [0, 241.61, 596, 38.39] } },
+  },
+  {
+    lesson: "cq-units",
+    name: "starter",
+    messages: ["広いカード（幅 250px）の見出しが 20px になっていません（8cqi は、カードの幅 250px の 8% です）"],
+    elements: { t1: { rect: [0, 0, 250, 41.38], computed: {"font-size":"23.84px"} }, t2: { rect: [0, 84.97, 150, 41.38], computed: {"font-size":"23.84px"} } },
+  },
+  {
+    lesson: "cq-units",
+    name: "solution",
+    messages: [],
+    elements: { t1: { rect: [0, 0, 250, 36], computed: {"font-size":"20px"} }, t2: { rect: [0, 79.59, 150, 30.39], computed: {"font-size":"16px"} } },
+  },
+  {
+    lesson: "cq-units",
+    name: "8cqw",
+    css: "/* カードはコンテナ */\n.card {\n  container-type: inline-size;\n  margin-bottom: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.wide {\n  width: 250px;\n}\n.narrow {\n  width: 150px;\n}\n.card h3 {\n  margin: 0;\n  padding: 8px 12px 0;\n  font-size: clamp(16px, 8cqw, 24px);\n}\n.card p {\n  margin: 0;\n  padding: 4px 12px 8px;\n  font-size: 14px;\n}\n",
+    messages: [],
+    elements: { t1: { rect: [0, 0, 250, 36], computed: {"font-size":"20px"} }, t2: { rect: [0, 79.59, 150, 30.39], computed: {"font-size":"16px"} } },
+  },
+  {
+    lesson: "cq-units",
+    name: "max(min())",
+    css: "/* カードはコンテナ */\n.card {\n  container-type: inline-size;\n  margin-bottom: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.wide {\n  width: 250px;\n}\n.narrow {\n  width: 150px;\n}\n.card h3 {\n  margin: 0;\n  padding: 8px 12px 0;\n  font-size: max(16px, min(8cqi, 24px));\n}\n.card p {\n  margin: 0;\n  padding: 4px 12px 8px;\n  font-size: 14px;\n}\n",
+    messages: [],
+    elements: { t1: { rect: [0, 0, 250, 36], computed: {"font-size":"20px"} }, t2: { rect: [0, 79.59, 150, 30.39], computed: {"font-size":"16px"} } },
+  },
+  {
+    lesson: "cq-units",
+    name: "8cqi without clamp",
+    css: "/* カードはコンテナ */\n.card {\n  container-type: inline-size;\n  margin-bottom: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.wide {\n  width: 250px;\n}\n.narrow {\n  width: 150px;\n}\n.card h3 {\n  margin: 0;\n  padding: 8px 12px 0;\n  font-size: 8cqi;\n}\n.card p {\n  margin: 0;\n  padding: 4px 12px 8px;\n  font-size: 14px;\n}\n",
+    messages: ["狭いカード（幅 150px）の見出しが 16px になっていません（150px の 8% は 12px なので、clamp() の下限の 16px になります）"],
+    elements: { t1: { rect: [0, 0, 250, 36], computed: {"font-size":"20px"} }, t2: { rect: [0, 79.59, 150, 24.8], computed: {"font-size":"12px"} } },
+  },
+  {
+    lesson: "cq-units",
+    name: "px per card",
+    css: "/* カードはコンテナ */\n.card {\n  container-type: inline-size;\n  margin-bottom: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.wide {\n  width: 250px;\n}\n.narrow {\n  width: 150px;\n}\n.card h3 {\n  margin: 0;\n  padding: 8px 12px 0;\n  font-size: clamp(16px, 4vw, 24px);\n}\n.card p {\n  margin: 0;\n  padding: 4px 12px 8px;\n  font-size: 14px;\n}\n.wide h3 {\n  font-size: 20px;\n}\n.narrow h3 {\n  font-size: 16px;\n}\n",
+    messages: ["見出しの大きさに、cqi（コンテナの幅の 1%）を使いましょう（カードごとに px で決めると、カードの幅が変わったときに合わなくなります）"],
+    elements: { t1: { rect: [0, 0, 250, 36], computed: {"font-size":"20px"} }, t2: { rect: [0, 79.59, 150, 30.39], computed: {"font-size":"16px"} } },
+  },
+  {
+    lesson: "cq-units",
+    name: "cards not containers",
+    css: "/* カードはコンテナ */\n.card {\n  margin-bottom: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.wide {\n  width: 250px;\n}\n.narrow {\n  width: 150px;\n}\n.card h3 {\n  margin: 0;\n  padding: 8px 12px 0;\n  font-size: clamp(16px, 8cqi, 24px);\n}\n.card p {\n  margin: 0;\n  padding: 4px 12px 8px;\n  font-size: 14px;\n}\n",
+    messages: ["広いカード（幅 250px）の見出しが 20px になっていません（8cqi は、カードの幅 250px の 8% です）"],
+    elements: { t1: { rect: [0, 0, 250, 41.59], computed: {"font-size":"24px"} }, t2: { rect: [0, 85.19, 150, 41.59], computed: {"font-size":"24px"} } },
+  },
+  {
+    lesson: "container-name",
+    name: "starter",
+    messages: ["幅 560px（本文の列は 468px）で、バッジが表示されていません（名前のない @container は、いちばん近いコンテナ＝カード（幅 200px）を調べます。.layout に container-name を付け、@container のあとにその名前を書きます）"],
+    elements: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } } },
+  },
+  {
+    lesson: "container-name",
+    name: "solution",
+    messages: [],
+    elements: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [104, 44.19, 52, 20.8], computed: {"display":"inline-block","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } } },
+  },
+  {
+    lesson: "container-name",
+    name: "container shorthand",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 80px 1fr;\n  gap: 12px;\n}\n.side {\n  padding: 8px;\n  background: #eef1f8;\n}\n/* 本文の列はコンテナ */\n.layout {\n  container: layout / inline-size;\n}\n/* カードもコンテナ（見出しの大きさに使う） */\n.card {\n  container-type: inline-size;\n  width: 224px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: clamp(14px, 9cqi, 20px);\n}\n.badge {\n  display: none;\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n/* 本文の列が 400px より広いときだけ、バッジを出したい */\n@container layout (width > 400px) {\n  .badge {\n    display: inline-block;\n  }\n}\n",
+    messages: [],
+    elements: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [104, 44.19, 52, 20.8], computed: {"display":"inline-block","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } } },
+  },
+  {
+    lesson: "container-name",
+    name: "min-width: 401px",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 80px 1fr;\n  gap: 12px;\n}\n.side {\n  padding: 8px;\n  background: #eef1f8;\n}\n/* 本文の列はコンテナ */\n.layout {\n  container-type: inline-size;\n  container-name: layout;\n}\n/* カードもコンテナ（見出しの大きさに使う） */\n.card {\n  container-type: inline-size;\n  width: 224px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: clamp(14px, 9cqi, 20px);\n}\n.badge {\n  display: none;\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n/* 本文の列が 400px より広いときだけ、バッジを出したい */\n@container layout (min-width: 401px) {\n  .badge {\n    display: inline-block;\n  }\n}\n",
+    messages: [],
+    elements: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [104, 44.19, 52, 20.8], computed: {"display":"inline-block","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } } },
+  },
+  {
+    lesson: "container-name",
+    name: "@media instead",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 80px 1fr;\n  gap: 12px;\n}\n.side {\n  padding: 8px;\n  background: #eef1f8;\n}\n/* 本文の列はコンテナ */\n.layout {\n  container-type: inline-size;\n}\n/* カードもコンテナ（見出しの大きさに使う） */\n.card {\n  container-type: inline-size;\n  width: 224px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: clamp(14px, 9cqi, 20px);\n}\n.badge {\n  display: none;\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n/* 本文の列が 400px より広いときだけ、バッジを出したい */\n@media (width > 400px) {\n  .badge {\n    display: inline-block;\n  }\n}\n",
+    messages: ["幅 480px（本文の列は 388px）でも、バッジが表示されています（@media は画面の幅を調べます。本文の列の幅で切り替えるには、名前を付けた @container を使います）"],
+    elements: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [104, 44.19, 52, 20.8], computed: {"display":"inline-block","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [104, 44.19, 52, 20.8], computed: {"display":"inline-block","font-size":"12px"} } } },
+  },
+  {
+    lesson: "container-name",
+    name: "card container removed",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 80px 1fr;\n  gap: 12px;\n}\n.side {\n  padding: 8px;\n  background: #eef1f8;\n}\n/* 本文の列はコンテナ */\n.layout {\n  container-type: inline-size;\n}\n/* カードもコンテナ（見出しの大きさに使う） */\n.card {\n  width: 224px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: clamp(14px, 9cqi, 20px);\n}\n.badge {\n  display: none;\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n/* 本文の列が 400px より広いときだけ、バッジを出したい */\n@container (width > 400px) {\n  .badge {\n    display: inline-block;\n  }\n}\n",
+    messages: ["カードの見出しが 18px ではなくなりました（見出しの 9cqi はカードの幅を基準にしているので、.card はコンテナのままにします）"],
+    elements: { title: { rect: [104, 12, 200, 28], computed: {"display":"block","font-size":"20px"} }, badge: { rect: [104, 47, 52, 20.8], computed: {"display":"inline-block","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 28], computed: {"display":"block","font-size":"20px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } } },
+  },
+  {
+    lesson: "container-name",
+    name: "named but query unnamed",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 80px 1fr;\n  gap: 12px;\n}\n.side {\n  padding: 8px;\n  background: #eef1f8;\n}\n/* 本文の列はコンテナ */\n.layout {\n  container-type: inline-size;\n  container-name: layout;\n}\n/* カードもコンテナ（見出しの大きさに使う） */\n.card {\n  container-type: inline-size;\n  width: 224px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: clamp(14px, 9cqi, 20px);\n}\n.badge {\n  display: none;\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n/* 本文の列が 400px より広いときだけ、バッジを出したい */\n@container (width > 400px) {\n  .badge {\n    display: inline-block;\n  }\n}\n",
+    messages: ["幅 560px（本文の列は 468px）で、バッジが表示されていません（名前のない @container は、いちばん近いコンテナ＝カード（幅 200px）を調べます。.layout に container-name を付け、@container のあとにその名前を書きます）"],
+    elements: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } } },
+  },
+  {
+    lesson: "container-name",
+    name: "name on the card",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 80px 1fr;\n  gap: 12px;\n}\n.side {\n  padding: 8px;\n  background: #eef1f8;\n}\n/* 本文の列はコンテナ */\n.layout {\n  container-type: inline-size;\n}\n/* カードもコンテナ（見出しの大きさに使う） */\n.card {\n  container-type: inline-size;\n  container-name: layout;\n  width: 224px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: clamp(14px, 9cqi, 20px);\n}\n.badge {\n  display: none;\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n/* 本文の列が 400px より広いときだけ、バッジを出したい */\n@container layout (width > 400px) {\n  .badge {\n    display: inline-block;\n  }\n}\n",
+    messages: ["幅 560px（本文の列は 468px）で、バッジが表示されていません（名前のない @container は、いちばん近いコンテナ＝カード（幅 200px）を調べます。.layout に container-name を付け、@container のあとにその名前を書きます）"],
+    elements: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } },
+    states: { 480: { title: { rect: [104, 12, 200, 25.19], computed: {"display":"block","font-size":"18px"} }, badge: { rect: [0, 0, 0, 0], computed: {"display":"none","font-size":"12px"} } } },
+  },
+  {
+    lesson: "inline-size-zero",
+    name: "starter",
+    messages: ["サイドバーの幅が 160px になっていません（container-type: inline-size にした要素は、中身から幅を決められません。幅を明示します）"],
+    elements: { side: { rect: [0, 0, 16, 94.38], computed: {"font-size":"16px"} }, menu: { rect: [8, 8, 0, 78.38], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "inline-size-zero",
+    name: "solution",
+    messages: [],
+    elements: { side: { rect: [0, 0, 160, 38.39], computed: {"font-size":"16px"} }, menu: { rect: [8, 8, 144, 19.59], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "inline-size-zero",
+    name: "flex: 0 0 160px",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n}\n/* サイドバーをコンテナにした */\n.side {\n  container-type: inline-size;\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  flex: 0 0 160px;\n}\n.main {\n  flex: 1;\n  padding: 8px;\n  background: #eef1f8;\n}\n/* サイドバーが 200px より狭いときは、文字を小さく */\n@container (width < 200px) {\n  .menu {\n    font-size: 14px;\n  }\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 0, 160, 38.39], computed: {"font-size":"16px"} }, menu: { rect: [8, 8, 144, 19.59], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "inline-size-zero",
+    name: "flex-basis: 160px",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n}\n/* サイドバーをコンテナにした */\n.side {\n  container-type: inline-size;\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  flex-basis: 160px;\n}\n.main {\n  flex: 1;\n  padding: 8px;\n  background: #eef1f8;\n}\n/* サイドバーが 200px より狭いときは、文字を小さく */\n@container (width < 200px) {\n  .menu {\n    font-size: 14px;\n  }\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 0, 160, 38.39], computed: {"font-size":"16px"} }, menu: { rect: [8, 8, 144, 19.59], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "inline-size-zero",
+    name: "min-width: 160px",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n}\n/* サイドバーをコンテナにした */\n.side {\n  container-type: inline-size;\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  min-width: 160px;\n}\n.main {\n  flex: 1;\n  padding: 8px;\n  background: #eef1f8;\n}\n/* サイドバーが 200px より狭いときは、文字を小さく */\n@container (width < 200px) {\n  .menu {\n    font-size: 14px;\n  }\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 0, 160, 38.39], computed: {"font-size":"16px"} }, menu: { rect: [8, 8, 144, 19.59], computed: {"font-size":"14px"} } },
+  },
+  {
+    lesson: "inline-size-zero",
+    name: "container removed, width set",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n}\n/* サイドバーをコンテナにした */\n.side {\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  width: 160px;\n}\n.main {\n  flex: 1;\n  padding: 8px;\n  background: #eef1f8;\n}\n/* サイドバーが 200px より狭いときは、文字を小さく */\n@container (width < 200px) {\n  .menu {\n    font-size: 14px;\n  }\n}\n",
+    messages: ["メニューの文字が 14px ではありません（サイドバーはコンテナのままにして、@container の指定が効くようにします）"],
+    elements: { side: { rect: [0, 0, 160, 38.39], computed: {"font-size":"16px"} }, menu: { rect: [8, 8, 144, 22.39], computed: {"font-size":"16px"} } },
+  },
+  {
+    lesson: "inline-size-zero",
+    name: "container removed",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n}\n/* サイドバーをコンテナにした */\n.side {\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.main {\n  flex: 1;\n  padding: 8px;\n  background: #eef1f8;\n}\n/* サイドバーが 200px より狭いときは、文字を小さく */\n@container (width < 200px) {\n  .menu {\n    font-size: 14px;\n  }\n}\n",
+    messages: ["サイドバーの幅が 160px になっていません（container-type: inline-size にした要素は、中身から幅を決められません。幅を明示します）","メニューの文字が 14px ではありません（サイドバーはコンテナのままにして、@container の指定が効くようにします）"],
+    elements: { side: { rect: [0, 0, 78.89, 38.39], computed: {"font-size":"16px"} }, menu: { rect: [8, 8, 62.89, 22.39], computed: {"font-size":"16px"} } },
+  },
+  {
+    lesson: "push-footer",
+    name: "starter",
+    messages: ["2 枚のカードのボタンが、カードの下端（内側の余白 12px）にそろっていません（カードを縦向きの flex にして、ボタンに margin-top: auto を付けると、余りがボタンの上に集まります）"],
+    elements: { a: { rect: [0, 0, 292, 125.17] }, ba: { rect: [12, 85.58, 66, 27.59] }, b: { rect: [304, 0, 292, 125.17] }, hb: { rect: [316, 12, 268, 22.39] }, pb: { rect: [316, 38.39, 268, 19.59] }, bb: { rect: [316, 65.98, 66, 27.59] } },
+  },
+  {
+    lesson: "push-footer",
+    name: "solution",
+    messages: [],
+    elements: { a: { rect: [0, 0, 292, 125.17] }, ba: { rect: [12, 85.58, 66, 27.59] }, b: { rect: [304, 0, 292, 125.17] }, hb: { rect: [316, 12, 268, 22.39] }, pb: { rect: [316, 38.39, 268, 19.59] }, bb: { rect: [316, 85.58, 66, 27.59] } },
+  },
+  {
+    lesson: "push-footer",
+    name: "text flex: 1",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0 0 8px;\n  font-size: 14px;\n}\n.more {\n  display: block;\n  width: fit-content;\n  padding: 4px 12px;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.card {\n  display: flex;\n  flex-direction: column;\n}\n.card p {\n  flex: 1;\n}\n",
+    messages: [],
+    elements: { a: { rect: [0, 0, 292, 125.17] }, ba: { rect: [12, 85.58, 66, 27.59] }, b: { rect: [304, 0, 292, 125.17] }, hb: { rect: [316, 12, 268, 22.39] }, pb: { rect: [316, 38.39, 268, 39.19] }, bb: { rect: [316, 85.58, 66, 27.59] } },
+  },
+  {
+    lesson: "push-footer",
+    name: "grid auto 1fr auto",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0 0 8px;\n  font-size: 14px;\n}\n.more {\n  display: block;\n  width: fit-content;\n  padding: 4px 12px;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.card {\n  display: grid;\n  grid-template-rows: auto 1fr auto;\n}\n",
+    messages: [],
+    elements: { a: { rect: [0, 0, 292, 125.17] }, ba: { rect: [12, 85.58, 66, 27.59] }, b: { rect: [304, 0, 292, 125.17] }, hb: { rect: [316, 12, 268, 22.39] }, pb: { rect: [316, 38.39, 268, 39.19] }, bb: { rect: [316, 85.58, 66, 27.59] } },
+  },
+  {
+    lesson: "push-footer",
+    name: "space-between",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0 0 8px;\n  font-size: 14px;\n}\n.more {\n  display: block;\n  width: fit-content;\n  padding: 4px 12px;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.card {\n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n}\n",
+    messages: ["短いカードの見出しと本文が、上に詰めて並んでいません（余りはボタンの上だけに集めます。justify-content: space-between では、本文まで動きます）"],
+    elements: { a: { rect: [0, 0, 292, 125.17] }, ba: { rect: [12, 85.58, 66, 27.59] }, b: { rect: [304, 0, 292, 125.17] }, hb: { rect: [316, 12, 268, 22.39] }, pb: { rect: [316, 48.19, 268, 19.59] }, bb: { rect: [316, 85.58, 66, 27.59] } },
+  },
+  {
+    lesson: "push-footer",
+    name: "flex-end",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0 0 8px;\n  font-size: 14px;\n}\n.more {\n  display: block;\n  width: fit-content;\n  padding: 4px 12px;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.card {\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n}\n",
+    messages: ["短いカードの見出しと本文が、上に詰めて並んでいません（余りはボタンの上だけに集めます。justify-content: space-between では、本文まで動きます）"],
+    elements: { a: { rect: [0, 0, 292, 125.17] }, ba: { rect: [12, 85.58, 66, 27.59] }, b: { rect: [304, 0, 292, 125.17] }, hb: { rect: [316, 31.59, 268, 22.39] }, pb: { rect: [316, 57.98, 268, 19.59] }, bb: { rect: [316, 85.58, 66, 27.59] } },
+  },
+  {
+    lesson: "push-footer",
+    name: "margin-top: auto without flex",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0 0 8px;\n  font-size: 14px;\n}\n.more {\n  display: block;\n  width: fit-content;\n  padding: 4px 12px;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 14px;\n}\n.more {\n  margin-top: auto;\n}\n",
+    messages: ["2 枚のカードのボタンが、カードの下端（内側の余白 12px）にそろっていません（カードを縦向きの flex にして、ボタンに margin-top: auto を付けると、余りがボタンの上に集まります）"],
+    elements: { a: { rect: [0, 0, 292, 125.17] }, ba: { rect: [12, 85.58, 66, 27.59] }, b: { rect: [304, 0, 292, 125.17] }, hb: { rect: [316, 12, 268, 22.39] }, pb: { rect: [316, 38.39, 268, 19.59] }, bb: { rect: [316, 65.98, 66, 27.59] } },
+  },
+  {
+    lesson: "stretch-cards",
+    name: "starter",
+    messages: ["2 枚のカードの高さがそろっていません（伸びているのは li だけで、中のカードは中身の高さのままです。li をグリッドにすると、中のカードも li いっぱいに伸びます）"],
+    elements: { la: { rect: [0, 0, 292, 89.58] }, ca: { rect: [0, 0, 292, 89.58] }, pa: { rect: [12, 38.39, 268, 39.19] }, lb: { rect: [304, 0, 292, 89.58] }, cb: { rect: [304, 0, 292, 69.98] } },
+  },
+  {
+    lesson: "stretch-cards",
+    name: "solution",
+    messages: [],
+    elements: { la: { rect: [0, 0, 292, 89.58] }, ca: { rect: [0, 0, 292, 89.58] }, pa: { rect: [12, 38.39, 268, 39.19] }, lb: { rect: [304, 0, 292, 89.58] }, cb: { rect: [304, 0, 292, 89.58] } },
+  },
+  {
+    lesson: "stretch-cards",
+    name: "height: 100%",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0;\n  font-size: 14px;\n}\n.card {\n  height: 100%;\n}\n",
+    messages: [],
+    elements: { la: { rect: [0, 0, 292, 89.58] }, ca: { rect: [0, 0, 292, 89.58] }, pa: { rect: [12, 38.39, 268, 39.19] }, lb: { rect: [304, 0, 292, 89.58] }, cb: { rect: [304, 0, 292, 89.58] } },
+  },
+  {
+    lesson: "stretch-cards",
+    name: "li flex, card flex: 1",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0;\n  font-size: 14px;\n}\n.list li {\n  display: flex;\n}\n.card {\n  flex: 1;\n}\n",
+    messages: [],
+    elements: { la: { rect: [0, 0, 292, 89.58] }, ca: { rect: [0, 0, 292, 89.58] }, pa: { rect: [12, 38.39, 268, 39.19] }, lb: { rect: [304, 0, 292, 89.58] }, cb: { rect: [304, 0, 292, 89.58] } },
+  },
+  {
+    lesson: "stretch-cards",
+    name: "li flex",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0;\n  font-size: 14px;\n}\n.list li {\n  display: flex;\n}\n",
+    messages: ["短いカードが、li の幅いっぱいではなくなりました（li を display: flex にすると、中のカードは中身の幅までしか広がりません。display: grid なら、幅も高さも伸びます）"],
+    elements: { la: { rect: [0, 0, 292, 89.58] }, ca: { rect: [0, 0, 292, 89.58] }, pa: { rect: [12, 38.39, 268, 39.19] }, lb: { rect: [304, 0, 292, 89.58] }, cb: { rect: [304, 0, 162.61, 89.58] } },
+  },
+  {
+    lesson: "stretch-cards",
+    name: "fixed height",
+    css: ".list {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.card {\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 16px;\n}\n.card p {\n  margin: 0;\n  font-size: 14px;\n}\n.card {\n  height: 160px;\n}\n",
+    messages: ["背の高いカードの本文の下に、余白 12px より広いすき間ができています（高さを px で決めずに、背の高いカードの中身に合わせて伸ばします）"],
+    elements: { la: { rect: [0, 0, 292, 160] }, ca: { rect: [0, 0, 292, 160] }, pa: { rect: [12, 38.39, 268, 39.19] }, lb: { rect: [304, 0, 292, 160] }, cb: { rect: [304, 0, 292, 160] } },
+  },
+  {
+    lesson: "last-row",
+    name: "starter",
+    messages: ["2 行目が、左から 20px 間隔で並んでいません（space-between は行ごとに余りを配るので、最後の行の 2 つも両端へ離れます。間隔は gap で決めて、左から詰めます）"],
+    elements: { list: { rect: [0, 0, 280, 124] }, i1: { rect: [0, 0, 80, 56] }, i2: { rect: [100, 0, 80, 56] }, i3: { rect: [200, 0, 80, 56] }, i4: { rect: [0, 68, 80, 56] }, i5: { rect: [200, 68, 80, 56] } },
+  },
+  {
+    lesson: "last-row",
+    name: "solution",
+    messages: [],
+    elements: { list: { rect: [0, 0, 280, 124] }, i1: { rect: [0, 0, 80, 56] }, i2: { rect: [100, 0, 80, 56] }, i3: { rect: [200, 0, 80, 56] }, i4: { rect: [0, 68, 80, 56] }, i5: { rect: [100, 68, 80, 56] } },
+  },
+  {
+    lesson: "last-row",
+    name: "flex-start + column-gap",
+    css: ".list {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  column-gap: 20px;\n  row-gap: 12px;\n  width: 280px;\n}\n.item {\n  display: grid;\n  place-items: center;\n  width: 80px;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 0, 280, 124] }, i1: { rect: [0, 0, 80, 56] }, i2: { rect: [100, 0, 80, 56] }, i3: { rect: [200, 0, 80, 56] }, i4: { rect: [0, 68, 80, 56] }, i5: { rect: [100, 68, 80, 56] } },
+  },
+  {
+    lesson: "last-row",
+    name: "grid of three",
+    css: ".list {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-between;\n  row-gap: 12px;\n  width: 280px;\n}\n.item {\n  display: grid;\n  place-items: center;\n  width: 80px;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.list {\n  display: grid;\n  grid-template-columns: repeat(3, 80px);\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 0, 280, 124] }, i1: { rect: [0, 0, 80, 56] }, i2: { rect: [100, 0, 80, 56] }, i3: { rect: [200, 0, 80, 56] }, i4: { rect: [0, 68, 80, 56] }, i5: { rect: [100, 68, 80, 56] } },
+  },
+  {
+    lesson: "last-row",
+    name: "::after filler",
+    css: ".list {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-between;\n  row-gap: 12px;\n  width: 280px;\n}\n.item {\n  display: grid;\n  place-items: center;\n  width: 80px;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.list::after {\n  content: \"\";\n  width: 80px;\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 0, 280, 124] }, i1: { rect: [0, 0, 80, 56] }, i2: { rect: [100, 0, 80, 56] }, i3: { rect: [200, 0, 80, 56] }, i4: { rect: [0, 68, 80, 56] }, i5: { rect: [100, 68, 80, 56] } },
+  },
+  {
+    lesson: "last-row",
+    name: "flex-start only",
+    css: ".list {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  row-gap: 12px;\n  width: 280px;\n}\n.item {\n  display: grid;\n  place-items: center;\n  width: 80px;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["1 行目の並び（3 つ・間隔 20px・両端ぴったり）が変わりました（横の間隔を gap: 20px にすれば、1 行目は今と同じ位置になります）","2 行目が、左から 20px 間隔で並んでいません（space-between は行ごとに余りを配るので、最後の行の 2 つも両端へ離れます。間隔は gap で決めて、左から詰めます）"],
+    elements: { list: { rect: [0, 0, 280, 124] }, i1: { rect: [0, 0, 80, 56] }, i2: { rect: [80, 0, 80, 56] }, i3: { rect: [160, 0, 80, 56] }, i4: { rect: [0, 68, 80, 56] }, i5: { rect: [80, 68, 80, 56] } },
+  },
+  {
+    lesson: "last-row",
+    name: "gap 20px, space-between kept",
+    css: ".list {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-between;\n  row-gap: 12px;\n  width: 280px;\n}\n.item {\n  display: grid;\n  place-items: center;\n  width: 80px;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.list {\n  column-gap: 20px;\n}\n",
+    messages: ["2 行目が、左から 20px 間隔で並んでいません（space-between は行ごとに余りを配るので、最後の行の 2 つも両端へ離れます。間隔は gap で決めて、左から詰めます）"],
+    elements: { list: { rect: [0, 0, 280, 124] }, i1: { rect: [0, 0, 80, 56] }, i2: { rect: [100, 0, 80, 56] }, i3: { rect: [200, 0, 80, 56] }, i4: { rect: [0, 68, 80, 56] }, i5: { rect: [200, 68, 80, 56] } },
+  },
+];
+
+describe("page grids, container queries in practice and card rows: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 9 lessons", () => {
+    expect([...new Set(PAGE_CASES.map((c) => c.lesson))].sort()).toEqual([...PAGE_LESSONS].sort());
+    for (const id of PAGE_LESSONS) {
+      const names = PAGE_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of PAGE_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of PAGE_LESSONS) {
+      const starter = PAGE_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = PAGE_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the measurements the lessons are about", () => {
+    const find = (id: string, name: string): RecordedCase => PAGE_CASES.find((c) => c.lesson === id && c.name === name)!;
+    const rect = (id: string, name: string, el: string): readonly number[] => find(id, name).elements[el]!.rect!;
+    const computed = (id: string, name: string, el: string, prop: string): string | undefined =>
+      find(id, name).elements[el]!.computed?.[prop];
+    // The photo spans the 240px text column plus 40px on each side; the band spans the page.
+    expect(rect("named-lines", "solution", "hero")[2]).toBe(320);
+    expect(rect("named-lines", "solution", "band")[2]).toBe(596);
+    // auto-fill keeps four 134px columns at 560px; auto-fit collapses the empty two.
+    expect(rect("auto-fit", "starter", "c1")[2]).toBe(134);
+    expect(rect("auto-fit", "solution", "c1")[2]).toBe(276);
+    // At 240px the cards stack, one 240px column.
+    expect(find("auto-fit", "solution").states![240]!.c2!.rect![1]).toBeGreaterThan(46);
+    // The footer ends at the bottom of the 280px preview; display: grid alone also stretches the header.
+    const foot = rect("sticky-footer", "solution", "foot");
+    expect(foot[1]! + foot[3]!).toBeCloseTo(280, 1);
+    expect(rect("sticky-footer", "display: grid only", "head")[3]).toBeGreaterThan(80);
+    // 8cqi is 20px of the 250px card and clamps to 16px in the 150px card; 4vw read the page.
+    expect(computed("cq-units", "starter", "t1", "font-size")).toBe("23.84px");
+    expect(computed("cq-units", "solution", "t1", "font-size")).toBe("20px");
+    expect(computed("cq-units", "solution", "t2", "font-size")).toBe("16px");
+    // The named query reads the 468px main column at 560px and the 388px column at 480px.
+    expect(computed("container-name", "solution", "badge", "display")).toBe("inline-block");
+    expect(find("container-name", "solution").states![480]!.badge!.computed!.display).toBe("none");
+    // The contained sidebar collapses to its 16px of padding until it is given a width.
+    expect(rect("inline-size-zero", "starter", "side")[2]).toBe(16);
+    expect(rect("inline-size-zero", "solution", "side")[2]).toBe(160);
+    // Both buttons end on the same line once the auto margin takes the spare height.
+    const ba = rect("push-footer", "solution", "ba");
+    const bb = rect("push-footer", "solution", "bb");
+    expect(ba[1]! + ba[3]!).toBeCloseTo(bb[1]! + bb[3]!, 1);
+    // A flex li shrinks the short card to its content; a grid li stretches it both ways.
+    expect(rect("stretch-cards", "li flex", "cb")[2]).toBeLessThan(200);
+    expect(rect("stretch-cards", "solution", "cb")[3]).toBe(rect("stretch-cards", "solution", "ca")[3]);
+    // space-between pushes the last item to the right edge; gap keeps it in the second column.
+    expect(rect("last-row", "starter", "i5")[0]).toBe(200);
+    expect(rect("last-row", "solution", "i5")[0]).toBe(100);
+  });
+});
