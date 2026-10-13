@@ -45,6 +45,9 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * (pointer-events, stretched links, 44px targets) follow absolute positioning
  * and the ways of hiding, whose positioned boxes they stack; the form states
  * that a learner cannot change from the preview follow the form styling track.
+ * The pitfalls of scale and opacity and the comfort of what a press reaches
+ * follow those two tracks; ARIA states follow the form states (both style a
+ * state the markup carries); and the text effects follow the typesetting track.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -245,6 +248,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "text-indent", title: "段落の頭を 1 字下げる: text-indent: 1em" },
       { id: "hanging-indent", title: "※ の注記をぶら下げる: 負の text-indent" },
       { id: "underline-offset", title: "下線を文字から離す: text-underline-offset" },
+    ],
+  },
+  {
+    id: "text-effects",
+    title: "文字の飾り（text-shadow・傍点・大文字）",
+    summary: "text-shadow で明るい背景の上の白い文字を読みやすくし、text-emphasis で強調したい語に傍点を付け、text-transform と letter-spacing で英字の小見出しを大文字にそろえる。",
+    emoji: "🔠",
+    lessons: [
+      { id: "text-shadow", title: "明るい背景の上の白い文字に: text-shadow" },
+      { id: "text-emphasis", title: "強調したい語に傍点を: text-emphasis" },
+      { id: "text-transform", title: "英字の小見出しを大文字に: text-transform と letter-spacing" },
     ],
   },
   {
@@ -511,6 +525,28 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "stacking-effects",
+    title: "重なりの落とし穴（scale・opacity）",
+    summary: "scale で大きくしても重なり順は変わらないことを知り、opacity が作る重ね合わせコンテキストから吹き出しを出し、opacity: 0 で隠したメニューが押せてしまうのを止める。",
+    emoji: "🎭",
+    lessons: [
+      { id: "scale-stacking", title: "大きくしても後ろに隠れる: scale と z-index" },
+      { id: "opacity-stacking", title: "半透明の箱に閉じ込められる: opacity" },
+      { id: "opacity-zero-click", title: "見えないのに押せる: opacity: 0 と visibility" },
+    ],
+  },
+  {
+    id: "tap-comfort",
+    title: "押しやすさの工夫（行全体のリンク・リンクの上のボタン・上下の余白）",
+    summary: "リンクを display: block にしてメニューの行全体を押せるようにし、カード全体に広げたリンクの上に保存ボタンを出し、上下の padding で文中のリンクの押せる範囲を行の高さを変えずに広げる。",
+    emoji: "🛟",
+    lessons: [
+      { id: "block-links", title: "行全体を押せるメニュー: リンクを display: block に" },
+      { id: "button-over-link", title: "広げたリンクの上にボタンを出す: position と z-index" },
+      { id: "inline-link-padding", title: "行の高さを変えずに押せる範囲を広げる: 文中のリンクの上下の padding" },
+    ],
+  },
+  {
     id: "shapes",
     title: "回り込みと図形（float・shape-outside）",
     summary: "float で文章を写真の横に流し、shape-outside で円に沿わせ、shape-margin で余白を取る。",
@@ -681,6 +717,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "aria-states",
+    title: "ARIA の状態で見た目を変える（aria-current・aria-expanded・aria-pressed）",
+    summary: "aria-current=\"page\" で今のページに印を付け、aria-expanded で閉じた答えを隠して矢印を回し、aria-pressed で押されている切り替えボタンを塗りつぶす。見た目と読み上げを同じ属性からそろえる。",
+    emoji: "🏷️",
+    lessons: [
+      { id: "aria-current", title: "いまのページに印: [aria-current=\"page\"]" },
+      { id: "aria-expanded", title: "開閉の状態で見せ分ける: [aria-expanded]" },
+      { id: "aria-pressed", title: "押されている切り替えボタン: [aria-pressed=\"true\"]" },
+    ],
+  },
+  {
     id: "transitions",
     title: "トランジション & 変形",
     summary: "transition で滑らかに、transform で拡大・回転。",
@@ -797,6 +844,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "text-wrap": () => import("./text-wrap.js").then((m) => m.textWrapTrack),
   "text-overflow": () => import("./text-overflow.js").then((m) => m.textOverflowTrack),
   typesetting: () => import("./typesetting.js").then((m) => m.typesettingTrack),
+  "text-effects": () => import("./text-effects.js").then((m) => m.textEffectsTrack),
   "modern-selectors": () => import("./modern-selectors.js").then((m) => m.modernSelectorsTrack),
   "has-patterns": () => import("./has-patterns.js").then((m) => m.hasPatternsTrack),
   specificity: () => import("./specificity.js").then((m) => m.specificityTrack),
@@ -821,6 +869,8 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   hiding: () => import("./hiding.js").then((m) => m.hidingTrack),
   stacking: () => import("./stacking.js").then((m) => m.stackingTrack),
   "hit-areas": () => import("./hit-areas.js").then((m) => m.hitAreasTrack),
+  "stacking-effects": () => import("./stacking-effects.js").then((m) => m.stackingEffectsTrack),
+  "tap-comfort": () => import("./tap-comfort.js").then((m) => m.tapComfortTrack),
   shapes: () => import("./shapes.js").then((m) => m.shapesTrack),
   "formatting-contexts": () => import("./formatting-contexts.js").then((m) => m.formattingContextsTrack),
   "aspect-ratio": () => import("./aspect-ratio.js").then((m) => m.aspectRatioTrack),
@@ -837,6 +887,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   filters: () => import("./filters.js").then((m) => m.filtersTrack),
   forms: () => import("./forms.js").then((m) => m.formsTrack),
   "form-states": () => import("./form-states.js").then((m) => m.formStatesTrack),
+  "aria-states": () => import("./aria-states.js").then((m) => m.ariaStatesTrack),
   transitions: () => import("./transitions.js").then((m) => m.transitionsTrack),
   "transforms-2d": () => import("./transforms-2d.js").then((m) => m.transforms2dTrack),
   "transforms-3d": () => import("./transforms-3d.js").then((m) => m.transforms3dTrack),
