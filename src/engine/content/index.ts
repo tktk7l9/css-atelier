@@ -55,7 +55,11 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * The page grids (named lines, auto-fit, a footer at the bottom) follow grid
  * placement, and the card rows (flex and grid together) follow them, before
  * subgrid lines up what is inside the cards; container queries in practice
- * follow their basics.
+ * follow their basics. Attribute selectors in practice follow the list markers
+ * (after generated content, whose external-link lesson uses one); logical
+ * properties in practice follow writing modes, whose vertical text they
+ * share; and the overflow clipping track follows sticky and scroll snap: its
+ * sticky lesson scrolls the same way.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -368,6 +372,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "attribute-selectors",
+    title: "属性セレクタの応用（$= と i・~=・:lang()）",
+    summary: "[href$=\".pdf\" i] で大文字の拡張子もまとめて選び、~= で空白で区切った語を 1 つずつ調べ、:lang(en) で親から受け継いだ言語も選ぶ。",
+    emoji: "🔍",
+    lessons: [
+      { id: "attr-ends-with-i", title: "拡張子で印を付ける: [href$=\".pdf\" i]" },
+      { id: "attr-word", title: "空白で区切った語で選ぶ: [data-tags~=\"sale\"]" },
+      { id: "lang-pseudo", title: "言語で選ぶ: :lang(en)" },
+    ],
+  },
+  {
     id: "nesting",
     title: "ネスト",
     summary: "& を使って入れ子でルールを書く（プリプロセッサ不要）。",
@@ -566,6 +581,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "logical-props-in-practice",
+    title: "論理プロパティの応用（縦書き・右から左）",
+    summary: "border-inline-start で縦書きでも行の始まりに線を引き、text-align: start で右から左の言語を行の始まりにそろえ、inline-size で横書きと縦書きの行の長さを 1 つの指定で決める。",
+    emoji: "🌐",
+    lessons: [
+      { id: "border-inline-start", title: "縦書きでも行の始まりに線を: border-inline-start" },
+      { id: "text-align-start", title: "右から左の言語も行の始まりに: text-align: start" },
+      { id: "inline-size", title: "横書きと縦書きで行の長さをそろえる: inline-size" },
+    ],
+  },
+  {
     id: "positioning",
     title: "絶対配置（absolute・inset）",
     summary: "position: absolute と inset・論理的な inset で、要素を基準の箱の角や全体にぴたりと重ねる。",
@@ -715,6 +741,17 @@ export const TRACKS: readonly TrackMeta[] = [
     lessons: [
       { id: "snap-type-align", title: "カルーセルを止める: scroll-snap-type と scroll-snap-align" },
       { id: "snap-padding", title: "固定ヘッダーの下に止める: scroll-padding" },
+    ],
+  },
+  {
+    id: "overflow-clip",
+    title: "はみ出しの切り取り（overflow: clip と hidden の違い）",
+    summary: "overflow-x: hidden で縦まで切れるのを overflow-x: clip で防ぎ、sticky を止めずに切り取り、clip では囲めない float を display: flow-root で囲む。",
+    emoji: "📎",
+    lessons: [
+      { id: "overflow-x-clip", title: "横だけ切る: overflow-x: clip" },
+      { id: "clip-keeps-sticky", title: "sticky を止めずに切る: overflow: clip" },
+      { id: "clip-flow-root", title: "clip では float を囲めない: display: flow-root と組む" },
     ],
   },
   {
@@ -961,6 +998,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   specificity: () => import("./specificity.js").then((m) => m.specificityTrack),
   "generated-content": () => import("./generated-content.js").then((m) => m.generatedContentTrack),
   "list-markers": () => import("./list-markers.js").then((m) => m.listMarkersTrack),
+  "attribute-selectors": () => import("./attribute-selectors.js").then((m) => m.attributeSelectorsTrack),
   nesting: () => import("./nesting.js").then((m) => m.nestingTrack),
   "nesting-in-practice": () => import("./nesting-in-practice.js").then((m) => m.nestingInPracticeTrack),
   scope: () => import("./scope.js").then((m) => m.scopeTrack),
@@ -979,6 +1017,8 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   tables: () => import("./tables.js").then((m) => m.tablesTrack),
   "logical-props": () => import("./logical-props.js").then((m) => m.logicalPropsTrack),
   "writing-modes": () => import("./writing-modes.js").then((m) => m.writingModesTrack),
+  "logical-props-in-practice": () =>
+    import("./logical-props-in-practice.js").then((m) => m.logicalPropsInPracticeTrack),
   positioning: () => import("./positioning.js").then((m) => m.positioningTrack),
   hiding: () => import("./hiding.js").then((m) => m.hidingTrack),
   stacking: () => import("./stacking.js").then((m) => m.stackingTrack),
@@ -993,6 +1033,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "scroll-areas": () => import("./scroll-areas.js").then((m) => m.scrollAreasTrack),
   sticky: () => import("./sticky.js").then((m) => m.stickyTrack),
   "scroll-snap": () => import("./scroll-snap.js").then((m) => m.scrollSnapTrack),
+  "overflow-clip": () => import("./overflow-clip.js").then((m) => m.overflowClipTrack),
   "media-queries": () => import("./media-queries.js").then((m) => m.mediaQueriesTrack),
   "container-queries": () => import("./container-queries.js").then((m) => m.containerQueriesTrack),
   "container-queries-in-practice": () =>

@@ -7120,3 +7120,456 @@ describe("page grids, container queries in practice and card rows: recorded answ
     expect(rect("last-row", "solution", "i5")[0]).toBe(100);
   });
 });
+
+const FLOW_LESSONS = [
+  "attr-ends-with-i",
+  "attr-word",
+  "lang-pseudo",
+  "border-inline-start",
+  "text-align-start",
+  "inline-size",
+  "overflow-x-clip",
+  "clip-keeps-sticky",
+  "clip-flow-root",
+];
+
+const FLOW_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "attr-ends-with-i",
+    name: "starter",
+    messages: ["拡張子が大文字の PDF（price.PDF・notice.Pdf）に、印が付いていません（属性の値は大文字と小文字を区別して比べられます。] の前に i を書くと区別しなくなります）"],
+    elements: { f1: { rect: [0, 2, 120, 18], computed: {"padding-left":"24px"} }, f2: { rect: [0, 32.39, 48, 18], computed: {"padding-left":"0px"} }, f3: { rect: [0, 62.78, 112, 18], computed: {"padding-left":"0px"} }, f4: { rect: [0, 93.17, 80, 18], computed: {"padding-left":"0px"} }, f5: { rect: [0, 123.56, 98.2, 18], computed: {"padding-left":"0px"} } },
+  },
+  {
+    lesson: "attr-ends-with-i",
+    name: "solution",
+    messages: [],
+    elements: { f1: { rect: [0, 2, 120, 18], computed: {"padding-left":"24px"} }, f2: { rect: [0, 32.39, 72, 18], computed: {"padding-left":"24px"} }, f3: { rect: [0, 62.78, 136, 18], computed: {"padding-left":"24px"} }, f4: { rect: [0, 93.17, 80, 18], computed: {"padding-left":"0px"} }, f5: { rect: [0, 123.56, 98.2, 18], computed: {"padding-left":"0px"} } },
+  },
+  {
+    lesson: "attr-ends-with-i",
+    name: "each case listed",
+    css: ".files {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.files li {\n  margin-bottom: 8px;\n}\n/* PDF へのリンクには、赤い書類の印を付ける */\n.files a[href$=\".pdf\"],\n.files a[href$=\".PDF\"],\n.files a[href$=\".Pdf\"] {\n  padding-left: 24px;\n  background: var(--pdf) no-repeat left center / 20px 20px;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.files {\n  --pdf: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Crect x='3' y='1' width='14' height='18' rx='2' fill='%23c62828'/%3E%3Cpath d='M7 7h6M7 11h6M7 15h4' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { f1: { rect: [0, 2, 120, 18], computed: {"padding-left":"24px"} }, f2: { rect: [0, 32.39, 72, 18], computed: {"padding-left":"24px"} }, f3: { rect: [0, 62.78, 136, 18], computed: {"padding-left":"24px"} }, f4: { rect: [0, 93.17, 80, 18], computed: {"padding-left":"0px"} }, f5: { rect: [0, 123.56, 98.2, 18], computed: {"padding-left":"0px"} } },
+  },
+  {
+    lesson: "attr-ends-with-i",
+    name: "pdf without the dot",
+    css: ".files {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.files li {\n  margin-bottom: 8px;\n}\n/* PDF へのリンクには、赤い書類の印を付ける */\n.files a[href$=\"pdf\" i] {\n  padding-left: 24px;\n  background: var(--pdf) no-repeat left center / 20px 20px;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.files {\n  --pdf: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Crect x='3' y='1' width='14' height='18' rx='2' fill='%23c62828'/%3E%3Cpath d='M7 7h6M7 11h6M7 15h4' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { f1: { rect: [0, 2, 120, 18], computed: {"padding-left":"24px"} }, f2: { rect: [0, 32.39, 72, 18], computed: {"padding-left":"24px"} }, f3: { rect: [0, 62.78, 136, 18], computed: {"padding-left":"24px"} }, f4: { rect: [0, 93.17, 80, 18], computed: {"padding-left":"0px"} }, f5: { rect: [0, 123.56, 98.2, 18], computed: {"padding-left":"0px"} } },
+  },
+  {
+    lesson: "attr-ends-with-i",
+    name: "*= with i",
+    css: ".files {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.files li {\n  margin-bottom: 8px;\n}\n/* PDF へのリンクには、赤い書類の印を付ける */\n.files a[href*=\"pdf\" i] {\n  padding-left: 24px;\n  background: var(--pdf) no-repeat left center / 20px 20px;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.files {\n  --pdf: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Crect x='3' y='1' width='14' height='18' rx='2' fill='%23c62828'/%3E%3Cpath d='M7 7h6M7 11h6M7 15h4' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["PDF ではないリンク（地図・PDF の開き方）にも印が付いています（*= は途中に含むだけで合うので、拡張子は $= で末尾を調べます）"],
+    elements: { f1: { rect: [0, 2, 120, 18], computed: {"padding-left":"24px"} }, f2: { rect: [0, 32.39, 72, 18], computed: {"padding-left":"24px"} }, f3: { rect: [0, 62.78, 136, 18], computed: {"padding-left":"24px"} }, f4: { rect: [0, 93.17, 80, 18], computed: {"padding-left":"0px"} }, f5: { rect: [0, 123.56, 122.2, 18], computed: {"padding-left":"24px"} } },
+  },
+  {
+    lesson: "attr-ends-with-i",
+    name: "upper case only",
+    css: ".files {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.files li {\n  margin-bottom: 8px;\n}\n/* PDF へのリンクには、赤い書類の印を付ける */\n.files a[href$=\".PDF\"] {\n  padding-left: 24px;\n  background: var(--pdf) no-repeat left center / 20px 20px;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.files {\n  --pdf: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Crect x='3' y='1' width='14' height='18' rx='2' fill='%23c62828'/%3E%3Cpath d='M7 7h6M7 11h6M7 15h4' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["拡張子が大文字の PDF（price.PDF・notice.Pdf）に、印が付いていません（属性の値は大文字と小文字を区別して比べられます。] の前に i を書くと区別しなくなります）"],
+    elements: { f1: { rect: [0, 2, 96, 18], computed: {"padding-left":"0px"} }, f2: { rect: [0, 32.39, 72, 18], computed: {"padding-left":"24px"} }, f3: { rect: [0, 62.78, 112, 18], computed: {"padding-left":"0px"} }, f4: { rect: [0, 93.17, 80, 18], computed: {"padding-left":"0px"} }, f5: { rect: [0, 123.56, 98.2, 18], computed: {"padding-left":"0px"} } },
+  },
+  {
+    lesson: "attr-word",
+    name: "starter",
+    messages: ["業務用のセット（wholesale）や秋のニットまで赤くなっています（*= は値の途中に含むだけで合います。sale という語そのものを調べるのは ~= です）"],
+    elements: { p1: { rect: [0, 0, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p2: { rect: [0, 40.39, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p3: { rect: [0, 80.78, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p4: { rect: [0, 121.17, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "attr-word",
+    name: "solution",
+    messages: [],
+    elements: { p1: { rect: [0, 0, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p2: { rect: [0, 40.39, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, p3: { rect: [0, 80.78, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p4: { rect: [0, 121.17, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "attr-word",
+    name: "word spelled out",
+    css: ".items {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.items li {\n  margin-bottom: 6px;\n  padding: 6px 10px;\n  border-radius: 6px;\n  background: #eef1f8;\n}\n/* タグに sale がある商品（セール中）を目立たせる */\n.items [data-tags=\"sale\"],\n.items [data-tags^=\"sale \"],\n.items [data-tags$=\" sale\"],\n.items [data-tags*=\" sale \"] {\n  background: #fdeaed;\n  color: #a92e45;\n}\n",
+    messages: [],
+    elements: { p1: { rect: [0, 0, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p2: { rect: [0, 40.39, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, p3: { rect: [0, 80.78, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p4: { rect: [0, 121.17, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "attr-word",
+    name: "= sale",
+    css: ".items {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.items li {\n  margin-bottom: 6px;\n  padding: 6px 10px;\n  border-radius: 6px;\n  background: #eef1f8;\n}\n/* タグに sale がある商品（セール中）を目立たせる */\n.items [data-tags=\"sale\"] {\n  background: #fdeaed;\n  color: #a92e45;\n}\n",
+    messages: ["「new sale」のように、ほかのタグと並んだ sale の商品が赤くなっていません（= は値全体との一致です。空白で区切った語のどれかと比べるのは ~= です）"],
+    elements: { p1: { rect: [0, 0, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, p2: { rect: [0, 40.39, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, p3: { rect: [0, 80.78, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p4: { rect: [0, 121.17, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "attr-word",
+    name: "$= sale",
+    css: ".items {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.items li {\n  margin-bottom: 6px;\n  padding: 6px 10px;\n  border-radius: 6px;\n  background: #eef1f8;\n}\n/* タグに sale がある商品（セール中）を目立たせる */\n.items [data-tags$=\"sale\"] {\n  background: #fdeaed;\n  color: #a92e45;\n}\n",
+    messages: ["業務用のセット（wholesale）や秋のニットまで赤くなっています（*= は値の途中に含むだけで合います。sale という語そのものを調べるのは ~= です）"],
+    elements: { p1: { rect: [0, 0, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p2: { rect: [0, 40.39, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p3: { rect: [0, 80.78, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p4: { rect: [0, 121.17, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "attr-word",
+    name: "^= sale",
+    css: ".items {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.items li {\n  margin-bottom: 6px;\n  padding: 6px 10px;\n  border-radius: 6px;\n  background: #eef1f8;\n}\n/* タグに sale がある商品（セール中）を目立たせる */\n.items [data-tags^=\"sale\"] {\n  background: #fdeaed;\n  color: #a92e45;\n}\n",
+    messages: ["「new sale」のように、ほかのタグと並んだ sale の商品が赤くなっていません（= は値全体との一致です。空白で区切った語のどれかと比べるのは ~= です）"],
+    elements: { p1: { rect: [0, 0, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, p2: { rect: [0, 40.39, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, p3: { rect: [0, 80.78, 596, 34.39], computed: {"background-color":"rgb(253, 234, 237)"} }, p4: { rect: [0, 121.17, 596, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "lang-pseudo",
+    name: "starter",
+    messages: ["lang=\"en-US\" の段落や、英語の引用の中の段落が斜体になっていません（[lang=\"en\"] は、その属性を自分で持ち、値がぴったり en の要素だけに合います。:lang(en) なら、en-US も、親から受け継いだ言語も合います）"],
+    elements: { ja: { rect: [0, 0, 596, 22.39], computed: {"font-style":"normal"} }, en1: { rect: [0, 30.39, 596, 22.39], computed: {"font-style":"italic"} }, en2: { rect: [0, 60.78, 596, 22.39], computed: {"font-style":"normal"} }, en3: { rect: [15, 91.17, 581, 22.39], computed: {"font-style":"normal"} } },
+  },
+  {
+    lesson: "lang-pseudo",
+    name: "solution",
+    messages: [],
+    elements: { ja: { rect: [0, 0, 596, 22.39], computed: {"font-style":"normal"} }, en1: { rect: [0, 30.39, 596, 22.39], computed: {"font-style":"italic"} }, en2: { rect: [0, 60.78, 596, 22.39], computed: {"font-style":"italic"} }, en3: { rect: [15, 91.17, 581, 22.39], computed: {"font-style":"italic"} } },
+  },
+  {
+    lesson: "lang-pseudo",
+    name: ":lang(en) on any element",
+    css: ".post p {\n  margin: 0 0 8px;\n}\n.post blockquote {\n  margin: 0;\n  padding-left: 12px;\n  border-left: 3px solid #d6dded;\n}\n/* 英語の段落だけを斜体にする */\n.post :lang(en) {\n  font-style: italic;\n}\n",
+    messages: [],
+    elements: { ja: { rect: [0, 0, 596, 22.39], computed: {"font-style":"normal"} }, en1: { rect: [0, 30.39, 596, 22.39], computed: {"font-style":"italic"} }, en2: { rect: [0, 60.78, 596, 22.39], computed: {"font-style":"italic"} }, en3: { rect: [15, 91.17, 581, 22.39], computed: {"font-style":"italic"} } },
+  },
+  {
+    lesson: "lang-pseudo",
+    name: "[lang|=en] and its paragraphs",
+    css: ".post p {\n  margin: 0 0 8px;\n}\n.post blockquote {\n  margin: 0;\n  padding-left: 12px;\n  border-left: 3px solid #d6dded;\n}\n/* 英語の段落だけを斜体にする */\n.post [lang|=\"en\"],\n.post [lang|=\"en\"] p {\n  font-style: italic;\n}\n",
+    messages: [],
+    elements: { ja: { rect: [0, 0, 596, 22.39], computed: {"font-style":"normal"} }, en1: { rect: [0, 30.39, 596, 22.39], computed: {"font-style":"italic"} }, en2: { rect: [0, 60.78, 596, 22.39], computed: {"font-style":"italic"} }, en3: { rect: [15, 91.17, 581, 22.39], computed: {"font-style":"italic"} } },
+  },
+  {
+    lesson: "lang-pseudo",
+    name: "p[lang|=en]",
+    css: ".post p {\n  margin: 0 0 8px;\n}\n.post blockquote {\n  margin: 0;\n  padding-left: 12px;\n  border-left: 3px solid #d6dded;\n}\n/* 英語の段落だけを斜体にする */\n.post p[lang|=\"en\"] {\n  font-style: italic;\n}\n",
+    messages: ["lang=\"en-US\" の段落や、英語の引用の中の段落が斜体になっていません（[lang=\"en\"] は、その属性を自分で持ち、値がぴったり en の要素だけに合います。:lang(en) なら、en-US も、親から受け継いだ言語も合います）"],
+    elements: { ja: { rect: [0, 0, 596, 22.39], computed: {"font-style":"normal"} }, en1: { rect: [0, 30.39, 596, 22.39], computed: {"font-style":"italic"} }, en2: { rect: [0, 60.78, 596, 22.39], computed: {"font-style":"italic"} }, en3: { rect: [15, 91.17, 581, 22.39], computed: {"font-style":"normal"} } },
+  },
+  {
+    lesson: "lang-pseudo",
+    name: "every paragraph",
+    css: ".post p {\n  margin: 0 0 8px;\n}\n.post blockquote {\n  margin: 0;\n  padding-left: 12px;\n  border-left: 3px solid #d6dded;\n}\n/* 英語の段落だけを斜体にする */\n.post p {\n  font-style: italic;\n}\n",
+    messages: ["日本語の段落まで斜体になっています（英語の段落だけを選びます）"],
+    elements: { ja: { rect: [0, 0, 596, 22.39], computed: {"font-style":"italic"} }, en1: { rect: [0, 30.39, 596, 22.39], computed: {"font-style":"italic"} }, en2: { rect: [0, 60.78, 596, 22.39], computed: {"font-style":"italic"} }, en3: { rect: [15, 91.17, 581, 22.39], computed: {"font-style":"italic"} } },
+  },
+  {
+    lesson: "border-inline-start",
+    name: "starter",
+    messages: ["縦書きの注意書きの線が、行の始まり（上）の 1 本になっていません（border-left は向きに関係なく左に引きます。border-inline-start なら、横書きでは左、縦書きでは上です）"],
+    elements: { h: { rect: [0, 0, 202.41, 38.39], computed: {"border-top-width":"0px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"4px"} }, v: { rect: [218.41, 0, 72.78, 168], computed: {"border-top-width":"0px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"4px"} } },
+  },
+  {
+    lesson: "border-inline-start",
+    name: "solution",
+    messages: [],
+    elements: { h: { rect: [0, 0, 202.41, 38.39], computed: {"border-top-width":"0px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"4px"} }, v: { rect: [218.41, 0, 68.78, 168], computed: {"border-top-width":"4px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"0px"} } },
+  },
+  {
+    lesson: "border-inline-start",
+    name: "longhands",
+    css: ".notes {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.note {\n  margin: 0;\n  padding: 8px 12px;\n  background: #fff3c4;\n  border-inline-start-width: 4px;\n  border-inline-start-style: solid;\n  border-inline-start-color: #b9791b;\n}\n.vertical {\n  writing-mode: vertical-rl;\n  height: 168px;\n}\n",
+    messages: [],
+    elements: { h: { rect: [0, 0, 202.41, 38.39], computed: {"border-top-width":"0px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"4px"} }, v: { rect: [218.41, 0, 68.78, 168], computed: {"border-top-width":"4px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"0px"} } },
+  },
+  {
+    lesson: "border-inline-start",
+    name: "border-inline (both ends)",
+    css: ".notes {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.note {\n  margin: 0;\n  padding: 8px 12px;\n  background: #fff3c4;\n  border-inline: 4px solid #b9791b;\n}\n.vertical {\n  writing-mode: vertical-rl;\n  height: 168px;\n}\n",
+    messages: ["横書きの注意書きの線が、左の 1 本だけになっていません"],
+    elements: { h: { rect: [0, 0, 206.41, 38.39], computed: {"border-top-width":"0px","border-right-width":"4px","border-bottom-width":"0px","border-left-width":"4px"} }, v: { rect: [222.41, 0, 68.78, 168], computed: {"border-top-width":"4px","border-right-width":"0px","border-bottom-width":"4px","border-left-width":"0px"} } },
+  },
+  {
+    lesson: "border-inline-start",
+    name: "border-block-start",
+    css: ".notes {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.note {\n  margin: 0;\n  padding: 8px 12px;\n  background: #fff3c4;\n  border-block-start: 4px solid #b9791b;\n}\n.vertical {\n  writing-mode: vertical-rl;\n  height: 168px;\n}\n",
+    messages: ["横書きの注意書きの線が、左の 1 本だけになっていません"],
+    elements: { h: { rect: [0, 0, 198.41, 42.39], computed: {"border-top-width":"4px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"0px"} }, v: { rect: [214.41, 0, 72.78, 168], computed: {"border-top-width":"0px","border-right-width":"4px","border-bottom-width":"0px","border-left-width":"0px"} } },
+  },
+  {
+    lesson: "border-inline-start",
+    name: "border-top for the vertical note",
+    css: ".notes {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.note {\n  margin: 0;\n  padding: 8px 12px;\n  background: #fff3c4;\n  border-left: 4px solid #b9791b;\n}\n.vertical {\n  writing-mode: vertical-rl;\n  height: 168px;\n}\n.vertical {\n  border-left: 0;\n  border-top: 4px solid #b9791b;\n}\n",
+    messages: ["縦書きの要素にだけ border-top を書くのではなく、.note の border-inline-start 1 つで両方に効かせましょう"],
+    elements: { h: { rect: [0, 0, 202.41, 38.39], computed: {"border-top-width":"0px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"4px"} }, v: { rect: [218.41, 0, 68.78, 168], computed: {"border-top-width":"4px","border-right-width":"0px","border-bottom-width":"0px","border-left-width":"0px"} } },
+  },
+  {
+    lesson: "text-align-start",
+    name: "starter",
+    messages: ["アラビア語のあいさつが、右（右から左に書く文の行の始まり）にそろっていません（text-align: left はいつも左です。start なら、書く向きに合わせて行の始まりにそろいます）"],
+    elements: { ja: { rect: [0, 0, 596, 38.39] }, "ja-text": { rect: [12, 10, 63.2, 18] }, ar: { rect: [0, 46.39, 596, 38.39] }, "ar-text": { rect: [12, 56.39, 62.48, 18] } },
+  },
+  {
+    lesson: "text-align-start",
+    name: "solution",
+    messages: [],
+    elements: { ja: { rect: [0, 0, 596, 38.39] }, "ja-text": { rect: [12, 10, 63.2, 18] }, ar: { rect: [0, 46.39, 596, 38.39] }, "ar-text": { rect: [521.52, 56.39, 62.48, 18] } },
+  },
+  {
+    lesson: "text-align-start",
+    name: "text-align removed",
+    css: ".greeting {\n  margin: 0 0 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n",
+    messages: [],
+    elements: { ja: { rect: [0, 0, 596, 38.39] }, "ja-text": { rect: [12, 10, 63.2, 18] }, ar: { rect: [0, 46.39, 596, 38.39] }, "ar-text": { rect: [521.52, 56.39, 62.48, 18] } },
+  },
+  {
+    lesson: "text-align-start",
+    name: "right for rtl",
+    css: ".greeting {\n  margin: 0 0 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n  /* 以前のリセットで付けた左寄せ */\n  text-align: left;\n}\n[dir=\"rtl\"] {\n  text-align: right;\n}\n",
+    messages: [],
+    elements: { ja: { rect: [0, 0, 596, 38.39] }, "ja-text": { rect: [12, 10, 63.2, 18] }, ar: { rect: [0, 46.39, 596, 38.39] }, "ar-text": { rect: [521.52, 56.39, 62.48, 18] } },
+  },
+  {
+    lesson: "text-align-start",
+    name: "right",
+    css: ".greeting {\n  margin: 0 0 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n  /* 以前のリセットで付けた左寄せ */\n  text-align: right;\n}\n",
+    messages: ["日本語のあいさつが、左（行の始まり）にそろっていません"],
+    elements: { ja: { rect: [0, 0, 596, 38.39] }, "ja-text": { rect: [520.8, 10, 63.2, 18] }, ar: { rect: [0, 46.39, 596, 38.39] }, "ar-text": { rect: [521.52, 56.39, 62.48, 18] } },
+  },
+  {
+    lesson: "text-align-start",
+    name: "end",
+    css: ".greeting {\n  margin: 0 0 8px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n  /* 以前のリセットで付けた左寄せ */\n  text-align: end;\n}\n",
+    messages: ["日本語のあいさつが、左（行の始まり）にそろっていません"],
+    elements: { ja: { rect: [0, 0, 596, 38.39] }, "ja-text": { rect: [520.8, 10, 63.2, 18] }, ar: { rect: [0, 46.39, 596, 38.39] }, "ar-text": { rect: [12, 56.39, 62.48, 18] } },
+  },
+  {
+    lesson: "inline-size",
+    name: "starter",
+    messages: ["縦書きの段落の高さ（1 行の長さ）が 160px になっていません（width はいつも横幅です。縦書きの 1 行は縦に伸びるので、行の長さは inline-size で決めます）"],
+    elements: { h: { rect: [0, 0, 160, 83.17] }, v: { rect: [176, 0, 160, 280] } },
+  },
+  {
+    lesson: "inline-size",
+    name: "solution",
+    messages: [],
+    elements: { h: { rect: [0, 0, 160, 83.17] }, v: { rect: [176, 0, 83.17, 160] } },
+  },
+  {
+    lesson: "inline-size",
+    name: "max-inline-size",
+    css: ".pair {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.column {\n  /* 1 行の長さ */\n  max-inline-size: 160px;\n  margin: 0;\n  padding: 8px;\n  background: #eef1f8;\n}\n.vertical {\n  writing-mode: vertical-rl;\n}\n",
+    messages: [],
+    elements: { h: { rect: [0, 0, 160, 83.17] }, v: { rect: [176, 0, 83.17, 160] } },
+  },
+  {
+    lesson: "inline-size",
+    name: "inline-size with width kept",
+    css: ".pair {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.column {\n  /* 1 行の長さ */\n  width: 160px;\n  margin: 0;\n  padding: 8px;\n  background: #eef1f8;\n}\n.vertical {\n  writing-mode: vertical-rl;\n}\n.column {\n  inline-size: 160px;\n}\n",
+    messages: [],
+    elements: { h: { rect: [0, 0, 160, 83.17] }, v: { rect: [176, 0, 160, 160] } },
+  },
+  {
+    lesson: "inline-size",
+    name: "height for the vertical one",
+    css: ".pair {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.column {\n  /* 1 行の長さ */\n  width: 160px;\n  margin: 0;\n  padding: 8px;\n  background: #eef1f8;\n}\n.vertical {\n  writing-mode: vertical-rl;\n}\n.vertical {\n  width: auto;\n  height: 160px;\n}\n",
+    messages: ["縦書きの要素にだけ height を書くのではなく、.column の inline-size 1 つで両方の行の長さを決めましょう"],
+    elements: { h: { rect: [0, 0, 160, 83.17] }, v: { rect: [176, 0, 83.17, 160] } },
+  },
+  {
+    lesson: "inline-size",
+    name: "block-size",
+    css: ".pair {\n  display: flex;\n  gap: 16px;\n  align-items: flex-start;\n}\n.column {\n  /* 1 行の長さ */\n  block-size: 160px;\n  margin: 0;\n  padding: 8px;\n  background: #eef1f8;\n}\n.vertical {\n  writing-mode: vertical-rl;\n}\n",
+    messages: ["横書きの段落の幅（1 行の長さ）が 160px になっていません"],
+    elements: { h: { rect: [0, 0, 364.33, 160] }, v: { rect: [380.33, 0, 160, 280] } },
+  },
+  {
+    lesson: "overflow-x-clip",
+    name: "starter",
+    messages: ["「新着」の印の上半分が切れています（overflow-x を hidden にすると、overflow-y の visible は auto として扱われ、縦も切られます。overflow-x: clip なら、overflow-y は visible のままです）"],
+    elements: { page: { rect: [0, 0, 596, 127.19] }, badge: { rect: [28, 12, 44, 20.8] }, ribbon: { rect: [32, 77.19, 252, 10] } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"page"},{"at":"badge","fx":0.5,"fy":0.2,"top":"page"}],
+  },
+  {
+    lesson: "overflow-x-clip",
+    name: "solution",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 127.19] }, badge: { rect: [28, 12, 44, 20.8] }, ribbon: { rect: [32, 77.19, 252, 10] } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"page"},{"at":"badge","fx":0.5,"fy":0.2,"top":"badge"}],
+  },
+  {
+    lesson: "overflow-x-clip",
+    name: "overflow: clip visible",
+    css: ".page {\n  padding: 24px 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯だけを切りたい */\n  overflow: clip visible;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.badge {\n  position: absolute;\n  top: -12px;\n  left: 12px;\n  padding: 2px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n.ribbon {\n  height: 10px;\n  margin: 12px -64px 0 0;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 127.19] }, badge: { rect: [28, 12, 44, 20.8] }, ribbon: { rect: [32, 77.19, 252, 10] } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"page"},{"at":"badge","fx":0.5,"fy":0.2,"top":"badge"}],
+  },
+  {
+    lesson: "overflow-x-clip",
+    name: "clip-path on the right",
+    css: ".page {\n  padding: 24px 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯だけを切りたい */\n  clip-path: inset(-20px 0 -20px -20px);\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.badge {\n  position: absolute;\n  top: -12px;\n  left: 12px;\n  padding: 2px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n.ribbon {\n  height: 10px;\n  margin: 12px -64px 0 0;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 127.19] }, badge: { rect: [28, 12, 44, 20.8] }, ribbon: { rect: [32, 77.19, 252, 10] } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"page"},{"at":"badge","fx":0.5,"fy":0.2,"top":"badge"}],
+  },
+  {
+    lesson: "overflow-x-clip",
+    name: "overflow-y: visible added",
+    css: ".page {\n  padding: 24px 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯だけを切りたい */\n  overflow-x: hidden;\n  overflow-y: visible;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.badge {\n  position: absolute;\n  top: -12px;\n  left: 12px;\n  padding: 2px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n.ribbon {\n  height: 10px;\n  margin: 12px -64px 0 0;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: ["「新着」の印の上半分が切れています（overflow-x を hidden にすると、overflow-y の visible は auto として扱われ、縦も切られます。overflow-x: clip なら、overflow-y は visible のままです）"],
+    elements: { page: { rect: [0, 0, 596, 127.19] }, badge: { rect: [28, 12, 44, 20.8] }, ribbon: { rect: [32, 77.19, 252, 10] } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"page"},{"at":"badge","fx":0.5,"fy":0.2,"top":"page"}],
+  },
+  {
+    lesson: "overflow-x-clip",
+    name: "overflow: hidden",
+    css: ".page {\n  padding: 24px 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯だけを切りたい */\n  overflow: hidden;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.badge {\n  position: absolute;\n  top: -12px;\n  left: 12px;\n  padding: 2px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n.ribbon {\n  height: 10px;\n  margin: 12px -64px 0 0;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: ["「新着」の印の上半分が切れています（overflow-x を hidden にすると、overflow-y の visible は auto として扱われ、縦も切られます。overflow-x: clip なら、overflow-y は visible のままです）"],
+    elements: { page: { rect: [0, 0, 596, 127.19] }, badge: { rect: [28, 12, 44, 20.8] }, ribbon: { rect: [32, 77.19, 252, 10] } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"page"},{"at":"badge","fx":0.5,"fy":0.2,"top":"page"}],
+  },
+  {
+    lesson: "overflow-x-clip",
+    name: "overflow removed",
+    css: ".page {\n  padding: 24px 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯だけを切りたい */\n  \n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.badge {\n  position: absolute;\n  top: -12px;\n  left: 12px;\n  padding: 2px 10px;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 12px;\n}\n.ribbon {\n  height: 10px;\n  margin: 12px -64px 0 0;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: ["右へはみ出した帯が、カードの外まで見えています（帯の切り取りは残します）"],
+    elements: { page: { rect: [0, 0, 596, 127.19] }, badge: { rect: [28, 12, 44, 20.8] }, ribbon: { rect: [32, 77.19, 252, 10] } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"ribbon"},{"at":"badge","fx":0.5,"fy":0.2,"top":"badge"}],
+  },
+  {
+    lesson: "clip-keeps-sticky",
+    name: "starter",
+    messages: ["見出しが、スクロールしても上に残っていません（overflow: hidden のカードはスクロールの仕組みを持つ箱になり、見出しはスクロールしないカードに貼り付こうとします。overflow: clip は切り取るだけで、スクロールの箱になりません）"],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, head: { rect: [0, -84.12, 240, 38.39], computed: {"position":"sticky"} }, ribbon: { rect: [0, 230, 280, 10], computed: {"position":"static"} } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"box"}],
+  },
+  {
+    lesson: "clip-keeps-sticky",
+    name: "solution",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, head: { rect: [0, 0, 240, 38.39], computed: {"position":"sticky"} }, ribbon: { rect: [0, 230, 280, 10], computed: {"position":"static"} } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"box"}],
+  },
+  {
+    lesson: "clip-keeps-sticky",
+    name: "overflow-x: clip",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n.card {\n  width: 240px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯を切る */\n  overflow-x: clip;\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 16px;\n}\n.item {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n}\n.ribbon {\n  height: 10px;\n  margin-right: -40px;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, head: { rect: [0, 0, 240, 38.39], computed: {"position":"sticky"} }, ribbon: { rect: [0, 230, 280, 10], computed: {"position":"static"} } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"box"}],
+  },
+  {
+    lesson: "clip-keeps-sticky",
+    name: "clip-path",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n.card {\n  width: 240px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯を切る */\n  clip-path: inset(0 round 12px);\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 16px;\n}\n.item {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n}\n.ribbon {\n  height: 10px;\n  margin-right: -40px;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, head: { rect: [0, 0, 240, 38.39], computed: {"position":"sticky"} }, ribbon: { rect: [0, 230, 280, 10], computed: {"position":"static"} } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"box"}],
+  },
+  {
+    lesson: "clip-keeps-sticky",
+    name: "overflow removed",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n.card {\n  width: 240px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯を切る */\n  overflow: visible;\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 16px;\n}\n.item {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n}\n.ribbon {\n  height: 10px;\n  margin-right: -40px;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: ["右へはみ出した帯が、カードの外まで見えています（overflow を外すと、切り取りもなくなります。切り取るだけなら overflow: clip です）"],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, head: { rect: [0, 0, 240, 38.39], computed: {"position":"sticky"} }, ribbon: { rect: [0, 230, 280, 10], computed: {"position":"static"} } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"ribbon"}],
+  },
+  {
+    lesson: "clip-keeps-sticky",
+    name: "overflow: auto",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n.card {\n  width: 240px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯を切る */\n  overflow: auto;\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 16px;\n}\n.item {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n}\n.ribbon {\n  height: 10px;\n  margin-right: -40px;\n  background: repeating-linear-gradient(45deg, #f5c400 0 8px, #18203a 8px 16px);\n}\n",
+    messages: ["見出しが、スクロールしても上に残っていません（overflow: hidden のカードはスクロールの仕組みを持つ箱になり、見出しはスクロールしないカードに貼り付こうとします。overflow: clip は切り取るだけで、スクロールの箱になりません）"],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, head: { rect: [0, -99.12, 240, 38.39], computed: {"position":"sticky"} }, ribbon: { rect: [0, 215, 280, 10], computed: {"position":"static"} } },
+    hits: [{"at":"ribbon","fx":0.1,"fy":0.5,"top":"ribbon"},{"at":"ribbon","fx":0.95,"fy":0.5,"top":"box"}],
+  },
+  {
+    lesson: "clip-flow-root",
+    name: "starter",
+    messages: ["カードが写真（float）を囲まず、写真の下がはみ出して切れています（clip は hidden と違って新しいブロック整形文脈を作らないので、float を囲みません。display: flow-root を足すと囲みます）"],
+    elements: { card: { rect: [0, 0, 596, 46.39], computed: {"overflow-x":"clip"} }, photo: { rect: [12, 12, 96, 96], computed: {"overflow-x":"visible"} }, text: { rect: [120, 14, 270.41, 18], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "clip-flow-root",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 596, 120], computed: {"overflow-x":"clip"} }, photo: { rect: [12, 12, 96, 96], computed: {"overflow-x":"visible"} }, text: { rect: [120, 14, 270.41, 18], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "clip-flow-root",
+    name: "clearfix",
+    css: ".card {\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* スクロールの箱にしないよう、hidden から clip に変えた */\n  overflow: clip;\n}\n.photo {\n  float: left;\n  width: 96px;\n  height: 96px;\n  margin-right: 12px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.text {\n  margin: 0;\n}\n.next {\n  margin: 12px 0 0;\n}\n.card::after {\n  content: \"\";\n  display: block;\n  clear: both;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 596, 120], computed: {"overflow-x":"clip"} }, photo: { rect: [12, 12, 96, 96], computed: {"overflow-x":"visible"} }, text: { rect: [120, 14, 270.41, 18], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "clip-flow-root",
+    name: "contain: layout",
+    css: ".card {\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* スクロールの箱にしないよう、hidden から clip に変えた */\n  overflow: clip;\n  contain: layout;\n}\n.photo {\n  float: left;\n  width: 96px;\n  height: 96px;\n  margin-right: 12px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.text {\n  margin: 0;\n}\n.next {\n  margin: 12px 0 0;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 596, 120], computed: {"overflow-x":"clip"} }, photo: { rect: [12, 12, 96, 96], computed: {"overflow-x":"visible"} }, text: { rect: [120, 14, 270.41, 18], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "clip-flow-root",
+    name: "back to hidden",
+    css: ".card {\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* スクロールの箱にしないよう、hidden から clip に変えた */\n  overflow: hidden;\n}\n.photo {\n  float: left;\n  width: 96px;\n  height: 96px;\n  margin-right: 12px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.text {\n  margin: 0;\n}\n.next {\n  margin: 12px 0 0;\n}\n",
+    messages: ["overflow は clip のままにしましょう（hidden に戻すとカードがスクロールの箱になり、中の sticky の見出しが止まらなくなります）"],
+    elements: { card: { rect: [0, 0, 596, 120], computed: {"overflow-x":"hidden"} }, photo: { rect: [12, 12, 96, 96], computed: {"overflow-x":"visible"} }, text: { rect: [120, 14, 270.41, 18], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "clip-flow-root",
+    name: "float removed",
+    css: ".card {\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* スクロールの箱にしないよう、hidden から clip に変えた */\n  overflow: clip;\n}\n.photo {\n  float: left;\n  width: 96px;\n  height: 96px;\n  margin-right: 12px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.text {\n  margin: 0;\n}\n.next {\n  margin: 12px 0 0;\n}\n.photo {\n  float: none;\n}\n",
+    messages: ["写真の横に文章が並んでいません（写真の float はそのままにします）"],
+    elements: { card: { rect: [0, 0, 596, 142.39], computed: {"overflow-x":"clip"} }, photo: { rect: [12, 12, 96, 96], computed: {"overflow-x":"visible"} }, text: { rect: [12, 110, 270.41, 18], computed: {"overflow-x":"visible"} } },
+  },
+];
+
+describe("attribute selectors, logical properties and overflow clipping in practice: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 9 lessons", () => {
+    expect([...new Set(FLOW_CASES.map((c) => c.lesson))].sort()).toEqual([...FLOW_LESSONS].sort());
+    for (const id of FLOW_LESSONS) {
+      const names = FLOW_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of FLOW_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of FLOW_LESSONS) {
+      const starter = FLOW_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = FLOW_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the measurements the lessons are about", () => {
+    const find = (id: string, name: string): RecordedCase => FLOW_CASES.find((c) => c.lesson === id && c.name === name)!;
+    const rect = (id: string, name: string, el: string): readonly number[] => find(id, name).elements[el]!.rect!;
+    const computed = (id: string, name: string, el: string, prop: string): string | undefined =>
+      find(id, name).elements[el]!.computed?.[prop];
+    const hit = (id: string, name: string, at: string, fx: number): string | null | undefined =>
+      find(id, name).hits?.find((h) => h.at === at && h.fx === fx)?.top;
+    // The i flag adds the upper-case PDFs; ~= leaves out "wholesale"; :lang(en) reaches en-US and the quote.
+    expect(computed("attr-ends-with-i", "solution", "f2", "padding-left")).toBe("24px");
+    expect(computed("attr-ends-with-i", "solution", "f5", "padding-left")).toBe("0px");
+    expect(computed("attr-word", "starter", "p2", "background-color")).toBe("rgb(253, 234, 237)");
+    expect(computed("attr-word", "solution", "p2", "background-color")).toBe("rgb(238, 241, 248)");
+    expect(computed("lang-pseudo", "solution", "en3", "font-style")).toBe("italic");
+    // border-inline-start is the top border of the vertical note; inline-size is its height.
+    expect(computed("border-inline-start", "solution", "v", "border-top-width")).toBe("4px");
+    expect(rect("inline-size", "starter", "v")[3]).toBe(280);
+    expect(rect("inline-size", "solution", "v")[3]).toBe(160);
+    // start puts the right-to-left greeting 12px inside the right edge.
+    const ar = rect("text-align-start", "solution", "ar");
+    const arText = rect("text-align-start", "solution", "ar-text");
+    expect(ar[0]! + ar[2]! - (arText[0]! + arText[2]!)).toBeCloseTo(12, 1);
+    // hidden on one axis clips the badge on the other; clip keeps it.
+    expect(hit("overflow-x-clip", "starter", "badge", 0.5)).toBe("page");
+    expect(hit("overflow-x-clip", "solution", "badge", 0.5)).toBe("badge");
+    // The heading is scrolled away under overflow: hidden and stuck to the box's top with clip.
+    expect(rect("clip-keeps-sticky", "starter", "head")[1]).toBeLessThan(0);
+    expect(rect("clip-keeps-sticky", "solution", "head")[1]).toBe(0);
+    // flow-root makes the card reach 12px below the 96px photo.
+    expect(rect("clip-flow-root", "starter", "card")[3]).toBeLessThan(96);
+    expect(rect("clip-flow-root", "solution", "card")[3]).toBe(120);
+  });
+});
