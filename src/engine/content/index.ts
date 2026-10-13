@@ -48,6 +48,8 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * The pitfalls of scale and opacity and the comfort of what a press reaches
  * follow those two tracks; ARIA states follow the form states (both style a
  * state the markup carries); and the text effects follow the typesetting track.
+ * Margin collapsing follows how widths are decided (both are box-model
+ * basics); the nesting and cascade-layer practice tracks follow their basics.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -108,6 +110,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "box-sizing", title: "余白と枠線を幅に含める: box-sizing: border-box" },
       { id: "width-auto", title: "margin のぶん自動で縮む: width: auto" },
       { id: "image-max-width", title: "画像を枠に収める: max-width: 100% と height: auto" },
+    ],
+  },
+  {
+    id: "margin-collapse",
+    title: "マージンの相殺（兄弟・親子・flex と grid）",
+    summary: "上下に並んだマージンが大きいほうだけになる相殺を知り、親を突き抜ける見出しのマージンを display: flow-root で中に収め、相殺しない flex の並びは gap で間をそろえる。",
+    emoji: "🪜",
+    lessons: [
+      { id: "sibling-collapse", title: "16px + 16px が 16px になる: 兄弟のマージンの相殺" },
+      { id: "parent-collapse", title: "親を突き抜けるマージン: display: flow-root で中に収める" },
+      { id: "flex-no-collapse", title: "flex の中では相殺しない: gap で間をそろえる" },
     ],
   },
   {
@@ -322,6 +335,17 @@ export const TRACKS: readonly TrackMeta[] = [
     emoji: "🪆",
     lessons: [
       { id: "nesting-amp", title: "入れ子で書く: & とネスト" },
+    ],
+  },
+  {
+    id: "nesting-in-practice",
+    title: "ネストの応用（& とスペース・入れ子の @media・後ろに付ける &）",
+    summary: "&.is-active と & .is-active の違いを知り、@media をルールの中に入れ子で書き、.is-dark & のように & を後ろに付けて親の状態でスタイルを変える。",
+    emoji: "🪺",
+    lessons: [
+      { id: "nesting-compound", title: "& のあとのスペースで変わる: &.is-active" },
+      { id: "nesting-media", title: "@media もルールの中に: 入れ子の @media" },
+      { id: "nesting-append", title: "親の状態で変える: .is-dark & と後ろに付ける &" },
     ],
   },
   {
@@ -673,6 +697,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "layers-in-practice",
+    title: "レイヤーの応用（レイヤーの外・順番の宣言・!important）",
+    summary: "レイヤーの外のスタイルがどのレイヤーにも勝つことを知って古い CSS をレイヤーに入れ、レイヤーの順番を先頭で宣言し、!important でレイヤーの順番が逆になることを使って hidden を必ず効かせる。",
+    emoji: "🧅",
+    lessons: [
+      { id: "unlayered-wins", title: "レイヤーの外がいちばん強い: 古い CSS をレイヤーに入れる" },
+      { id: "layer-order-statement", title: "レイヤーの順番は最初に書いた順: 先頭で宣言する" },
+      { id: "important-reverses", title: "!important はレイヤーの順番が逆になる: hidden を必ず効かせる" },
+    ],
+  },
+  {
     id: "clip-mask",
     title: "クリップとマスク",
     summary: "clip-path と mask-image で、要素を好きなかたちに切り抜く・ぼかして消す。",
@@ -831,6 +866,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "structural-selectors": () => import("./structural-selectors.js").then((m) => m.structuralSelectorsTrack),
   "box-model": () => import("./box-model.js").then((m) => m.boxModelTrack),
   "sizing-basics": () => import("./sizing-basics.js").then((m) => m.sizingBasicsTrack),
+  "margin-collapse": () => import("./margin-collapse.js").then((m) => m.marginCollapseTrack),
   "inline-boxes": () => import("./inline-boxes.js").then((m) => m.inlineBoxesTrack),
   units: () => import("./units.js").then((m) => m.unitsTrack),
   "relative-units": () => import("./relative-units.js").then((m) => m.relativeUnitsTrack),
@@ -851,6 +887,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "generated-content": () => import("./generated-content.js").then((m) => m.generatedContentTrack),
   "list-markers": () => import("./list-markers.js").then((m) => m.listMarkersTrack),
   nesting: () => import("./nesting.js").then((m) => m.nestingTrack),
+  "nesting-in-practice": () => import("./nesting-in-practice.js").then((m) => m.nestingInPracticeTrack),
   scope: () => import("./scope.js").then((m) => m.scopeTrack),
   flexbox: () => import("./flexbox.js").then((m) => m.flexboxTrack),
   "flex-patterns": () => import("./flex-patterns.js").then((m) => m.flexPatternsTrack),
@@ -883,6 +920,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "container-queries": () => import("./container-queries.js").then((m) => m.containerQueriesTrack),
   supports: () => import("./supports.js").then((m) => m.supportsTrack),
   layers: () => import("./layers.js").then((m) => m.layersTrack),
+  "layers-in-practice": () => import("./layers-in-practice.js").then((m) => m.layersInPracticeTrack),
   "clip-mask": () => import("./clip-mask.js").then((m) => m.clipMaskTrack),
   filters: () => import("./filters.js").then((m) => m.filtersTrack),
   forms: () => import("./forms.js").then((m) => m.formsTrack),
