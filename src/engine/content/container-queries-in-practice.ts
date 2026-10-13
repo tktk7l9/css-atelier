@@ -50,23 +50,28 @@ export const containerQueriesInPracticeTrack: Track = {
         snapshot: { props: ["font-size"] },
         validators: [
           {
-            kind: "computedEquals",
-            id: "t1",
-            prop: "font-size",
-            value: "20px",
-            message: "広いカード（幅 250px）の見出しが 20px になっていません（8cqi は、カードの幅 250px の 8% です）",
-          },
-          {
-            kind: "computedEquals",
-            id: "t2",
-            prop: "font-size",
-            value: "16px",
-            message: "狭いカード（幅 150px）の見出しが 16px になっていません（150px の 8% は 12px なので、clamp() の下限の 16px になります）",
-          },
-          {
-            kind: "sourceMatches",
-            pattern: "font-size\\s*:[^;}]*\\dcq[a-z]+\\b",
-            message: "見出しの大きさに、cqi（コンテナの幅の 1%）を使いましょう（カードごとに px で決めると、カードの幅が変わったときに合わなくなります）",
+            kind: "allOf",
+            of: [
+              {
+                kind: "computedEquals",
+                id: "t1",
+                prop: "font-size",
+                value: "20px",
+                message: "広いカード（幅 250px）の見出しが 20px になっていません（8cqi は、カードの幅 250px の 8% です）",
+              },
+              {
+                kind: "computedEquals",
+                id: "t2",
+                prop: "font-size",
+                value: "16px",
+                message: "狭いカード（幅 150px）の見出しが 16px になっていません（150px の 8% は 12px なので、clamp() の下限の 16px になります）",
+              },
+              {
+                kind: "sourceMatches",
+                pattern: "font-size\\s*:[^;}]*\\dcq[a-z]+\\b",
+                message: "見出しの大きさに、cqi（コンテナの幅の 1%）を使いましょう（カードごとに px で決めると、カードの幅が変わったときに合わなくなります）",
+              },
+            ],
           },
         ],
         hints: ["画面の幅の vw を、コンテナの幅の cqi に替えます", ".card h3 { font-size: clamp(16px, 8cqi, 24px); }"],
@@ -124,13 +129,13 @@ export const containerQueriesInPracticeTrack: Track = {
       id: "inline-size-zero",
       title: "コンテナにしたら幅がつぶれた: 幅を明示する",
       explanation:
-        "<p><code>container-type: inline-size</code> を付けた要素は、<b>中身を見ずに幅を決める</b>ようになります（インラインサイズの封じ込め）。親の幅いっぱいに広がるブロック要素なら困りませんが、flex のアイテムのように<b>中身の幅から大きさが決まる要素</b>は、中身の幅が 0 として扱われ、幅がつぶれて中身がはみ出します。</p><p>コンテナの大きさは、親いっぱいに広がるなどの<b>まわりの状況か、明示した指定</b>で決まる必要があります。コンテナにする要素には、<code>width</code> や <code>flex-basis</code> で幅を決めておきます。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
+        "<p><code>container-type: inline-size</code> を付けた要素は、<b>中身を見ずに幅を決める</b>ようになります（インラインサイズの封じ込め）。親の幅いっぱいに広がるブロック要素なら困りませんが、flex のアイテムのように<b>中身の幅から大きさが決まる要素</b>は、中身の幅が 0 として扱われ、幅がつぶれます。文字は 1 文字ずつ折り返されて、はみ出します。</p><p>コンテナの大きさは、親いっぱいに広がるなどの<b>まわりの状況か、明示した指定</b>で決まる必要があります。コンテナにする要素には、<code>width</code> や <code>flex-basis</code> で幅を決めておきます。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/container-type",
       viz: { concept: "none" },
       challenge: {
         starterHTML: SIDE_HTML,
         starterCSS: SIDE_CSS(""),
-        task: "サイドバーをコンテナにしたら、幅がつぶれて「メニュー」がはみ出しました。サイドバーをコンテナのまま、幅 160px にしよう。",
+        task: "サイドバーをコンテナにしたら、幅がつぶれて「メニュー」が 1 文字ずつ縦に並び、はみ出しました。サイドバーをコンテナのまま、幅 160px にしよう。",
         snapshot: { props: ["font-size"] },
         validators: [
           {

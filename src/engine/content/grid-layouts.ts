@@ -63,13 +63,18 @@ export const gridLayoutsTrack: Track = {
         validators: [
           {
             kind: "allOf",
-            of: [between("hero", "text", "left", "left", 40), between("text", "hero", "right", "right", 40)],
-            message: "写真が、本文より左右 40px ずつ広い範囲に置かれていません（[wide-start] と [wide-end] ではさまれた範囲は、grid-column: wide で使えます）",
-          },
-          {
-            kind: "allOf",
-            of: [between("page", "band", "left", "left", 0), between("page", "band", "right", "right", 0)],
-            message: "帯が、ページの端から端まで広がっていません（[full-start] と [full-end] ではさまれた範囲は、grid-column: full です）",
+            of: [
+              {
+                kind: "allOf",
+                of: [between("hero", "text", "left", "left", 40), between("text", "hero", "right", "right", 40)],
+                message: "写真が、本文より左右 40px ずつ広い範囲に置かれていません（[wide-start] と [wide-end] ではさまれた範囲は、grid-column: wide で使えます）",
+              },
+              {
+                kind: "allOf",
+                of: [between("page", "band", "left", "left", 0), between("page", "band", "right", "right", 0)],
+                message: "帯が、ページの端から端まで広がっていません（[full-start] と [full-end] ではさまれた範囲は、grid-column: full です）",
+              },
+            ],
           },
         ],
         hints: ["名前-start と名前-end の線の間は、grid-column: 名前 で指定できます", ".hero { grid-column: wide; } .band { grid-column: full; }"],
