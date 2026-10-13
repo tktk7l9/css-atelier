@@ -7,13 +7,17 @@ import type { Lesson } from "./engine/content/types.js";
 import type { Snapshot } from "./engine/validate/snapshot.js";
 import { parseCss } from "./engine/validate/css-parse.js";
 
-// A device without WebGL. Three.js's WebGLRenderer throws when the canvas gives
-// it no context ("Error creating WebGL context."); here its constructor throws
-// that same error, while the real visualizer and render context run. Only the
-// sandbox is a double (jsdom renders no iframe), recording what the lesson
-// loads so the test can see the preview and the checks carry on.
+// Devices that cannot draw the 3D view. Either the browser offers no WebGL 2
+// context at all (canvas.getContext("webgl2") is null), or it offers one but
+// Three.js's WebGLRenderer still fails and throws ("Error creating WebGL
+// context."). Here its constructor throws that same error while the real
+// visualizer and render context run; only the sandbox is a double (jsdom
+// renders no iframe), recording what the lesson loads, so the tests can see
+// the preview and the checks carry on.
 
 const fakes = vi.hoisted(() => ({
+  webgl2: false,
+  probes: 0,
   renderers: 0,
   loaded: [] as { html: string; css: string }[],
   computed: {} as Record<string, Record<string, string>>,
@@ -83,9 +87,32 @@ function mount(): { app: AppController; root: HTMLElement } {
 const stageOf = (root: HTMLElement): HTMLElement => root.querySelector(".viz__stage") as HTMLElement;
 const noteOf = (root: HTMLElement): HTMLElement => getByText(root, NOTE);
 
+/** Opens the padding lesson, checks a passing answer and expects the note instead of the stage. */
+async function expectLessonWithoutStage(root: HTMLElement, app: AppController): Promise<void> {
+  const user = userEvent.setup();
+  const padding = lesson("box-model-padding");
+  await app.open(padding);
+  expect(stageOf(root).classList.contains("hidden")).toBe(true);
+  expect(noteOf(root).classList.contains("hidden")).toBe(false);
+  // The lesson itself is intact: its preview loaded and the heading has focus.
+  expect(fakes.loaded).toEqual([{ html: padding.challenge.starterHTML, css: padding.challenge.starterCSS }]);
+  expect(document.activeElement).toBe(getByRole(root, "heading", { level: 1 }));
+
+  fakes.computed = { card: { "padding-top": "20px", "padding-left": "20px" } };
+  await user.click(getByRole(root, "button", { name: "チェック" }));
+  await settle();
+  expect(root.querySelector(".banner")?.textContent).toBe("✓ クリア！ よくできました。");
+}
+
 beforeEach(() => {
   Element.prototype.scrollIntoView = () => void 0;
+  HTMLCanvasElement.prototype.getContext = function (id: string) {
+    if (id !== "webgl2") return null;
+    fakes.probes++;
+    return fakes.webgl2 ? { getExtension: () => null } : null;
+  } as unknown as HTMLCanvasElement["getContext"];
   localStorage.clear();
+  fakes.probes = 0;
   fakes.renderers = 0;
   fakes.loaded = [];
   fakes.computed = {};
@@ -96,24 +123,41 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-describe("createApp without WebGL", () => {
-  it("replaces the 3D view with a note, still loads the preview and still checks the CSS", async () => {
-    const user = userEvent.setup();
+describe("createApp in a browser without WebGL 2", () => {
+  beforeEach(() => {
+    fakes.webgl2 = false;
+  });
+
+  it("shows the note instead of the 3D view without loading Three.js, and still checks the CSS", async () => {
     const { app, root } = mount();
-    const padding = lesson("box-model-padding");
-    await app.open(padding);
+    await expectLessonWithoutStage(root, app);
+    expect(fakes.probes).toBe(1);
+    expect(fakes.renderers).toBe(0);
+  });
 
-    expect(fakes.renderers).toBe(1);
-    expect(stageOf(root).classList.contains("hidden")).toBe(true);
+  it("asks only once, and hides the note on lessons without a 3D view", async () => {
+    const { app, root } = mount();
+    await app.open(lesson("box-model-padding"));
+    await app.open(lesson("flexbox-justify-center"));
+    expect(fakes.probes).toBe(1);
     expect(noteOf(root).classList.contains("hidden")).toBe(false);
-    // The lesson itself is intact: its preview loaded and the heading has focus.
-    expect(fakes.loaded).toEqual([{ html: padding.challenge.starterHTML, css: padding.challenge.starterCSS }]);
-    expect(document.activeElement).toBe(getByRole(root, "heading", { level: 1 }));
 
-    fakes.computed = { card: { "padding-top": "20px", "padding-left": "20px" } };
-    await user.click(getByRole(root, "button", { name: "チェック" }));
-    await settle();
-    expect(root.querySelector(".banner")?.textContent).toBe("✓ クリア！ よくできました。");
+    await app.open(lesson("selectors-class"));
+    expect(noteOf(root).classList.contains("hidden")).toBe(true);
+    expect(stageOf(root).classList.contains("hidden")).toBe(true);
+    expect(fakes.loaded).toHaveLength(3);
+  });
+});
+
+describe("createApp when Three.js cannot create its renderer", () => {
+  beforeEach(() => {
+    fakes.webgl2 = true;
+  });
+
+  it("replaces the 3D view with the note, still loads the preview and still checks the CSS", async () => {
+    const { app, root } = mount();
+    await expectLessonWithoutStage(root, app);
+    expect(fakes.renderers).toBe(1);
   });
 
   it("does not try again on later 3D lessons and hides the note on lessons without a 3D view", async () => {
@@ -121,6 +165,7 @@ describe("createApp without WebGL", () => {
     await app.open(lesson("box-model-padding"));
     await app.open(lesson("flexbox-justify-center"));
     expect(fakes.renderers).toBe(1);
+    expect(fakes.probes).toBe(1);
     expect(noteOf(root).classList.contains("hidden")).toBe(false);
     expect(stageOf(root).classList.contains("hidden")).toBe(true);
     expect(fakes.loaded).toHaveLength(2);

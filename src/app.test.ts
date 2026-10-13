@@ -146,11 +146,23 @@ const FAILING = { card: { "padding-top": "0px", "padding-left": "0px" } };
 // jsdom does not implement scrollIntoView; record who was revealed and how.
 const revealed: { node: Element; options: unknown }[] = [];
 
+// jsdom has no WebGL either: offer a WebGL 2 context so the (fake) 3D view
+// starts, and count how often the app asks and how many contexts it releases.
+const webgl = { probes: 0, released: 0 };
+
 beforeEach(() => {
   revealed.length = 0;
   Element.prototype.scrollIntoView = function (this: Element, options?: unknown): void {
     revealed.push({ node: this, options });
   };
+  webgl.probes = 0;
+  webgl.released = 0;
+  HTMLCanvasElement.prototype.getContext = function (id: string) {
+    if (id !== "webgl2") return null;
+    webgl.probes++;
+    const loseContext = { loseContext: () => void webgl.released++ };
+    return { getExtension: (name: string) => (name === "WEBGL_lose_context" ? loseContext : null) };
+  } as unknown as HTMLCanvasElement["getContext"];
   localStorage.clear();
   const s = fakes.state;
   s.css = "";
@@ -228,7 +240,10 @@ describe("createApp: opening a lesson", () => {
     expect(note.classList.contains("hidden")).toBe(true);
     expect(getByText(root, "プレビュー", { selector: ".viz__badge" })).toBeTruthy();
 
+    expect(webgl.probes).toBe(0);
     await app.open(loaded(PADDING));
+    // WebGL 2 is asked for once, on a throwaway canvas whose context is released.
+    expect(webgl).toEqual({ probes: 1, released: 1 });
     expect(fakes.state.viz.created).toBe(1);
     expect(fakes.state.viz.reducedMotion).toBe(true);
     expect(fakes.state.viz.concepts).toEqual(["box-model"]);
@@ -242,6 +257,7 @@ describe("createApp: opening a lesson", () => {
 
     await app.open(loaded("flexbox-justify-center"));
     expect(fakes.state.viz.concepts).toEqual(["box-model", "none", "flexbox"]);
+    expect(webgl.probes).toBe(1);
     await settle();
     expect(fakes.state.viz.updates.at(-1)).toBe("flexbox");
   });

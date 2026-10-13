@@ -48,6 +48,18 @@ export interface AppController {
   dispose(): void;
 }
 
+/**
+ * Whether this browser can give the 3D view a WebGL 2 context (Three.js needs
+ * WebGL 2). Asked once, on a throwaway canvas, before the stage is shown: a
+ * device without it then never downloads Three.js, never logs its context
+ * errors, and never shows the stage only to swap it for the note (a layout shift).
+ */
+function webgl2Available(): boolean {
+  const gl = document.createElement("canvas").getContext("webgl2");
+  gl?.getExtension("WEBGL_lose_context")?.loseContext();
+  return gl !== null;
+}
+
 function debounce<T extends (...args: never[]) => void>(fn: T, ms: number): T {
   let t: ReturnType<typeof setTimeout> | undefined;
   return ((...args: never[]) => {
@@ -364,6 +376,7 @@ export function createApp(callbacks: AppCallbacks): AppController {
 
     // Lazily attach the 3D visualizer — Three.js loads only for 3D lessons.
     const wants3D = lesson.viz.concept !== "none";
+    if (wants3D && !visualizer && !vizUnavailable && !webgl2Available()) vizUnavailable = true;
     stage.classList.toggle("hidden", !wants3D || vizUnavailable);
     vizNote.classList.toggle("hidden", !wants3D || !vizUnavailable);
     if (!wants3D) {
@@ -376,8 +389,8 @@ export function createApp(callbacks: AppCallbacks): AppController {
           const { createVisualizer } = await import("./viz/index.js");
           visualizer = createVisualizer(canvas, callbacks.reducedMotion);
         } catch {
-          // No WebGL here (Three.js cannot create its renderer), or the 3D code
-          // failed to load: carry on to the preview without the 3D view.
+          // Three.js could not create its renderer after all (the context was
+          // refused), or the 3D code failed to load: carry on without the 3D view.
           vizUnavailable = true;
           stage.classList.add("hidden");
           vizNote.classList.remove("hidden");
