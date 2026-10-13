@@ -8231,48 +8231,47 @@ const GRID_MARGIN_MATH_CASES: readonly RecordedCase[] = [
     lesson: "negative-breakout",
     name: "starter",
     messages: ["写真が、ページの端から端まで広がっていません（列の幅の半分（50%）とページの幅の半分（50cqi）の差だけ、左右のマージンを負にします）"],
-    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [138, 30.39, 320, 72] } },
+    elements: { page: { rect: [0, 0, 560, 140.78] }, column: { rect: [120, 0, 320, 132.78] }, p1: { rect: [120, 0, 320, 22.39] }, photo: { rect: [120, 30.39, 320, 72] } },
+    states: { 320: { page: { rect: [0, 0, 320, 140.78] }, column: { rect: [0, 0, 320, 132.78] }, p1: { rect: [0, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 320, 72] } } },
   },
   {
     lesson: "negative-breakout",
     name: "solution",
     messages: [],
-    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
-  },
-  {
-    lesson: "negative-breakout",
-    name: "solution @300",
-    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin-inline: calc(50% - 50cqi);\n}\n",
-    messages: [],
-    elements: { page: { rect: [0, 0, 300, 140.78] }, column: { rect: [0, 0, 300, 132.78] }, p1: { rect: [0, 0, 300, 22.39] }, photo: { rect: [0, 30.39, 300, 72] } },
+    elements: { page: { rect: [0, 0, 560, 140.78] }, column: { rect: [120, 0, 320, 132.78] }, p1: { rect: [120, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 560, 72] } },
+    states: { 320: { page: { rect: [0, 0, 320, 140.78] }, column: { rect: [0, 0, 320, 132.78] }, p1: { rect: [0, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 320, 72] } } },
   },
   {
     lesson: "negative-breakout",
     name: "100cqi wide",
     css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  width: 100cqi;\n  margin-left: calc(50% - 50cqi);\n}\n",
     messages: [],
-    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
+    elements: { page: { rect: [0, 0, 560, 140.78] }, column: { rect: [120, 0, 320, 132.78] }, p1: { rect: [120, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 560, 72] } },
+    states: { 320: { page: { rect: [0, 0, 320, 140.78] }, column: { rect: [0, 0, 320, 132.78] }, p1: { rect: [0, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 320, 72] } } },
   },
   {
     lesson: "negative-breakout",
     name: "vw",
     css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin-inline: calc(50% - 50vw);\n}\n",
     messages: [],
-    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
+    elements: { page: { rect: [0, 0, 560, 140.78] }, column: { rect: [120, 0, 320, 132.78] }, p1: { rect: [120, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 560, 72] } },
+    states: { 320: { page: { rect: [0, 0, 320, 140.78] }, column: { rect: [0, 0, 320, 132.78] }, p1: { rect: [0, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 320, 72] } } },
   },
   {
     lesson: "negative-breakout",
-    name: "fixed -138px @300",
-    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin-inline: -138px;\n}\n",
-    messages: ["写真が、ページの端から端まで広がっていません（列の幅の半分（50%）とページの幅の半分（50cqi）の差だけ、左右のマージンを負にします）"],
-    elements: { page: { rect: [0, 0, 300, 140.78] }, column: { rect: [0, 0, 300, 132.78] }, p1: { rect: [0, 0, 300, 22.39] }, photo: { rect: [-138, 30.39, 576, 72] } },
+    name: "fixed -120px",
+    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin-inline: -120px;\n}\n",
+    messages: ["幅 320px で、写真がページからはみ出しているか、端まで届いていません（px で決めたマージンは、画面の幅が変わると合いません。calc(50% - 50cqi) なら、列とページが同じ幅のときは 0 になります）"],
+    elements: { page: { rect: [0, 0, 560, 140.78] }, column: { rect: [120, 0, 320, 132.78] }, p1: { rect: [120, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 560, 72] } },
+    states: { 320: { page: { rect: [0, 0, 320, 140.78] }, column: { rect: [0, 0, 320, 132.78] }, p1: { rect: [0, 0, 320, 22.39] }, photo: { rect: [-120, 30.39, 560, 72] } } },
   },
   {
     lesson: "negative-breakout",
     name: "column max-width removed",
     css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.column {\n  max-width: none;\n}\n",
     messages: ["文章が、幅 320px の列の中に収まっていません（列はそのままにして、写真にだけ負のマージンを付けます）"],
-    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [0, 0, 596, 132.78] }, p1: { rect: [0, 0, 596, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
+    elements: { page: { rect: [0, 0, 560, 140.78] }, column: { rect: [0, 0, 560, 132.78] }, p1: { rect: [0, 0, 560, 22.39] }, photo: { rect: [0, 30.39, 560, 72] } },
+    states: { 320: { page: { rect: [0, 0, 320, 140.78] }, column: { rect: [0, 0, 320, 132.78] }, p1: { rect: [0, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 320, 72] } } },
   },
   {
     lesson: "max-gutter",
@@ -8444,7 +8443,8 @@ describe("implicit grid tracks, negative margins and math functions in practice:
     // The photo reaches the card's edges; the avatar overlaps the 80px cover by 32px; the photo spans the page.
     expect(rect("negative-bleed", "solution", "photo")[2]).toBe(240);
     expect(rect("negative-overlap", "solution", "avatar")[1]).toBe(48);
-    expect(rect("negative-breakout", "solution", "photo")[2]).toBe(596);
+    expect(rect("negative-breakout", "solution", "photo")[2]).toBe(560);
+    expect(find("negative-breakout", "solution").states![320]!.photo!.rect![2]).toBe(320);
     // max() keeps 16px of padding at 320px where the plain calc() went negative and collapsed to 0.
     expect(find("max-gutter", "starter").states![320]!.text!.rect![0]).toBe(0);
     expect(find("max-gutter", "solution").states![320]!.text!.rect![0]).toBe(16);

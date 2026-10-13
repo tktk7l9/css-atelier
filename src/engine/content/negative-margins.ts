@@ -5,7 +5,8 @@ import type { Track } from "./types.js";
 // and right edges while the heading stays 16px inside; the avatar overlaps the
 // cover by 32px and the name follows 8px below it (moving it with position or
 // transform leaves the gap behind); and the photo in the 320px column spans
-// the whole page at any preview width while the paragraphs stay in the column.
+// the whole page at 560px and at 320px (a margin in px fits only one width)
+// while the paragraphs stay in the column.
 
 const between = (a: string, b: string, edgeA: Edge, edgeB: Edge, px: number): ValidatorSpec => ({
   kind: "offset",
@@ -119,10 +120,11 @@ export const negativeMarginsTrack: Track = {
       id: "negative-breakout",
       title: "列から飛び出す: margin-inline: calc(50% - 50cqi)",
       explanation:
-        "<p>320px の列の中にある写真を、<b>ページの端から端まで</b>広げるには、列の幅とページの幅の差の半分だけ、左右のマージンを負にします。margin の % は親（列）の幅が基準なので <code>50%</code> は列の幅の半分、ページをコンテナにしておけば <code>50cqi</code> はページの幅の半分です。</p><p><code>margin-inline: calc(50% - 50cqi)</code> は、ページが列より広いと負になり、写真がその分だけ左右に広がります。列とページが同じ幅（狭い画面）なら 0 で、そのまま収まります。文章は列の中に残ります。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
+        "<p>320px の列の中にある写真を、<b>ページの端から端まで</b>広げるには、列の幅とページの幅の差の半分だけ、左右のマージンを負にします。margin の % は親（列）の幅が基準なので <code>50%</code> は列の幅の半分、ページをコンテナにしておけば <code>50cqi</code> はページの幅の半分です。</p><p><code>margin-inline: calc(50% - 50cqi)</code> は、ページが列より広いと負になり、写真がその分だけ左右に広がります。列とページが同じ幅（狭い画面）なら 0 で、そのまま収まります。文章は列の中に残ります。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。プレビューは幅 560px で採点し、320px でも確かめます。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/margin",
       viz: { concept: "none" },
       challenge: {
+        viewport: 560,
         starterHTML: BREAKOUT_HTML,
         starterCSS: BREAKOUT_CSS(""),
         task: "320px の列の中の写真だけを、列から飛び出させて、ページの端から端まで広げよう（文章は列の中のまま。画面の幅が変わっても）。",
@@ -140,6 +142,18 @@ export const negativeMarginsTrack: Track = {
                 kind: "allOf",
                 of: [...spans("column", "p1"), { kind: "offset", a: "p1", b: "p1", edgeA: "left", edgeB: "right", max: 320.5 }],
                 message: "文章が、幅 320px の列の中に収まっていません（列はそのままにして、写真にだけ負のマージンを付けます）",
+              },
+            ],
+          },
+        ],
+        states: [
+          {
+            viewport: 320,
+            validators: [
+              {
+                kind: "allOf",
+                of: spans("page", "photo"),
+                message: "幅 320px で、写真がページからはみ出しているか、端まで届いていません（px で決めたマージンは、画面の幅が変わると合いません。calc(50% - 50cqi) なら、列とページが同じ幅のときは 0 になります）",
               },
             ],
           },
