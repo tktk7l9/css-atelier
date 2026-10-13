@@ -7573,3 +7573,436 @@ describe("attribute selectors, logical properties and overflow clipping in pract
     expect(rect("clip-flow-root", "solution", "card")[3]).toBe(120);
   });
 });
+
+const PINNED_LESSONS = [
+  "inline-flex-icon",
+  "icon-em",
+  "icon-first-line",
+  "fixed-bar",
+  "fixed-will-change",
+  "fixed-header-offset",
+  "sticky-bottom",
+  "sticky-stacked",
+  "sticky-parent-box",
+];
+
+const PINNED_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "inline-flex-icon",
+    name: "starter",
+    messages: ["アイコンと文字の上下の中心がそろっていません（行の中のアイコンは、下端が文字のベースラインにそろいます。ボタンを inline-flex にして align-items: center を付けると、箱の真ん中どうしがそろいます）"],
+    elements: { btn: { rect: [0, 0, 118, 41.39] }, icon: { rect: [14, 8, 20, 20] }, label: { rect: [40, 13, 64, 18] } },
+  },
+  {
+    lesson: "inline-flex-icon",
+    name: "solution",
+    messages: [],
+    elements: { btn: { rect: [0, 0, 118, 38.39] }, icon: { rect: [14, 9.19, 20, 20] }, label: { rect: [40, 8, 64, 22.39] } },
+  },
+  {
+    lesson: "inline-flex-icon",
+    name: "display: flex",
+    css: ".btn {\n  display: flex;\n  align-items: center;\n  padding: 8px 14px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  margin-right: 6px;\n  background: var(--save) no-repeat center / contain;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.btn {\n  --save: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 3h11l3 3v11H3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M6 3h7v5H6z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { btn: { rect: [0, 0, 118, 38.39] }, icon: { rect: [14, 9.19, 20, 20] }, label: { rect: [40, 8, 64, 22.39] } },
+  },
+  {
+    lesson: "inline-flex-icon",
+    name: "inline-grid",
+    css: ".btn {\n  display: inline-grid;\n  grid-auto-flow: column;\n  align-items: center;\n  padding: 8px 14px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  margin-right: 6px;\n  background: var(--save) no-repeat center / contain;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.btn {\n  --save: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 3h11l3 3v11H3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M6 3h7v5H6z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { btn: { rect: [0, 0, 118, 38.39] }, icon: { rect: [14, 9.19, 20, 20] }, label: { rect: [40, 8, 64, 22.39] } },
+  },
+  {
+    lesson: "inline-flex-icon",
+    name: "vertical-align: middle",
+    css: ".btn {\n  padding: 8px 14px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  margin-right: 6px;\n  background: var(--save) no-repeat center / contain;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.btn {\n  --save: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 3h11l3 3v11H3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M6 3h7v5H6z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n.icon {\n  vertical-align: middle;\n}\n",
+    messages: ["アイコンと文字の上下の中心がそろっていません（行の中のアイコンは、下端が文字のベースラインにそろいます。ボタンを inline-flex にして align-items: center を付けると、箱の真ん中どうしがそろいます）"],
+    elements: { btn: { rect: [0, 0, 118, 38.78] }, icon: { rect: [14, 10.78, 20, 20] }, label: { rect: [40, 10, 64, 18] } },
+  },
+  {
+    lesson: "inline-flex-icon",
+    name: "inline-flex without align-items",
+    css: ".btn {\n  display: inline-flex;\n  padding: 8px 14px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.icon {\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  margin-right: 6px;\n  background: var(--save) no-repeat center / contain;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.btn {\n  --save: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 3h11l3 3v11H3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M6 3h7v5H6z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["アイコンと文字の上下の中心がそろっていません（行の中のアイコンは、下端が文字のベースラインにそろいます。ボタンを inline-flex にして align-items: center を付けると、箱の真ん中どうしがそろいます）"],
+    elements: { btn: { rect: [0, 0, 118, 38.39] }, icon: { rect: [14, 8, 20, 20] }, label: { rect: [40, 8, 64, 22.39] } },
+  },
+  {
+    lesson: "icon-em",
+    name: "starter",
+    messages: ["アイコンの大きさが、それぞれのボタンの文字の大きさ（14px と 22px）になっていません（1em は、その要素の文字の大きさです。rem はページ全体の文字の大きさなので、どちらも 16px になります）"],
+    elements: { small: { rect: [0, 5.39, 78, 32] }, "icon-s": { rect: [12, 11.39, 20, 20] }, large: { rect: [90, 0, 94, 42.8] }, "icon-l": { rect: [102, 11.39, 20, 20] } },
+  },
+  {
+    lesson: "icon-em",
+    name: "solution",
+    messages: [],
+    elements: { small: { rect: [0, 5.59, 72, 31.59] }, "icon-s": { rect: [12, 14.39, 14, 14] }, large: { rect: [84, 0, 96, 42.8] }, "icon-l": { rect: [96, 10.39, 22, 22] } },
+  },
+  {
+    lesson: "icon-em",
+    name: "inline-size and block-size",
+    css: ".row {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n.btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.small {\n  font-size: 14px;\n}\n.large {\n  font-size: 22px;\n}\n.icon {\n  inline-size: 1em;\n  block-size: 1em;\n  background: var(--save) no-repeat center / contain;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.row {\n  --save: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 3h11l3 3v11H3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M6 3h7v5H6z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { small: { rect: [0, 5.59, 72, 31.59] }, "icon-s": { rect: [12, 14.39, 14, 14] }, large: { rect: [84, 0, 96, 42.8] }, "icon-l": { rect: [96, 10.39, 22, 22] } },
+  },
+  {
+    lesson: "icon-em",
+    name: "1rem",
+    css: ".row {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n.btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.small {\n  font-size: 14px;\n}\n.large {\n  font-size: 22px;\n}\n.icon {\n  width: 1rem;\n  height: 1rem;\n  background: var(--save) no-repeat center / contain;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.row {\n  --save: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 3h11l3 3v11H3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M6 3h7v5H6z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["アイコンの大きさが、それぞれのボタンの文字の大きさ（14px と 22px）になっていません（1em は、その要素の文字の大きさです。rem はページ全体の文字の大きさなので、どちらも 16px になります）"],
+    elements: { small: { rect: [0, 5.59, 74, 31.59] }, "icon-s": { rect: [12, 13.39, 16, 16] }, large: { rect: [86, 0, 90, 42.8] }, "icon-l": { rect: [98, 13.39, 16, 16] } },
+  },
+  {
+    lesson: "icon-em",
+    name: "1.2em",
+    css: ".row {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n.btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border: 0;\n  border-radius: 8px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.small {\n  font-size: 14px;\n}\n.large {\n  font-size: 22px;\n}\n.icon {\n  width: 1.2em;\n  height: 1.2em;\n  background: var(--save) no-repeat center / contain;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.row {\n  --save: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 3h11l3 3v11H3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M6 3h7v5H6z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["アイコンの大きさが、それぞれのボタンの文字の大きさ（14px と 22px）になっていません（1em は、その要素の文字の大きさです。rem はページ全体の文字の大きさなので、どちらも 16px になります）"],
+    elements: { small: { rect: [0, 5.59, 74.8, 31.59] }, "icon-s": { rect: [12, 12.98, 16.8, 16.8] }, large: { rect: [86.8, 0, 100.39, 42.8] }, "icon-l": { rect: [98.8, 8.2, 26.39, 26.39] } },
+  },
+  {
+    lesson: "icon-first-line",
+    name: "starter",
+    messages: ["アイコンが、文の 1 行目の真ん中（文の上端から 12px）にそろっていません（align-items: center は、3 行ぶんの高さの真ん中にそろえます。flex-start で上端をそろえ、アイコンを (1lh - 1em) / 2 だけ下げます）"],
+    elements: { icon: { rect: [12, 40, 16, 16] }, text: { rect: [36, 12, 232, 72] } },
+  },
+  {
+    lesson: "icon-first-line",
+    name: "solution",
+    messages: [],
+    elements: { icon: { rect: [12, 16, 16, 16] }, text: { rect: [36, 12, 232, 72] } },
+  },
+  {
+    lesson: "icon-first-line",
+    name: "margin-top: 4px",
+    css: ".note {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #fff3c4;\n  line-height: 24px;\n}\n.icon {\n  flex-shrink: 0;\n  width: 1em;\n  height: 1em;\n  margin-top: 4px;\n  background: var(--warn) no-repeat center / contain;\n}\n.text {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.note {\n  --warn: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1l9 17H1z' fill='%23e0a100'/%3E%3Cpath d='M9 7h2v6H9zM9 14.5h2v2H9z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { icon: { rect: [12, 16, 16, 16] }, text: { rect: [36, 12, 232, 72] } },
+  },
+  {
+    lesson: "icon-first-line",
+    name: "align-items: start",
+    css: ".note {\n  display: flex;\n  align-items: start;\n  gap: 8px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #fff3c4;\n  line-height: 24px;\n}\n.icon {\n  flex-shrink: 0;\n  width: 1em;\n  height: 1em;\n  margin-top: calc((1lh - 1em) / 2);\n  background: var(--warn) no-repeat center / contain;\n}\n.text {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.note {\n  --warn: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1l9 17H1z' fill='%23e0a100'/%3E%3Cpath d='M9 7h2v6H9zM9 14.5h2v2H9z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { icon: { rect: [12, 16, 16, 16] }, text: { rect: [36, 12, 232, 72] } },
+  },
+  {
+    lesson: "icon-first-line",
+    name: "align-items: baseline",
+    css: ".note {\n  display: flex;\n  align-items: baseline;\n  gap: 8px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #fff3c4;\n  line-height: 24px;\n}\n.icon {\n  flex-shrink: 0;\n  width: 1em;\n  height: 1em;\n  background: var(--warn) no-repeat center / contain;\n}\n.text {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.note {\n  --warn: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1l9 17H1z' fill='%23e0a100'/%3E%3Cpath d='M9 7h2v6H9zM9 14.5h2v2H9z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["アイコンが、文の 1 行目の真ん中（文の上端から 12px）にそろっていません（align-items: center は、3 行ぶんの高さの真ん中にそろえます。flex-start で上端をそろえ、アイコンを (1lh - 1em) / 2 だけ下げます）"],
+    elements: { icon: { rect: [12, 14, 16, 16] }, text: { rect: [36, 12, 232, 72] } },
+  },
+  {
+    lesson: "icon-first-line",
+    name: "flex-start without the margin",
+    css: ".note {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  width: 280px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #fff3c4;\n  line-height: 24px;\n}\n.icon {\n  flex-shrink: 0;\n  width: 1em;\n  height: 1em;\n  background: var(--warn) no-repeat center / contain;\n}\n.text {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.note {\n  --warn: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1l9 17H1z' fill='%23e0a100'/%3E%3Cpath d='M9 7h2v6H9zM9 14.5h2v2H9z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["アイコンが、文の 1 行目の真ん中（文の上端から 12px）にそろっていません（align-items: center は、3 行ぶんの高さの真ん中にそろえます。flex-start で上端をそろえ、アイコンを (1lh - 1em) / 2 だけ下げます）"],
+    elements: { icon: { rect: [12, 12, 16, 16] }, text: { rect: [36, 12, 232, 72] } },
+  },
+  {
+    lesson: "fixed-bar",
+    name: "starter",
+    messages: ["購入バーが、画面の下端に左右いっぱいの幅で固定されていません（position: fixed で画面を基準にし、inset: auto 0 0 で下端と左右に付けます。absolute だと、position: relative の .card が基準になります）"],
+    elements: { page: { rect: [0, 0, 596, 174.97] }, bar: { rect: [28, 91.58, 196, 55.39] } },
+  },
+  {
+    lesson: "fixed-bar",
+    name: "solution",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 119.58] }, bar: { rect: [0, 224.61, 596, 55.39] } },
+  },
+  {
+    lesson: "fixed-bar",
+    name: "left, right and bottom",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: fixed;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 119.58] }, bar: { rect: [0, 224.61, 596, 55.39] } },
+  },
+  {
+    lesson: "fixed-bar",
+    name: "width: 100%",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: fixed;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 119.58] }, bar: { rect: [0, 224.61, 596, 55.39] } },
+  },
+  {
+    lesson: "fixed-bar",
+    name: "absolute",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: absolute;\n  inset: auto 0 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n",
+    messages: ["購入バーが、画面の下端に左右いっぱいの幅で固定されていません（position: fixed で画面を基準にし、inset: auto 0 0 で下端と左右に付けます。absolute だと、position: relative の .card が基準になります）"],
+    elements: { page: { rect: [0, 0, 596, 119.58] }, bar: { rect: [16, 48.19, 220, 55.39] } },
+  },
+  {
+    lesson: "fixed-bar",
+    name: "fixed with bottom only",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: fixed;\n  bottom: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n",
+    messages: ["購入バーが、画面の下端に左右いっぱいの幅で固定されていません（position: fixed で画面を基準にし、inset: auto 0 0 で下端と左右に付けます。absolute だと、position: relative の .card が基準になります）"],
+    elements: { page: { rect: [0, 0, 596, 119.58] }, bar: { rect: [28, 224.61, 152, 55.39] } },
+  },
+  {
+    lesson: "fixed-bar",
+    name: "sticky bottom",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: sticky;\n  bottom: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n",
+    messages: ["購入バーが、画面の下端に左右いっぱいの幅で固定されていません（position: fixed で画面を基準にし、inset: auto 0 0 で下端と左右に付けます。absolute だと、position: relative の .card が基準になります）"],
+    elements: { page: { rect: [0, 0, 596, 174.97] }, bar: { rect: [28, 91.58, 196, 55.39] } },
+  },
+  {
+    lesson: "fixed-will-change",
+    name: "starter",
+    messages: ["購入バーが、カードの中に閉じ込められています（transform や filter、will-change: transform を持つ祖先は、fixed の要素の基準の箱になります。使っていない will-change は外します）"],
+    elements: { page: { rect: [0, 0, 596, 119.58], computed: {"position":"static"} }, bar: { rect: [16, 48.19, 220, 55.39], computed: {"position":"fixed"} } },
+  },
+  {
+    lesson: "fixed-will-change",
+    name: "solution",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 119.58], computed: {"position":"static"} }, bar: { rect: [0, 224.61, 596, 55.39], computed: {"position":"fixed"} } },
+  },
+  {
+    lesson: "fixed-will-change",
+    name: "will-change: auto",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 以前のアニメーションのなごり */\n  will-change: auto;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: fixed;\n  inset: auto 0 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 119.58], computed: {"position":"static"} }, bar: { rect: [0, 224.61, 596, 55.39], computed: {"position":"fixed"} } },
+  },
+  {
+    lesson: "fixed-will-change",
+    name: "will-change: opacity",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 以前のアニメーションのなごり */\n  will-change: opacity;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: fixed;\n  inset: auto 0 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 119.58], computed: {"position":"static"} }, bar: { rect: [0, 224.61, 596, 55.39], computed: {"position":"fixed"} } },
+  },
+  {
+    lesson: "fixed-will-change",
+    name: "transform: none added",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 以前のアニメーションのなごり */\n  will-change: transform;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: fixed;\n  inset: auto 0 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.card {\n  transform: none;\n}\n",
+    messages: ["購入バーが、カードの中に閉じ込められています（transform や filter、will-change: transform を持つ祖先は、fixed の要素の基準の箱になります。使っていない will-change は外します）"],
+    elements: { page: { rect: [0, 0, 596, 119.58], computed: {"position":"static"} }, bar: { rect: [16, 48.19, 220, 55.39], computed: {"position":"fixed"} } },
+  },
+  {
+    lesson: "fixed-will-change",
+    name: "bar made absolute",
+    css: ".page {\n  padding: 16px;\n}\n.card {\n  position: relative;\n  width: 220px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 以前のアニメーションのなごり */\n  will-change: transform;\n}\n.title {\n  margin: 0;\n  font-size: 18px;\n}\n.price {\n  margin: 4px 0 12px;\n}\n/* 画面の下に固定したい購入バー */\n.bar {\n  position: fixed;\n  inset: auto 0 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n  background: #fff;\n}\n.buy {\n  width: 100%;\n  padding: 8px;\n  border: 0;\n  border-radius: 6px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n.bar {\n  position: absolute;\n}\n",
+    messages: ["購入バーは position: fixed のままにしましょう"],
+    elements: { page: { rect: [0, 0, 596, 119.58], computed: {"position":"static"} }, bar: { rect: [16, 48.19, 220, 55.39], computed: {"position":"absolute"} } },
+  },
+  {
+    lesson: "fixed-header-offset",
+    name: "starter",
+    messages: ["見出しが、ヘッダーのすぐ下から始まっていません（fixed のヘッダーはページの中に場所を取らないので、本文の上に、ヘッダーの高さと同じ 48px の余白を空けます）"],
+    elements: { head: { rect: [0, 0, 596, 48], computed: {"position":"fixed"} }, title: { rect: [16, 0, 564, 33.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "fixed-header-offset",
+    name: "solution",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 48], computed: {"position":"fixed"} }, title: { rect: [16, 48, 564, 33.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "fixed-header-offset",
+    name: "margin-top on main",
+    css: "/* 画面の上に固定したヘッダー（高さ 48px） */\n.head {\n  position: fixed;\n  inset: 0 0 auto;\n  height: 48px;\n  padding: 12px 16px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 0 16px;\n  margin-top: 48px;\n}\n.main h2 {\n  margin: 0 0 8px;\n}\n.main p {\n  margin: 0;\n}\n",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 48], computed: {"position":"fixed"} }, title: { rect: [16, 48, 564, 33.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "fixed-header-offset",
+    name: "padding on body",
+    css: "/* 画面の上に固定したヘッダー（高さ 48px） */\n.head {\n  position: fixed;\n  inset: 0 0 auto;\n  height: 48px;\n  padding: 12px 16px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 0 16px;\n}\n.main h2 {\n  margin: 0 0 8px;\n}\n.main p {\n  margin: 0;\n}\nbody {\n  padding-top: 48px;\n}\n",
+    messages: [],
+    elements: { head: { rect: [0, 0, 596, 48], computed: {"position":"fixed"} }, title: { rect: [16, 48, 564, 33.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "fixed-header-offset",
+    name: "header made sticky",
+    css: "/* 画面の上に固定したヘッダー（高さ 48px） */\n.head {\n  position: sticky;\n  inset: 0 0 auto;\n  height: 48px;\n  padding: 12px 16px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 0 16px;\n}\n.main h2 {\n  margin: 0 0 8px;\n}\n.main p {\n  margin: 0;\n}\n",
+    messages: ["ヘッダーは position: fixed のままにしましょう"],
+    elements: { head: { rect: [0, 0, 596, 48], computed: {"position":"sticky"} }, title: { rect: [16, 48, 564, 33.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "fixed-header-offset",
+    name: "padding-top: 24px",
+    css: "/* 画面の上に固定したヘッダー（高さ 48px） */\n.head {\n  position: fixed;\n  inset: 0 0 auto;\n  height: 48px;\n  padding: 12px 16px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.main {\n  padding: 0 16px;\n  padding-top: 24px;\n}\n.main h2 {\n  margin: 0 0 8px;\n}\n.main p {\n  margin: 0;\n}\n",
+    messages: ["見出しが、ヘッダーのすぐ下から始まっていません（fixed のヘッダーはページの中に場所を取らないので、本文の上に、ヘッダーの高さと同じ 48px の余白を空けます）"],
+    elements: { head: { rect: [0, 0, 596, 48], computed: {"position":"fixed"} }, title: { rect: [16, 24, 564, 33.59], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "sticky-bottom",
+    name: "starter",
+    messages: ["合計が、箱の下端に貼り付いていません（position: sticky と bottom: 0 で、下端より下に行こうとしたときに下端に貼り付きます。top: 0 では、下にある要素は引き上げられません）"],
+    elements: { box: { rect: [0, 0, 596, 220], computed: {"position":"static"} }, total: { rect: [0, 393.91, 581, 42.39], computed: {"position":"static"} } },
+  },
+  {
+    lesson: "sticky-bottom",
+    name: "solution",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 220], computed: {"position":"static"} }, total: { rect: [0, 177.61, 581, 42.39], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-bottom",
+    name: "inset-block-end",
+    css: ".box {\n  height: 220px;\n  overflow-y: auto;\n  background: #f6f7fb;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #dde3f0;\n}\n/* スクロールしても下に残したい合計 */\n.total {\n  position: sticky;\n  inset-block-end: 0;\n  margin: 0;\n  padding: 10px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-weight: 700;\n}\n",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 220], computed: {"position":"static"} }, total: { rect: [0, 177.61, 581, 42.39], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-bottom",
+    name: "top: 0",
+    css: ".box {\n  height: 220px;\n  overflow-y: auto;\n  background: #f6f7fb;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #dde3f0;\n}\n/* スクロールしても下に残したい合計 */\n.total {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  padding: 10px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-weight: 700;\n}\n",
+    messages: ["合計が、箱の下端に貼り付いていません（position: sticky と bottom: 0 で、下端より下に行こうとしたときに下端に貼り付きます。top: 0 では、下にある要素は引き上げられません）"],
+    elements: { box: { rect: [0, 0, 596, 220], computed: {"position":"static"} }, total: { rect: [0, 393.91, 581, 42.39], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-bottom",
+    name: "fixed bottom",
+    css: ".box {\n  height: 220px;\n  overflow-y: auto;\n  background: #f6f7fb;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #dde3f0;\n}\n/* スクロールしても下に残したい合計 */\n.total {\n  position: fixed;\n  bottom: 0;\n  margin: 0;\n  padding: 10px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-weight: 700;\n}\n",
+    messages: ["合計が、箱の下端に貼り付いていません（position: sticky と bottom: 0 で、下端より下に行こうとしたときに下端に貼り付きます。top: 0 では、下にある要素は引き上げられません）"],
+    elements: { box: { rect: [0, 0, 596, 220], computed: {"position":"static"} }, total: { rect: [0, 237.61, 127.69, 42.39], computed: {"position":"fixed"} } },
+  },
+  {
+    lesson: "sticky-bottom",
+    name: "absolute bottom",
+    css: ".box {\n  height: 220px;\n  overflow-y: auto;\n  background: #f6f7fb;\n}\n.list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.list li {\n  padding: 8px 12px;\n  border-bottom: 1px solid #dde3f0;\n}\n/* スクロールしても下に残したい合計 */\n.total {\n  position: absolute;\n  bottom: 0;\n  margin: 0;\n  padding: 10px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-weight: 700;\n}\n",
+    messages: ["合計が、箱の下端に貼り付いていません（position: sticky と bottom: 0 で、下端より下に行こうとしたときに下端に貼り付きます。top: 0 では、下にある要素は引き上げられません）"],
+    elements: { box: { rect: [0, 0, 596, 220], computed: {"position":"static"} }, total: { rect: [0, 237.61, 127.69, 42.39], computed: {"position":"absolute"} } },
+  },
+  {
+    lesson: "sticky-stacked",
+    name: "starter",
+    messages: ["季節の見出しが、ページの見出し（高さ 40px）のすぐ下に貼り付いていません（2 つとも top: 0 だと同じ位置で重なります。下の段は top に上の段の高さを書きます）"],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, header: { rect: [0, 0, 581, 40], computed: {"position":"sticky"} }, season: { rect: [0, 0, 581, 33], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-stacked",
+    name: "solution",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, header: { rect: [0, 0, 581, 40], computed: {"position":"sticky"} }, season: { rect: [0, 40, 581, 33], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-stacked",
+    name: "2.5rem",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* ページの見出し（高さ 40px） */\n.header {\n  position: sticky;\n  top: 0;\n  height: 40px;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n/* 季節の見出し */\n.season {\n  position: sticky;\n  top: 2.5rem;\n  margin: 0;\n  padding: 6px 12px;\n  background: #dbe4fb;\n  font-size: 15px;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, header: { rect: [0, 0, 581, 40], computed: {"position":"sticky"} }, season: { rect: [0, 40, 581, 33], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-stacked",
+    name: "shared custom property",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* ページの見出し（高さ 40px） */\n.header {\n  position: sticky;\n  top: 0;\n  height: var(--head);\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n/* 季節の見出し */\n.season {\n  position: sticky;\n  top: var(--head);\n  margin: 0;\n  padding: 6px 12px;\n  background: #dbe4fb;\n  font-size: 15px;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n.box {\n  --head: 40px;\n}\n",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, header: { rect: [0, 0, 581, 40], computed: {"position":"sticky"} }, season: { rect: [0, 40, 581, 33], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-stacked",
+    name: "z-index on the header",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* ページの見出し（高さ 40px） */\n.header {\n  position: sticky;\n  top: 0;\n  height: 40px;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n/* 季節の見出し */\n.season {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  padding: 6px 12px;\n  background: #dbe4fb;\n  font-size: 15px;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n.header {\n  z-index: 1;\n}\n",
+    messages: ["季節の見出しが、ページの見出し（高さ 40px）のすぐ下に貼り付いていません（2 つとも top: 0 だと同じ位置で重なります。下の段は top に上の段の高さを書きます）"],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, header: { rect: [0, 0, 581, 40], computed: {"position":"sticky"} }, season: { rect: [0, 0, 581, 33], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-stacked",
+    name: "top: 48px",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* ページの見出し（高さ 40px） */\n.header {\n  position: sticky;\n  top: 0;\n  height: 40px;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n/* 季節の見出し */\n.season {\n  position: sticky;\n  top: 48px;\n  margin: 0;\n  padding: 6px 12px;\n  background: #dbe4fb;\n  font-size: 15px;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n",
+    messages: ["季節の見出しが、ページの見出し（高さ 40px）のすぐ下に貼り付いていません（2 つとも top: 0 だと同じ位置で重なります。下の段は top に上の段の高さを書きます）"],
+    elements: { box: { rect: [0, 0, 596, 240], computed: {"position":"static"} }, header: { rect: [0, 0, 581, 40], computed: {"position":"sticky"} }, season: { rect: [0, 48, 581, 33], computed: {"position":"sticky"} } },
+  },
+  {
+    lesson: "sticky-parent-box",
+    name: "starter",
+    messages: ["見出しの行が、上端に貼り付いていません（sticky は親の箱の中でしか動けません。見出しの親の .title-row は見出しと同じ高さなので、動けずに流れていきます。.title-row のほうを sticky にします）"],
+    elements: { box: { rect: [0, 0, 596, 240] }, row: { rect: [0, -70.12, 581, 34.39] }, head: { rect: [12, -64.12, 64, 22.39] }, more: { rect: [514.72, -62.03, 54.28, 18.19] } },
+  },
+  {
+    lesson: "sticky-parent-box",
+    name: "solution",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240] }, row: { rect: [0, 0, 581, 34.39] }, head: { rect: [12, 6, 64, 22.39] }, more: { rect: [514.72, 8.09, 54.28, 18.19] } },
+  },
+  {
+    lesson: "sticky-parent-box",
+    name: "row sticky, heading static",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* 見出しと「一覧へ」を横に並べる箱 */\n.title-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 6px 12px;\n  background: #dbe4fb;\n  position: sticky;\n  top: 0;\n}\n.head {\n  margin: 0;\n  font-size: 16px;\n}\n.more {\n  font-size: 13px;\n  color: #234aa8;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n",
+    messages: [],
+    elements: { box: { rect: [0, 0, 596, 240] }, row: { rect: [0, 0, 581, 34.39] }, head: { rect: [12, 6, 64, 22.39] }, more: { rect: [514.72, 8.09, 54.28, 18.19] } },
+  },
+  {
+    lesson: "sticky-parent-box",
+    name: "display: contents on the row",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* 見出しと「一覧へ」を横に並べる箱 */\n.title-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 6px 12px;\n  background: #dbe4fb;\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  font-size: 16px;\n}\n.more {\n  font-size: 13px;\n  color: #234aa8;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n.title-row {\n  display: contents;\n}\n",
+    messages: ["見出しと「一覧へ」が横に並んでいません（横に並べる箱はそのまま使います）"],
+    elements: { box: { rect: [0, 0, 596, 240] }, row: { rect: [0, 0, 0, 0] }, head: { rect: [0, 0, 581, 22.39] }, more: { rect: [0, -54.12, 54.28, 16] } },
+  },
+  {
+    lesson: "sticky-parent-box",
+    name: "z-index on the heading",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* 見出しと「一覧へ」を横に並べる箱 */\n.title-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 6px 12px;\n  background: #dbe4fb;\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  font-size: 16px;\n}\n.more {\n  font-size: 13px;\n  color: #234aa8;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n.head {\n  z-index: 1;\n}\n",
+    messages: ["見出しの行が、上端に貼り付いていません（sticky は親の箱の中でしか動けません。見出しの親の .title-row は見出しと同じ高さなので、動けずに流れていきます。.title-row のほうを sticky にします）"],
+    elements: { box: { rect: [0, 0, 596, 240] }, row: { rect: [0, -70.12, 581, 34.39] }, head: { rect: [12, -64.12, 64, 22.39] }, more: { rect: [514.72, -62.03, 54.28, 18.19] } },
+  },
+  {
+    lesson: "sticky-parent-box",
+    name: "row position: relative",
+    css: "/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n/* 見出しと「一覧へ」を横に並べる箱 */\n.title-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 6px 12px;\n  background: #dbe4fb;\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  font-size: 16px;\n}\n.more {\n  font-size: 13px;\n  color: #234aa8;\n}\nsection p {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #eef1f8;\n}\n.title-row {\n  position: relative;\n}\n",
+    messages: ["見出しの行が、上端に貼り付いていません（sticky は親の箱の中でしか動けません。見出しの親の .title-row は見出しと同じ高さなので、動けずに流れていきます。.title-row のほうを sticky にします）"],
+    elements: { box: { rect: [0, 0, 596, 240] }, row: { rect: [0, -70.12, 581, 34.39] }, head: { rect: [12, -64.12, 64, 22.39] }, more: { rect: [514.72, -62.03, 54.28, 18.19] } },
+  },
+];
+
+describe("icons beside text, fixed positioning and sticky in practice: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 9 lessons", () => {
+    expect([...new Set(PINNED_CASES.map((c) => c.lesson))].sort()).toEqual([...PINNED_LESSONS].sort());
+    for (const id of PINNED_LESSONS) {
+      const names = PINNED_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of PINNED_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of PINNED_LESSONS) {
+      const starter = PINNED_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = PINNED_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the measurements the lessons are about", () => {
+    const find = (id: string, name: string): RecordedCase => PINNED_CASES.find((c) => c.lesson === id && c.name === name)!;
+    const rect = (id: string, name: string, el: string): readonly number[] => find(id, name).elements[el]!.rect!;
+    const centre = (r: readonly number[]): number => r[1]! + r[3]! / 2;
+    // On the baseline the icon sits 4px high; inline-flex centres both boxes; middle still misses by about 2px.
+    expect(centre(rect("inline-flex-icon", "starter", "label")) - centre(rect("inline-flex-icon", "starter", "icon"))).toBeCloseTo(4, 0);
+    expect(centre(rect("inline-flex-icon", "solution", "label"))).toBeCloseTo(centre(rect("inline-flex-icon", "solution", "icon")), 1);
+    expect(Math.abs(centre(rect("inline-flex-icon", "vertical-align: middle", "label")) - centre(rect("inline-flex-icon", "vertical-align: middle", "icon")))).toBeGreaterThan(1);
+    // 1em icons follow the 14px and 22px buttons.
+    expect(rect("icon-em", "solution", "icon-s")[2]).toBe(14);
+    expect(rect("icon-em", "solution", "icon-l")[2]).toBe(22);
+    // The warning icon moves from the middle of three 24px lines to the middle of the first.
+    expect(centre(rect("icon-first-line", "starter", "icon")) - rect("icon-first-line", "starter", "text")[1]!).toBe(36);
+    expect(centre(rect("icon-first-line", "solution", "icon")) - rect("icon-first-line", "solution", "text")[1]!).toBe(12);
+    // The fixed bar ends at the bottom of the 280px preview; absolute keeps it on the 220px card.
+    const bar = rect("fixed-bar", "solution", "bar");
+    expect(bar[1]! + bar[3]!).toBeCloseTo(280, 1);
+    expect(rect("fixed-bar", "absolute", "bar")[2]).toBe(220);
+    expect(rect("fixed-will-change", "starter", "bar")[2]).toBe(220);
+    // The heading starts right under the 48px fixed header.
+    expect(rect("fixed-header-offset", "starter", "title")[1]).toBe(0);
+    expect(rect("fixed-header-offset", "solution", "title")[1]).toBe(48);
+    // The total sticks to the bottom of the 220px box; the season heading stacks under the 40px header.
+    const total = rect("sticky-bottom", "solution", "total");
+    expect(total[1]! + total[3]!).toBeCloseTo(220, 1);
+    expect(rect("sticky-stacked", "starter", "season")[1]).toBe(0);
+    expect(rect("sticky-stacked", "solution", "season")[1]).toBe(40);
+    // The heading row scrolls away while only the heading is sticky, and sticks once the row is.
+    expect(rect("sticky-parent-box", "starter", "row")[1]).toBeLessThan(0);
+    expect(rect("sticky-parent-box", "solution", "row")[1]).toBe(0);
+  });
+});
