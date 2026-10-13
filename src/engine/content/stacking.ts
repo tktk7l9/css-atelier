@@ -65,7 +65,7 @@ export const stackingTrack: Track = {
       id: "z-index-order",
       title: "後ろの要素に隠れたメニューを出す: z-index",
       explanation:
-        "<p>position を指定した要素どうしが重なると、<code>z-index</code> がなければ <b>HTML で後ろにある要素ほど上</b>に描かれます（position のない要素は、それらより下です）。ヘッダーの中で開いたメニューに、あとに続くカードがかぶさるのはそのためです。</p><p><code>z-index</code> は、position を指定した要素（と flex・grid のアイテム）の重なり順を決めます。数が大きいほど手前で、何も指定しない <code>auto</code> は 0 の高さなので、その上に出すなら <code>z-index: 1</code> で十分です。重なり順は見た目だけでなく、<b>押したときにどの要素が反応するか</b>も決めます。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
+        "<p>position を指定した要素どうしが重なると、<code>z-index</code> がなければ <b>HTML で後ろにある要素ほど上</b>に描かれます（position のない要素は、それらより下です）。ヘッダーの中で開いたメニューに、あとに続くカードがかぶさるのはそのためです。</p><p><code>z-index</code> は、position を指定した要素（と flex・grid のアイテム）の重なり順を決めます。数が大きいほど手前です。何も指定しない <code>auto</code> の重なりの高さは 0 なので、その上に出すなら <code>z-index: 1</code> で十分です。重なり順は見た目だけでなく、<b>押したときにどの要素が反応するか</b>も決めます。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/z-index",
       viz: { concept: "none" },
       challenge: {
