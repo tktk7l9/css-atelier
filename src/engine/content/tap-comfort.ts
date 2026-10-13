@@ -25,7 +25,7 @@ const FAV_CSS = (extra: string): string =>
   `.card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n/* カード全体を記事へのリンクに */\n.card a::after {\n  content: "";\n  position: absolute;\n  inset: 0;\n}\n/* 保存ボタン */\n.fav {\n  margin-top: 8px;\n  width: 36px;\n  height: 36px;\n  border: 1px solid #c5cde0;\n  border-radius: 50%;\n  background: #fff;\n  font: inherit;\n${extra}}\n`;
 
 const TEXT_HTML =
-  '<p data-id="para" class="para"><a data-id="link" href="#">利用規約</a>を読んでから申し込んでください。</p>' +
+  '<p data-id="para" class="para"><a data-id="link" href="#">利用規約</a>をご覧ください。</p>' +
   '<p data-id="next" class="para">お問い合わせは平日 10 時から受け付けます。</p>';
 
 const TEXT_CSS = (extra: string): string =>

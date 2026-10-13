@@ -2,7 +2,8 @@ import type { Track } from "./types.js";
 
 // Text effects draw no boxes of their own, so these lessons read computed
 // values: the text-shadow list (its colour comes first, then x, y and blur),
-// the emphasis-mark style, and the case transform with the letter spacing
+// the emphasis-mark style (filled is the default fill, so filled sesame reads
+// back as sesame), and the case transform with the letter spacing
 // (which computes to px, so 0.08em of 13px reads as 1.04px). Each lesson also
 // checks that the text it should not touch keeps its look.
 
@@ -89,10 +90,10 @@ export const textEffectsTrack: Track = {
             kind: "allOf",
             of: [
               {
-                kind: "computedEquals",
+                kind: "computedMatches",
                 id: "mark",
                 prop: "text-emphasis-style",
-                value: "filled sesame",
+                pattern: "^(?:filled )?sesame$",
                 message: "「本日かぎり」に傍点（﹅）が付いていません（text-emphasis: filled sesame）",
               },
               {

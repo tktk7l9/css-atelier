@@ -31,7 +31,7 @@ const SHOP_CSS = (extra: string): string =>
 const CLOSED_HTML =
   '<header class="bar"><span>Atelier</span><button class="toggle" type="button" aria-expanded="false">メニュー</button>' +
   '<nav data-id="menu" class="menu"><a href="#">ホーム</a><a href="#">講座の一覧</a><a href="#">お問い合わせ</a></nav></header>' +
-  '<section class="card"><p>春の講座の受付を始めました。</p><button data-id="buy" class="buy" type="button">申し込む</button></section>';
+  '<section data-id="card" class="card"><p>春の講座の受付を始めました。</p><button data-id="buy" class="buy" type="button">申し込む</button></section>';
 
 const CLOSED_CSS = (extra: string): string =>
   `.bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n.toggle {\n  padding: 4px 10px;\n  border: 1px solid #fff;\n  border-radius: 6px;\n  background: none;\n  color: inherit;\n  font: inherit;\n}\n/* 閉じているメニュー（開くと opacity: 1 でふわっと出す） */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n  opacity: 0;\n${extra}}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.toggle[aria-expanded="true"] + .menu {\n  opacity: 1;\n}\n.card {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-top: 12px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card p {\n  margin: 0;\n}\n.buy {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n}\n`;
@@ -130,7 +130,13 @@ export const stackingEffectsTrack: Track = {
         starterHTML: CLOSED_HTML,
         starterCSS: CLOSED_CSS(""),
         task: "閉じているメニュー（opacity: 0）が「申し込む」ボタンの上に重なっていて、ボタンが押せません。opacity: 0 は残したまま、閉じているメニューが押されないようにしよう。",
-        snapshot: { props: ["opacity"], hits: [{ at: "buy", fx: 0.5, fy: 0.5 }] },
+        snapshot: {
+          props: ["opacity"],
+          hits: [
+            { at: "buy", fx: 0.5, fy: 0.5 },
+            { at: "card", fx: 0.9, fy: 0.12 },
+          ],
+        },
         validators: [
           {
             kind: "allOf",
@@ -140,6 +146,14 @@ export const stackingEffectsTrack: Track = {
                 at: "buy",
                 top: "buy",
                 message: "「申し込む」ボタンを押すと、透明なメニューが反応してしまいます（opacity: 0 の要素も押せます。閉じたメニューに visibility: hidden を）",
+              },
+              {
+                kind: "hitTarget",
+                at: "card",
+                fx: 0.9,
+                fy: 0.12,
+                top: "card",
+                message: "閉じたメニューが重なっている部分を押すと、透明なメニューが反応してしまいます（ボタンだけを前に出すのではなく、閉じたメニューが押されないようにします）",
               },
               {
                 kind: "computedEquals",
