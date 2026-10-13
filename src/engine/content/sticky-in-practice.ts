@@ -134,19 +134,19 @@ export const stickyInPracticeTrack: Track = {
             kind: "allOf",
             of: [
               {
+                kind: "alignedEdge",
+                ids: ["head", "more"],
+                edge: "centery",
+                tol: 2,
+                message: "見出しと「一覧へ」が横に並んでいません（横に並べる箱はそのまま使います）",
+              },
+              {
                 kind: "allOf",
                 of: [
                   { kind: "alignedEdge", ids: ["row", "box"], edge: "top", tol: 0.5 },
                   { kind: "insideContainer", id: "head", containerId: "row" },
                 ],
                 message: "見出しの行が、上端に貼り付いていません（sticky は親の箱の中でしか動けません。見出しの親の .title-row は見出しと同じ高さなので、動けずに流れていきます。.title-row のほうを sticky にします）",
-              },
-              {
-                kind: "alignedEdge",
-                ids: ["head", "more"],
-                edge: "centery",
-                tol: 2,
-                message: "見出しと「一覧へ」が横に並んでいません（横に並べる箱はそのまま使います）",
               },
             ],
           },
