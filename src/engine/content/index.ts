@@ -62,7 +62,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * sticky lesson scrolls the same way. Icons beside text follow the flex sizing
  * track (their buttons are inline-flex); fixed positioning follows absolute
  * positioning, whose containing blocks it contrasts; and sticky in practice
- * follows the sticky basics, with the same scroll set-up.
+ * follows the sticky basics, with the same scroll set-up. The implicit grid
+ * tracks follow the card rows; negative margins follow container queries in
+ * practice (the breakout lesson uses cqi); and math functions in practice
+ * come last, after the math functions they use.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -531,6 +534,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "grid-implicit",
+    title: "グリッドの暗黙のトラック（横に流す・-1 が届かない・伸びる行）",
+    summary: "grid-auto-flow: column で自動で足される列に横に流し、-1 が明示的な線までしか届かないことを span で補い、高さのある箱で伸びる auto の行を align-content: start で詰める。",
+    emoji: "🛤️",
+    lessons: [
+      { id: "auto-flow-column", title: "横 1 列に流す: grid-auto-flow: column" },
+      { id: "minus-one-explicit", title: "-1 が届かない: grid-row: 1 / span 3" },
+      { id: "rows-stretch", title: "高さのある箱で行が伸びる: align-content: start" },
+    ],
+  },
+  {
     id: "subgrid",
     title: "サブグリッド",
     summary: "入れ子のグリッドを親のトラックにそろえる subgrid。",
@@ -822,6 +836,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "negative-margins",
+    title: "負のマージン（端まで広げる・重ねる・列から飛び出す）",
+    summary: "負の margin-inline で写真をカードの余白の外まで広げ、負の margin-top でアイコンを表紙に重ね、calc(50% - 50cqi) で列の中の写真をページの端から端まで広げる。",
+    emoji: "🥞",
+    lessons: [
+      { id: "negative-bleed", title: "余白の外まで広げる: 負の margin-inline" },
+      { id: "negative-overlap", title: "前の要素に重ねる: 負の margin-top" },
+      { id: "negative-breakout", title: "列から飛び出す: margin-inline: calc(50% - 50cqi)" },
+    ],
+  },
+  {
     id: "supports",
     title: "機能クエリ（@supports）",
     summary: "@supports で、ブラウザが対応しているかどうかに応じて CSS を切り替え、古いブラウザ向けの指定を分けておく。",
@@ -981,6 +1006,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "math-trig", title: "円周に並べる: sin() と cos()" },
     ],
   },
+  {
+    id: "math-in-practice",
+    title: "数学関数の応用（max() の余白・minmax と min()・pow() の比）",
+    summary: "max() で狭い画面でも余白を残し、minmax(min(200px, 100%), 1fr) で狭い箱からはみ出さないようにし、pow() で見出しの大きさを 1 つの比から決める。",
+    emoji: "➗",
+    lessons: [
+      { id: "max-gutter", title: "最低限の余白を残す: max()" },
+      { id: "minmax-min", title: "狭い箱からはみ出さない: minmax(min(200px, 100%), 1fr)" },
+      { id: "pow-scale", title: "見出しの大きさを比で決める: pow()" },
+    ],
+  },
 ];
 
 export const LESSONS: readonly LessonMeta[] = TRACKS.flatMap((t) => t.lessons);
@@ -1048,6 +1084,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "grid-placement": () => import("./grid-placement.js").then((m) => m.gridPlacementTrack),
   "grid-layouts": () => import("./grid-layouts.js").then((m) => m.gridLayoutsTrack),
   "card-rows": () => import("./card-rows.js").then((m) => m.cardRowsTrack),
+  "grid-implicit": () => import("./grid-implicit.js").then((m) => m.gridImplicitTrack),
   subgrid: () => import("./subgrid.js").then((m) => m.subgridTrack),
   "intrinsic-sizing": () => import("./intrinsic-sizing.js").then((m) => m.intrinsicSizingTrack),
   multicol: () => import("./multicol.js").then((m) => m.multicolTrack),
@@ -1077,6 +1114,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "container-queries": () => import("./container-queries.js").then((m) => m.containerQueriesTrack),
   "container-queries-in-practice": () =>
     import("./container-queries-in-practice.js").then((m) => m.containerQueriesInPracticeTrack),
+  "negative-margins": () => import("./negative-margins.js").then((m) => m.negativeMarginsTrack),
   supports: () => import("./supports.js").then((m) => m.supportsTrack),
   layers: () => import("./layers.js").then((m) => m.layersTrack),
   "layers-in-practice": () => import("./layers-in-practice.js").then((m) => m.layersInPracticeTrack),
@@ -1092,6 +1130,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "entry-animations": () => import("./entry-animations.js").then((m) => m.entryAnimationsTrack),
   "registered-props": () => import("./registered-props.js").then((m) => m.registeredPropsTrack),
   "math-functions": () => import("./math-functions.js").then((m) => m.mathFunctionsTrack),
+  "math-in-practice": () => import("./math-in-practice.js").then((m) => m.mathInPracticeTrack),
 };
 
 export function loadTrack(id: TrackId): Promise<Track> {
