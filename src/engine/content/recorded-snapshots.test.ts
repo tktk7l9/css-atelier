@@ -6226,3 +6226,373 @@ describe("margin collapsing, nesting and cascade layers in practice: recorded an
     expect(fromTop("flex-no-collapse", "solution", "list", "c1")).toBeCloseTo(0, 1);
   });
 });
+
+const PATTERN2_LESSONS = [
+  "white-space-pre-line",
+  "white-space-nowrap",
+  "tab-size",
+  "nth-child-of",
+  "only-child",
+  "first-of-type",
+  "custom-prop-override",
+  "custom-prop-inherit",
+  "custom-prop-calc",
+];
+
+const PATTERN2_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "white-space-pre-line",
+    name: "starter",
+    messages: ["住所が、HTML の改行のとおり 3 行になっていません（ふつうは改行も空白と同じに扱われます。white-space: pre-line）"],
+    elements: { address: { rect: [0, 0, 280, 48], computed: {"white-space":"normal"} }, l2: { rect: [90.28, 3, 188.83, 18], computed: {"white-space":"normal"} }, l3: { rect: [0, 27, 130.36, 18], computed: {"white-space":"normal"} } },
+  },
+  {
+    lesson: "white-space-pre-line",
+    name: "solution",
+    messages: [],
+    elements: { address: { rect: [0, 0, 280, 72], computed: {"white-space":"pre-line"} }, l2: { rect: [0, 27, 188.83, 18], computed: {"white-space":"pre-line"} }, l3: { rect: [0, 51, 130.36, 18], computed: {"white-space":"pre-line"} } },
+  },
+  {
+    lesson: "white-space-pre-line",
+    name: "pre-wrap",
+    css: ".address {\n  width: 280px;\n  margin: 0;\n  padding: 0;\n  line-height: 24px;\n  white-space: pre-wrap;\n}\n",
+    messages: [],
+    elements: { address: { rect: [0, 0, 280, 72], computed: {"white-space":"pre-wrap"} }, l2: { rect: [0, 27, 188.83, 18], computed: {"white-space":"pre-wrap"} }, l3: { rect: [0, 51, 130.36, 18], computed: {"white-space":"pre-wrap"} } },
+  },
+  {
+    lesson: "white-space-pre-line",
+    name: "pre",
+    css: ".address {\n  width: 280px;\n  margin: 0;\n  padding: 0;\n  line-height: 24px;\n  white-space: pre;\n}\n",
+    messages: [],
+    elements: { address: { rect: [0, 0, 280, 72], computed: {"white-space":"pre"} }, l2: { rect: [0, 27, 188.83, 18], computed: {"white-space":"pre"} }, l3: { rect: [0, 51, 130.36, 18], computed: {"white-space":"pre"} } },
+  },
+  {
+    lesson: "white-space-pre-line",
+    name: "lines as blocks",
+    css: ".address {\n  width: 280px;\n  margin: 0;\n  padding: 0;\n  line-height: 24px;\n}\n.address span {\n  display: block;\n}\n",
+    messages: ["行ごとに span を block にするのではなく、white-space で HTML の改行を残しましょう"],
+    elements: { address: { rect: [0, 0, 280, 72], computed: {"white-space":"normal"} }, l2: { rect: [0, 24, 280, 24], computed: {"white-space":"normal"} }, l3: { rect: [0, 48, 280, 24], computed: {"white-space":"normal"} } },
+  },
+  {
+    lesson: "white-space-nowrap",
+    name: "starter",
+    messages: ["値段が 1 行になっていません（日本語は文字のあいだで折り返されます。値段に white-space: nowrap）"],
+    elements: { row: { rect: [0, 0, 260, 72], computed: {"white-space":"normal"} }, name: { rect: [12, 12, 152.41, 48], computed: {"white-space":"normal"} }, price: { rect: [176.41, 12, 71.59, 48], computed: {"white-space":"normal"} } },
+  },
+  {
+    lesson: "white-space-nowrap",
+    name: "solution",
+    messages: [],
+    elements: { row: { rect: [0, 0, 260, 120], computed: {"white-space":"normal"} }, name: { rect: [12, 12, 95.25, 96], computed: {"white-space":"normal"} }, price: { rect: [119.25, 12, 128.75, 24], computed: {"white-space":"nowrap"} } },
+  },
+  {
+    lesson: "white-space-nowrap",
+    name: "flex-shrink: 0",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n  align-items: flex-start;\n  width: 260px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.name {\n  margin: 0;\n  font-size: 16px;\n  line-height: 24px;\n}\n.price {\n  margin: 0;\n  line-height: 24px;\n  font-weight: 700;\n}\n.price {\n  flex-shrink: 0;\n}\n",
+    messages: [],
+    elements: { row: { rect: [0, 0, 260, 120], computed: {"white-space":"normal"} }, name: { rect: [12, 12, 95.25, 96], computed: {"white-space":"normal"} }, price: { rect: [119.25, 12, 128.75, 24], computed: {"white-space":"normal"} } },
+  },
+  {
+    lesson: "white-space-nowrap",
+    name: "text-wrap-mode: nowrap",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n  align-items: flex-start;\n  width: 260px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.name {\n  margin: 0;\n  font-size: 16px;\n  line-height: 24px;\n}\n.price {\n  margin: 0;\n  line-height: 24px;\n  font-weight: 700;\n}\n.price {\n  text-wrap-mode: nowrap;\n}\n",
+    messages: [],
+    elements: { row: { rect: [0, 0, 260, 120], computed: {"white-space":"normal"} }, name: { rect: [12, 12, 95.25, 96], computed: {"white-space":"normal"} }, price: { rect: [119.25, 12, 128.75, 24], computed: {"white-space":"nowrap"} } },
+  },
+  {
+    lesson: "white-space-nowrap",
+    name: "nowrap on the whole row",
+    css: ".row {\n  display: flex;\n  gap: 12px;\n  align-items: flex-start;\n  width: 260px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.name {\n  margin: 0;\n  font-size: 16px;\n  line-height: 24px;\n}\n.price {\n  margin: 0;\n  line-height: 24px;\n  font-weight: 700;\n}\n.row {\n  white-space: nowrap;\n}\n",
+    messages: ["値段が枠からはみ出しています（商品名のほうを縮めて、折り返させます）"],
+    elements: { row: { rect: [0, 0, 260, 48], computed: {"white-space":"nowrap"} }, name: { rect: [12, 12, 274.06, 24], computed: {"white-space":"nowrap"} }, price: { rect: [298.06, 12, 128.75, 24], computed: {"white-space":"nowrap"} } },
+  },
+  {
+    lesson: "tab-size",
+    name: "starter",
+    messages: ["2 行目の字下げが、スペース 2 つ分ほどになっていません（タブの幅は初期値で 8 つ分です。tab-size: 2）"],
+    elements: { code: { rect: [0, 0, 596, 87] }, body: { rect: [79.44, 36, 77, 15] } },
+  },
+  {
+    lesson: "tab-size",
+    name: "solution",
+    messages: [],
+    elements: { code: { rect: [0, 0, 596, 87] }, body: { rect: [28.86, 36, 77, 15] } },
+  },
+  {
+    lesson: "tab-size",
+    name: "tab-size: 4",
+    css: ".code {\n  margin: 0;\n  padding: 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #e6ecff;\n  font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace;\n  tab-size: 4;\n}\n",
+    messages: ["2 行目の字下げが、スペース 2 つ分ほどになっていません（タブの幅は初期値で 8 つ分です。tab-size: 2）"],
+    elements: { code: { rect: [0, 0, 596, 87] }, body: { rect: [45.72, 36, 77, 15] } },
+  },
+  {
+    lesson: "tab-size",
+    name: "set on the code element",
+    css: ".code {\n  margin: 0;\n  padding: 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #e6ecff;\n  font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace;\n}\n.code code {\n  tab-size: 2;\n}\n",
+    messages: [],
+    elements: { code: { rect: [0, 0, 596, 87] }, body: { rect: [28.86, 36, 77, 15] } },
+  },
+  {
+    lesson: "tab-size",
+    name: "tab-size: 2 on the body",
+    css: ".code {\n  margin: 0;\n  padding: 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #e6ecff;\n  font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace;\n}\nbody {\n  tab-size: 2;\n}\n",
+    messages: [],
+    elements: { code: { rect: [0, 0, 596, 87] }, body: { rect: [28.86, 36, 77, 15] } },
+  },
+  {
+    lesson: "nth-child-of",
+    name: "starter",
+    messages: ["表示している行が 1 行おきに塗られていません（:nth-child(even) は隠した行も数えます。:nth-child(even of :not([hidden]))）"],
+    elements: { r1: { rect: [0, 0, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 0, 0, 0], computed: {"background-color":"rgb(238, 241, 248)"} }, r3: { rect: [0, 34.39, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 68.78, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r6: { rect: [0, 103.17, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "nth-child-of",
+    name: "solution",
+    messages: [],
+    elements: { r1: { rect: [0, 0, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r3: { rect: [0, 34.39, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, r4: { rect: [0, 68.78, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r5: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r6: { rect: [0, 103.17, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "nth-child-of",
+    name: "rows picked by hand",
+    css: ".rows {\n  width: 280px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.rows li {\n  padding: 6px 12px;\n}\n/* 1 行おきに色を付ける */\n.rows li:is([data-id=\"r3\"], [data-id=\"r6\"]) {\n  background: #eef1f8;\n}\n",
+    messages: [],
+    elements: { r1: { rect: [0, 0, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r3: { rect: [0, 34.39, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, r4: { rect: [0, 68.78, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r5: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r6: { rect: [0, 103.17, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "nth-child-of",
+    name: "odd of",
+    css: ".rows {\n  width: 280px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.rows li {\n  padding: 6px 12px;\n}\n/* 1 行おきに色を付ける */\n.rows li:nth-child(odd of :not([hidden])) {\n  background: #eef1f8;\n}\n",
+    messages: ["表示している行が 1 行おきに塗られていません（:nth-child(even) は隠した行も数えます。:nth-child(even of :not([hidden]))）"],
+    elements: { r1: { rect: [0, 0, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, r2: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r3: { rect: [0, 34.39, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 68.78, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r6: { rect: [0, 103.17, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "nth-child-of",
+    name: "of li (hidden rows counted)",
+    css: ".rows {\n  width: 280px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.rows li {\n  padding: 6px 12px;\n}\n/* 1 行おきに色を付ける */\n.rows li:nth-child(even of li) {\n  background: #eef1f8;\n}\n",
+    messages: ["表示している行が 1 行おきに塗られていません（:nth-child(even) は隠した行も数えます。:nth-child(even of :not([hidden]))）"],
+    elements: { r1: { rect: [0, 0, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r2: { rect: [0, 0, 0, 0], computed: {"background-color":"rgb(238, 241, 248)"} }, r3: { rect: [0, 34.39, 280, 34.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r4: { rect: [0, 68.78, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} }, r5: { rect: [0, 0, 0, 0], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, r6: { rect: [0, 103.17, 280, 34.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "only-child",
+    name: "starter",
+    messages: ["1 枚だけの写真が、2 列ぶんの幅（280px）になっていません（兄弟のいない要素は :only-child で選べます）"],
+    elements: { one: { rect: [0, 0, 280, 56] }, o1: { rect: [0, 0, 136, 56] }, three: { rect: [0, 68, 280, 120] }, t1: { rect: [0, 68, 136, 56] }, t2: { rect: [144, 68, 136, 56] }, t3: { rect: [0, 132, 136, 56] } },
+  },
+  {
+    lesson: "only-child",
+    name: "solution",
+    messages: [],
+    elements: { one: { rect: [0, 0, 280, 56] }, o1: { rect: [0, 0, 280, 56] }, three: { rect: [0, 68, 280, 120] }, t1: { rect: [0, 68, 136, 56] }, t2: { rect: [144, 68, 136, 56] }, t3: { rect: [0, 132, 136, 56] } },
+  },
+  {
+    lesson: "only-child",
+    name: ":first-child:last-child",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 8px;\n  width: 280px;\n  margin-bottom: 12px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n/* 1 枚だけのときは 2 列ぶんに */\n.tile:first-child:last-child {\n  grid-column: 1 / -1;\n}\n",
+    messages: [],
+    elements: { one: { rect: [0, 0, 280, 56] }, o1: { rect: [0, 0, 280, 56] }, three: { rect: [0, 68, 280, 120] }, t1: { rect: [0, 68, 136, 56] }, t2: { rect: [144, 68, 136, 56] }, t3: { rect: [0, 132, 136, 56] } },
+  },
+  {
+    lesson: "only-child",
+    name: "span 2",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 8px;\n  width: 280px;\n  margin-bottom: 12px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n/* 1 枚だけのときは 2 列ぶんに */\n.tile:only-child {\n  grid-column: span 2;\n}\n",
+    messages: [],
+    elements: { one: { rect: [0, 0, 280, 56] }, o1: { rect: [0, 0, 280, 56] }, three: { rect: [0, 68, 280, 120] }, t1: { rect: [0, 68, 136, 56] }, t2: { rect: [144, 68, 136, 56] }, t3: { rect: [0, 132, 136, 56] } },
+  },
+  {
+    lesson: "only-child",
+    name: "every tile spans",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 8px;\n  width: 280px;\n  margin-bottom: 12px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n/* 1 枚だけのときは 2 列ぶんに */\n.tile {\n  grid-column: 1 / -1;\n}\n",
+    messages: ["3 枚のギャラリーの写真まで広がっています（1 枚だけのときに限ります）"],
+    elements: { one: { rect: [0, 0, 280, 56] }, o1: { rect: [0, 0, 280, 56] }, three: { rect: [0, 68, 280, 184] }, t1: { rect: [0, 68, 280, 56] }, t2: { rect: [0, 132, 280, 56] }, t3: { rect: [0, 196, 280, 56] } },
+  },
+  {
+    lesson: "only-child",
+    name: ":first-child only",
+    css: ".gallery {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 8px;\n  width: 280px;\n  margin-bottom: 12px;\n}\n.tile {\n  display: grid;\n  place-items: center;\n  height: 56px;\n  border-radius: 8px;\n  background: #dbe4fb;\n  font-weight: 700;\n}\n/* 1 枚だけのときは 2 列ぶんに */\n.tile:first-child {\n  grid-column: 1 / -1;\n}\n",
+    messages: ["3 枚のギャラリーの写真まで広がっています（1 枚だけのときに限ります）"],
+    elements: { one: { rect: [0, 0, 280, 56] }, o1: { rect: [0, 0, 280, 56] }, three: { rect: [0, 68, 280, 120] }, t1: { rect: [0, 68, 280, 56] }, t2: { rect: [0, 132, 136, 56] }, t3: { rect: [144, 132, 136, 56] } },
+  },
+  {
+    lesson: "first-of-type",
+    name: "starter",
+    messages: ["最初の段落が大きく太くなっていません（記事の最初の子は見出しなので、p:first-child は当たりません。p:first-of-type）"],
+    elements: { title: { rect: [0, 0, 280, 28], computed: {"font-size":"20px","font-weight":"700"} }, p1: { rect: [0, 36, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} }, p2: { rect: [0, 61.59, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} }, p3: { rect: [0, 87.19, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} } },
+  },
+  {
+    lesson: "first-of-type",
+    name: "solution",
+    messages: [],
+    elements: { title: { rect: [0, 0, 280, 28], computed: {"font-size":"20px","font-weight":"700"} }, p1: { rect: [0, 36, 280, 23.8], computed: {"font-size":"17px","font-weight":"700"} }, p2: { rect: [0, 65.8, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} }, p3: { rect: [0, 91.39, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} } },
+  },
+  {
+    lesson: "first-of-type",
+    name: ":nth-of-type(1)",
+    css: ".article {\n  width: 280px;\n}\n.article h2 {\n  margin: 0 0 8px;\n  font-size: 20px;\n}\n.article p {\n  margin: 0 0 6px;\n  font-size: 14px;\n}\n/* 最初の段落（リード）を大きく */\n.article p:nth-of-type(1) {\n  font-size: 17px;\n  font-weight: 700;\n}\n",
+    messages: [],
+    elements: { title: { rect: [0, 0, 280, 28], computed: {"font-size":"20px","font-weight":"700"} }, p1: { rect: [0, 36, 280, 23.8], computed: {"font-size":"17px","font-weight":"700"} }, p2: { rect: [0, 65.8, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} }, p3: { rect: [0, 91.39, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} } },
+  },
+  {
+    lesson: "first-of-type",
+    name: "h2 + p",
+    css: ".article {\n  width: 280px;\n}\n.article h2 {\n  margin: 0 0 8px;\n  font-size: 20px;\n}\n.article p {\n  margin: 0 0 6px;\n  font-size: 14px;\n}\n/* 最初の段落（リード）を大きく */\n.article h2 + p {\n  font-size: 17px;\n  font-weight: 700;\n}\n",
+    messages: [],
+    elements: { title: { rect: [0, 0, 280, 28], computed: {"font-size":"20px","font-weight":"700"} }, p1: { rect: [0, 36, 280, 23.8], computed: {"font-size":"17px","font-weight":"700"} }, p2: { rect: [0, 65.8, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} }, p3: { rect: [0, 91.39, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} } },
+  },
+  {
+    lesson: "first-of-type",
+    name: "every paragraph",
+    css: ".article {\n  width: 280px;\n}\n.article h2 {\n  margin: 0 0 8px;\n  font-size: 20px;\n}\n.article p {\n  margin: 0 0 6px;\n  font-size: 14px;\n}\n/* 最初の段落（リード）を大きく */\n.article p {\n  font-size: 17px;\n  font-weight: 700;\n}\n",
+    messages: ["最初の段落のほかまで大きくなっています（最初の段落だけを選びます）"],
+    elements: { title: { rect: [0, 0, 280, 28], computed: {"font-size":"20px","font-weight":"700"} }, p1: { rect: [0, 36, 280, 23.8], computed: {"font-size":"17px","font-weight":"700"} }, p2: { rect: [0, 65.8, 280, 23.8], computed: {"font-size":"17px","font-weight":"700"} }, p3: { rect: [0, 95.59, 280, 23.8], computed: {"font-size":"17px","font-weight":"700"} } },
+  },
+  {
+    lesson: "first-of-type",
+    name: ":nth-child(1)",
+    css: ".article {\n  width: 280px;\n}\n.article h2 {\n  margin: 0 0 8px;\n  font-size: 20px;\n}\n.article p {\n  margin: 0 0 6px;\n  font-size: 14px;\n}\n/* 最初の段落（リード）を大きく */\n.article p:nth-child(1) {\n  font-size: 17px;\n  font-weight: 700;\n}\n",
+    messages: ["最初の段落が大きく太くなっていません（記事の最初の子は見出しなので、p:first-child は当たりません。p:first-of-type）"],
+    elements: { title: { rect: [0, 0, 280, 28], computed: {"font-size":"20px","font-weight":"700"} }, p1: { rect: [0, 36, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} }, p2: { rect: [0, 61.59, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} }, p3: { rect: [0, 87.19, 280, 19.59], computed: {"font-size":"14px","font-weight":"400"} } },
+  },
+  {
+    lesson: "custom-prop-override",
+    name: "starter",
+    messages: ["「削除する」ボタンの文字と枠線が、両方とも赤になっていません（色は --btn-color から取っています。変数を上書きします）"],
+    elements: { save: { rect: [0, 0, 96, 38.39], computed: {"color":"rgb(47, 95, 208)","border-top-color":"rgb(47, 95, 208)"} }, del: { rect: [104, 0, 96, 38.39], computed: {"color":"rgb(198, 40, 40)","border-top-color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "custom-prop-override",
+    name: "solution",
+    messages: [],
+    elements: { save: { rect: [0, 0, 96, 38.39], computed: {"color":"rgb(47, 95, 208)","border-top-color":"rgb(47, 95, 208)"} }, del: { rect: [104, 0, 96, 38.39], computed: {"color":"rgb(198, 40, 40)","border-top-color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "custom-prop-override",
+    name: "colour written as rgb()",
+    css: ".actions {\n  display: flex;\n  gap: 8px;\n}\n/* ボタンの色は --btn-color ひとつで決める */\n.btn {\n  --btn-color: #2f5fd0;\n  padding: 6px 14px;\n  border: 2px solid var(--btn-color);\n  border-radius: 999px;\n  background: #fff;\n  color: var(--btn-color);\n  font: inherit;\n}\n/* 危険な操作のボタン */\n.btn.is-danger {\n  --btn-color: rgb(198 40 40);\n}\n",
+    messages: [],
+    elements: { save: { rect: [0, 0, 96, 38.39], computed: {"color":"rgb(47, 95, 208)","border-top-color":"rgb(47, 95, 208)"} }, del: { rect: [104, 0, 96, 38.39], computed: {"color":"rgb(198, 40, 40)","border-top-color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "custom-prop-override",
+    name: "border and colour written out",
+    css: ".actions {\n  display: flex;\n  gap: 8px;\n}\n/* ボタンの色は --btn-color ひとつで決める */\n.btn {\n  --btn-color: #2f5fd0;\n  padding: 6px 14px;\n  border: 2px solid var(--btn-color);\n  border-radius: 999px;\n  background: #fff;\n  color: var(--btn-color);\n  font: inherit;\n}\n/* 危険な操作のボタン */\n.btn.is-danger {\n  color: #c62828;\n}\n.btn.is-danger {\n  border-color: #c62828;\n}\n",
+    messages: [".btn.is-danger の中で、--btn-color を #c62828 に上書きしましょう（枠線と文字色を 1 つずつ書くのではなく）"],
+    elements: { save: { rect: [0, 0, 96, 38.39], computed: {"color":"rgb(47, 95, 208)","border-top-color":"rgb(47, 95, 208)"} }, del: { rect: [104, 0, 96, 38.39], computed: {"color":"rgb(198, 40, 40)","border-top-color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "custom-prop-override",
+    name: "base variable changed",
+    css: ".actions {\n  display: flex;\n  gap: 8px;\n}\n/* ボタンの色は --btn-color ひとつで決める */\n.btn {\n  --btn-color: #c62828;\n  padding: 6px 14px;\n  border: 2px solid var(--btn-color);\n  border-radius: 999px;\n  background: #fff;\n  color: var(--btn-color);\n  font: inherit;\n}\n/* 危険な操作のボタン */\n.btn.is-danger {\n  color: #c62828;\n}\n",
+    messages: ["「保存する」ボタンの色まで変わっています（危険な操作のボタンだけを変えます）"],
+    elements: { save: { rect: [0, 0, 96, 38.39], computed: {"color":"rgb(198, 40, 40)","border-top-color":"rgb(198, 40, 40)"} }, del: { rect: [104, 0, 96, 38.39], computed: {"color":"rgb(198, 40, 40)","border-top-color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "custom-prop-inherit",
+    name: "starter",
+    messages: ["暖かい色の区画のカードの線が、黄土色になっていません（区画 .warm に --accent を置くと、中のカードが受け継ぎます）"],
+    elements: { a1: { rect: [0, 0, 92, 38.39], computed: {"border-left-color":"rgb(47, 95, 208)"} }, b1: { rect: [0, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(47, 95, 208)"} }, b2: { rect: [100, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "custom-prop-inherit",
+    name: "solution",
+    messages: [],
+    elements: { a1: { rect: [0, 0, 92, 38.39], computed: {"border-left-color":"rgb(47, 95, 208)"} }, b1: { rect: [0, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} }, b2: { rect: [100, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} } },
+  },
+  {
+    lesson: "custom-prop-inherit",
+    name: ".news.warm",
+    css: ":root {\n  --accent: #2f5fd0;\n}\n.news {\n  display: flex;\n  gap: 8px;\n  margin-bottom: 8px;\n}\n.card {\n  padding: 8px 12px;\n  border-left: 4px solid var(--accent);\n  border-radius: 4px;\n  background: #f6f7fb;\n}\n/* 暖かい色の区画 */\n.news.warm {\n  --accent: #b9791b;\n}\n",
+    messages: [],
+    elements: { a1: { rect: [0, 0, 92, 38.39], computed: {"border-left-color":"rgb(47, 95, 208)"} }, b1: { rect: [0, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} }, b2: { rect: [100, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} } },
+  },
+  {
+    lesson: "custom-prop-inherit",
+    name: "set on each card",
+    css: ":root {\n  --accent: #2f5fd0;\n}\n.news {\n  display: flex;\n  gap: 8px;\n  margin-bottom: 8px;\n}\n.card {\n  padding: 8px 12px;\n  border-left: 4px solid var(--accent);\n  border-radius: 4px;\n  background: #f6f7fb;\n}\n.warm .card {\n  --accent: #b9791b;\n}\n",
+    messages: ["カードのルールではなく、区画（.warm）に --accent: #b9791b を置きましょう（中の要素がまとめて受け継ぎます）"],
+    elements: { a1: { rect: [0, 0, 92, 38.39], computed: {"border-left-color":"rgb(47, 95, 208)"} }, b1: { rect: [0, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} }, b2: { rect: [100, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} } },
+  },
+  {
+    lesson: "custom-prop-inherit",
+    name: "set on :root",
+    css: ":root {\n  --accent: #b9791b;\n}\n.news {\n  display: flex;\n  gap: 8px;\n  margin-bottom: 8px;\n}\n.card {\n  padding: 8px 12px;\n  border-left: 4px solid var(--accent);\n  border-radius: 4px;\n  background: #f6f7fb;\n}\n",
+    messages: ["ほかの区画のカードの色まで変わっています（.warm の中だけを変えます）"],
+    elements: { a1: { rect: [0, 0, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} }, b1: { rect: [0, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} }, b2: { rect: [100, 46.39, 92, 38.39], computed: {"border-left-color":"rgb(185, 121, 27)"} } },
+  },
+  {
+    lesson: "custom-prop-calc",
+    name: "starter",
+    messages: ["下のパネルの余白とすき間が詰まっていません（.compact に --space: 4px を置くと、calc(var(--space) * 2) の 8px も、gap の 4px も変わります）"],
+    elements: { normal: { rect: [0, 0, 280, 116.78] }, n1: { rect: [16, 16, 248, 38.39] }, n2: { rect: [16, 62.39, 248, 38.39] }, compact: { rect: [0, 128.78, 280, 116.78] }, c1: { rect: [16, 144.78, 248, 38.39] }, c2: { rect: [16, 191.17, 248, 38.39] } },
+  },
+  {
+    lesson: "custom-prop-calc",
+    name: "solution",
+    messages: [],
+    elements: { normal: { rect: [0, 0, 280, 116.78] }, n1: { rect: [16, 16, 248, 38.39] }, n2: { rect: [16, 62.39, 248, 38.39] }, compact: { rect: [0, 128.78, 280, 80.78] }, c1: { rect: [8, 136.78, 264, 30.39] }, c2: { rect: [8, 171.17, 264, 30.39] } },
+  },
+  {
+    lesson: "custom-prop-calc",
+    name: "0.25rem",
+    css: ":root {\n  --space: 8px;\n}\n.panel {\n  display: grid;\n  gap: var(--space);\n  width: 280px;\n  margin-bottom: 12px;\n  padding: calc(var(--space) * 2);\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.box {\n  padding: var(--space);\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n/* 詰めた表示の区画 */\n.compact {\n  --space: 0.25rem;\n}\n",
+    messages: [],
+    elements: { normal: { rect: [0, 0, 280, 116.78] }, n1: { rect: [16, 16, 248, 38.39] }, n2: { rect: [16, 62.39, 248, 38.39] }, compact: { rect: [0, 128.78, 280, 80.78] }, c1: { rect: [8, 136.78, 264, 30.39] }, c2: { rect: [8, 171.17, 264, 30.39] } },
+  },
+  {
+    lesson: "custom-prop-calc",
+    name: "paddings rewritten",
+    css: ":root {\n  --space: 8px;\n}\n.panel {\n  display: grid;\n  gap: var(--space);\n  width: 280px;\n  margin-bottom: 12px;\n  padding: calc(var(--space) * 2);\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.box {\n  padding: var(--space);\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.compact {\n  gap: 4px;\n  padding: 8px;\n}\n.compact .box {\n  padding: 4px;\n}\n",
+    messages: ["padding や gap を 1 つずつ書き直すのではなく、.compact で --space を 4px に上書きしましょう"],
+    elements: { normal: { rect: [0, 0, 280, 116.78] }, n1: { rect: [16, 16, 248, 38.39] }, n2: { rect: [16, 62.39, 248, 38.39] }, compact: { rect: [0, 128.78, 280, 80.78] }, c1: { rect: [8, 136.78, 264, 30.39] }, c2: { rect: [8, 171.17, 264, 30.39] } },
+  },
+  {
+    lesson: "custom-prop-calc",
+    name: "set on :root",
+    css: ":root {\n  --space: 4px;\n}\n.panel {\n  display: grid;\n  gap: var(--space);\n  width: 280px;\n  margin-bottom: 12px;\n  padding: calc(var(--space) * 2);\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.box {\n  padding: var(--space);\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["上のパネルの余白まで変わっています（.compact の中だけを詰めます）"],
+    elements: { normal: { rect: [0, 0, 280, 80.78] }, n1: { rect: [8, 8, 264, 30.39] }, n2: { rect: [8, 42.39, 264, 30.39] }, compact: { rect: [0, 92.78, 280, 80.78] }, c1: { rect: [8, 100.78, 264, 30.39] }, c2: { rect: [8, 135.17, 264, 30.39] } },
+  },
+];
+
+describe("white space, structural patterns and custom properties in practice: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 9 lessons", () => {
+    expect([...new Set(PATTERN2_CASES.map((c) => c.lesson))].sort()).toEqual([...PATTERN2_LESSONS].sort());
+    for (const id of PATTERN2_LESSONS) {
+      const names = PATTERN2_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of PATTERN2_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of PATTERN2_LESSONS) {
+      const starter = PATTERN2_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = PATTERN2_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the measurements the lessons are about", () => {
+    const rect = (id: string, name: string, el: string): readonly number[] =>
+      PATTERN2_CASES.find((c) => c.lesson === id && c.name === name)!.elements[el]!.rect!;
+    // pre-line puts the second and third address lines on lines of their own.
+    expect(rect("white-space-pre-line", "solution", "l2")[0]).toBe(0);
+    expect(rect("white-space-pre-line", "solution", "address")[3]).toBe(72);
+    // The price wraps in the starter and is one 24px line with nowrap.
+    expect(rect("white-space-nowrap", "starter", "price")[3]).toBeGreaterThan(24);
+    expect(rect("white-space-nowrap", "solution", "price")[3]).toBe(24);
+    // A tab of 8 spaces pushes the line far in; 2 spaces keep it close.
+    expect(rect("tab-size", "starter", "body")[0]).toBeGreaterThan(60);
+    expect(rect("tab-size", "solution", "body")[0]).toBeLessThan(40);
+    // The lone tile spans both 136px columns and the gap.
+    expect(rect("only-child", "solution", "o1")[2]).toBe(280);
+    // Halving --space halves the compact panel's padding and gap.
+    expect(rect("custom-prop-calc", "solution", "c1")[1]! - rect("custom-prop-calc", "solution", "compact")[1]!).toBeCloseTo(8, 1);
+  });
+});
