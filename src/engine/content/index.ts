@@ -50,6 +50,8 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * state the markup carries); and the text effects follow the typesetting track.
  * Margin collapsing follows how widths are decided (both are box-model
  * basics); the nesting and cascade-layer practice tracks follow their basics.
+ * White space follows the other text tracks, and the practice tracks for the
+ * structural pseudo-classes and custom properties follow their basics.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -91,6 +93,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "nth-patterns",
+    title: "何番目かの応用（of S・:only-child・:first-of-type）",
+    summary: ":nth-child(even of :not([hidden])) で表示している行だけを 1 行おきに塗り、:only-child で 1 枚だけのときに全幅にし、:first-of-type で見出しのあとの最初の段落を選ぶ。",
+    emoji: "🔁",
+    lessons: [
+      { id: "nth-child-of", title: "表示している行だけ数える: :nth-child(even of …)" },
+      { id: "only-child", title: "1 つだけのときは広く: :only-child" },
+      { id: "first-of-type", title: "見出しのあとの最初の段落: p:first-of-type" },
+    ],
+  },
+  {
     id: "box-model",
     title: "ボックスモデル",
     summary: "content・padding・border・margin の4層を理解する。",
@@ -105,7 +118,7 @@ export const TRACKS: readonly TrackMeta[] = [
     id: "sizing-basics",
     title: "幅の決まり方（box-sizing・width: auto・max-width: 100%）",
     summary: "box-sizing: border-box で余白と枠線を幅に含め、width: auto で margin のぶん自動で縮め、max-width: 100% で画像を枠に収める。",
-    emoji: "📦",
+    emoji: "↔️",
     lessons: [
       { id: "box-sizing", title: "余白と枠線を幅に含める: box-sizing: border-box" },
       { id: "width-auto", title: "margin のぶん自動で縮む: width: auto" },
@@ -175,6 +188,17 @@ export const TRACKS: readonly TrackMeta[] = [
     lessons: [
       { id: "custom-props-define", title: "変数を定義して使う: --x と var()" },
       { id: "custom-props-fallback", title: "フォールバック付き var()" },
+    ],
+  },
+  {
+    id: "custom-props-in-practice",
+    title: "カスタムプロパティの応用（部品ごとの上書き・受け継ぎ・calc）",
+    summary: "修飾クラスで変数だけを上書きして部品の色をまとめて変え、親に置いた変数を子に受け継がせてテーマを切り替え、calc() と組み合わせた余白の基準を 1 か所で変える。",
+    emoji: "🧰",
+    lessons: [
+      { id: "custom-prop-override", title: "変数だけを上書きする: 修飾クラスで --btn-color を変える" },
+      { id: "custom-prop-inherit", title: "親に置いて子が受け継ぐ: 区画ごとのテーマ色" },
+      { id: "custom-prop-calc", title: "余白の基準を 1 か所で変える: calc(var(--space) * 2)" },
     ],
   },
   {
@@ -272,6 +296,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "text-shadow", title: "明るい背景の上の白い文字に: text-shadow" },
       { id: "text-emphasis", title: "強調したい語に傍点を: text-emphasis" },
       { id: "text-transform", title: "英字の小見出しを大文字に: text-transform と letter-spacing" },
+    ],
+  },
+  {
+    id: "white-space",
+    title: "空白と改行（pre-line・nowrap・tab-size）",
+    summary: "white-space: pre-line で HTML の改行を表示に残し、nowrap で値段を途中で折り返さず、tab-size でコードのタブの幅を詰める。",
+    emoji: "↩️",
+    lessons: [
+      { id: "white-space-pre-line", title: "HTML の改行をそのまま: white-space: pre-line" },
+      { id: "white-space-nowrap", title: "値段を途中で折り返さない: white-space: nowrap" },
+      { id: "tab-size", title: "コードのタブの幅を詰める: tab-size" },
     ],
   },
   {
@@ -433,7 +468,7 @@ export const TRACKS: readonly TrackMeta[] = [
     id: "grid-placement",
     title: "グリッドの配置（span・dense・同じマスに重ねる）",
     summary: "span で 1 枚だけ大きくし、grid-auto-flow: dense ですき間を埋め、同じマスに置いて写真とキャプションを重ねる。",
-    emoji: "🧱",
+    emoji: "🔳",
     lessons: [
       { id: "grid-span", title: "1 枚だけ大きくする: grid-column: span 2" },
       { id: "grid-dense", title: "すき間を埋める: grid-auto-flow: dense" },
@@ -864,6 +899,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   selectors: () => import("./selectors.js").then((m) => m.selectorsTrack),
   combinators: () => import("./combinators.js").then((m) => m.combinatorsTrack),
   "structural-selectors": () => import("./structural-selectors.js").then((m) => m.structuralSelectorsTrack),
+  "nth-patterns": () => import("./nth-patterns.js").then((m) => m.nthPatternsTrack),
   "box-model": () => import("./box-model.js").then((m) => m.boxModelTrack),
   "sizing-basics": () => import("./sizing-basics.js").then((m) => m.sizingBasicsTrack),
   "margin-collapse": () => import("./margin-collapse.js").then((m) => m.marginCollapseTrack),
@@ -872,6 +908,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "relative-units": () => import("./relative-units.js").then((m) => m.relativeUnitsTrack),
   inheritance: () => import("./inheritance.js").then((m) => m.inheritanceTrack),
   "custom-props": () => import("./custom-props.js").then((m) => m.customPropsTrack),
+  "custom-props-in-practice": () => import("./custom-props-in-practice.js").then((m) => m.customPropsInPracticeTrack),
   color: () => import("./color.js").then((m) => m.colorTrack),
   "color-functions": () => import("./color-functions.js").then((m) => m.colorFunctionsTrack),
   gradients: () => import("./gradients.js").then((m) => m.gradientsTrack),
@@ -881,6 +918,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "text-overflow": () => import("./text-overflow.js").then((m) => m.textOverflowTrack),
   typesetting: () => import("./typesetting.js").then((m) => m.typesettingTrack),
   "text-effects": () => import("./text-effects.js").then((m) => m.textEffectsTrack),
+  "white-space": () => import("./white-space.js").then((m) => m.whiteSpaceTrack),
   "modern-selectors": () => import("./modern-selectors.js").then((m) => m.modernSelectorsTrack),
   "has-patterns": () => import("./has-patterns.js").then((m) => m.hasPatternsTrack),
   specificity: () => import("./specificity.js").then((m) => m.specificityTrack),

@@ -99,6 +99,11 @@ describe("content integrity", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it("gives every track its own emoji, so the catalogue cards stay distinct", () => {
+    const emoji = TRACKS.map((t) => t.emoji);
+    expect(emoji.filter((e, i) => emoji.indexOf(e) !== i)).toEqual([]);
+  });
+
   it("has at least a handful of tracks and lessons", () => {
     expect(TRACKS.length).toBeGreaterThanOrEqual(6);
     expect(LESSONS.length).toBeGreaterThanOrEqual(15);

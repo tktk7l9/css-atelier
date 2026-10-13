@@ -44,7 +44,7 @@ export const gridPlacementTrack: Track = {
   id: "grid-placement",
   title: "グリッドの配置（span・dense・同じマスに重ねる）",
   summary: "span で 1 枚だけ大きくし、grid-auto-flow: dense ですき間を埋め、同じマスに置いて写真とキャプションを重ねる。",
-  emoji: "🧱",
+  emoji: "🔳",
   lessons: [
     {
       id: "grid-span",

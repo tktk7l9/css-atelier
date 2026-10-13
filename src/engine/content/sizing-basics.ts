@@ -50,7 +50,7 @@ export const sizingBasicsTrack: Track = {
   id: "sizing-basics",
   title: "幅の決まり方（box-sizing・width: auto・max-width: 100%）",
   summary: "box-sizing: border-box で余白と枠線を幅に含め、width: auto で margin のぶん自動で縮め、max-width: 100% で画像を枠に収める。",
-  emoji: "📦",
+  emoji: "↔️",
   lessons: [
     {
       id: "box-sizing",
