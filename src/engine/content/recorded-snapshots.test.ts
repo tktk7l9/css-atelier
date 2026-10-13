@@ -4262,3 +4262,590 @@ describe("sizing, outlines and shadows, flex sizing and grid placement: recorded
     expect(Math.abs(mainW - 2 * sideW)).toBeLessThan(1);
   });
 });
+
+const SURFACE_LESSONS = [
+  "bg-cover",
+  "bg-icon",
+  "bg-layers",
+  "specificity-columns",
+  "where-zero",
+  "is-specificity",
+  "text-indent",
+  "hanging-indent",
+  "underline-offset",
+  "list-style-none",
+  "list-style-string",
+  "list-style-inside",
+];
+
+const SURFACE_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "bg-cover",
+    name: "starter",
+    messages: ["写真が、ゆがまずに枠いっぱいに広がっていません（縦横比を保って枠を覆うのは background-size: cover。100% 100% だとゆがみます）"],
+    elements: { hero: { rect: [0, 0, 280, 140], computed: {"background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-cover",
+    name: "solution",
+    messages: [],
+    elements: { hero: { rect: [0, 0, 280, 140], computed: {"background-size":"cover","background-position":"50% 50%"} } },
+  },
+  {
+    lesson: "bg-cover",
+    name: "shorthand center / cover",
+    css: ".hero {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  background-color: #bfe3fa;\n  background-image: var(--photo);\n}\n.hero h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.hero p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.hero {\n  --photo: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='100' viewBox='0 0 160 100'%3E%3Crect width='160' height='100' fill='%23bfe3fa'/%3E%3Ccircle cx='122' cy='28' r='11' fill='%23ffd75e'/%3E%3Cpath d='M0 72l38-32 26 22 36-34 60 46v26H0z' fill='%232f9d5b'/%3E%3Crect y='80' width='160' height='20' fill='%232f5fd0'/%3E%3Cpath d='M56 84h30l-5 6H61z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n.hero {\n  background: #bfe3fa var(--photo) center / cover;\n}\n",
+    messages: [],
+    elements: { hero: { rect: [0, 0, 280, 140], computed: {"background-size":"cover","background-position":"50% 50%"} } },
+  },
+  {
+    lesson: "bg-cover",
+    name: "50% 50% written",
+    css: ".hero {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  background-color: #bfe3fa;\n  background-image: var(--photo);\n  background-size: cover;\n  background-position: 50% 50%;\n}\n.hero h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.hero p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.hero {\n  --photo: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='100' viewBox='0 0 160 100'%3E%3Crect width='160' height='100' fill='%23bfe3fa'/%3E%3Ccircle cx='122' cy='28' r='11' fill='%23ffd75e'/%3E%3Cpath d='M0 72l38-32 26 22 36-34 60 46v26H0z' fill='%232f9d5b'/%3E%3Crect y='80' width='160' height='20' fill='%232f5fd0'/%3E%3Cpath d='M56 84h30l-5 6H61z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { hero: { rect: [0, 0, 280, 140], computed: {"background-size":"cover","background-position":"50% 50%"} } },
+  },
+  {
+    lesson: "bg-cover",
+    name: "100% 100%",
+    css: ".hero {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  background-color: #bfe3fa;\n  background-image: var(--photo);\n  background-size: 100% 100%;\n  background-position: center;\n}\n.hero h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.hero p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.hero {\n  --photo: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='100' viewBox='0 0 160 100'%3E%3Crect width='160' height='100' fill='%23bfe3fa'/%3E%3Ccircle cx='122' cy='28' r='11' fill='%23ffd75e'/%3E%3Cpath d='M0 72l38-32 26 22 36-34 60 46v26H0z' fill='%232f9d5b'/%3E%3Crect y='80' width='160' height='20' fill='%232f5fd0'/%3E%3Cpath d='M56 84h30l-5 6H61z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["写真が、ゆがまずに枠いっぱいに広がっていません（縦横比を保って枠を覆うのは background-size: cover。100% 100% だとゆがみます）"],
+    elements: { hero: { rect: [0, 0, 280, 140], computed: {"background-size":"100% 100%","background-position":"50% 50%"} } },
+  },
+  {
+    lesson: "bg-cover",
+    name: "contain",
+    css: ".hero {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  background-color: #bfe3fa;\n  background-image: var(--photo);\n  background-size: contain;\n  background-position: center;\n}\n.hero h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.hero p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.hero {\n  --photo: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='100' viewBox='0 0 160 100'%3E%3Crect width='160' height='100' fill='%23bfe3fa'/%3E%3Ccircle cx='122' cy='28' r='11' fill='%23ffd75e'/%3E%3Cpath d='M0 72l38-32 26 22 36-34 60 46v26H0z' fill='%232f9d5b'/%3E%3Crect y='80' width='160' height='20' fill='%232f5fd0'/%3E%3Cpath d='M56 84h30l-5 6H61z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["写真が、ゆがまずに枠いっぱいに広がっていません（縦横比を保って枠を覆うのは background-size: cover。100% 100% だとゆがみます）"],
+    elements: { hero: { rect: [0, 0, 280, 140], computed: {"background-size":"contain","background-position":"50% 50%"} } },
+  },
+  {
+    lesson: "bg-cover",
+    name: "cover without center",
+    css: ".hero {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  background-color: #bfe3fa;\n  background-image: var(--photo);\n  background-size: cover;\n}\n.hero h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.hero p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.hero {\n  --photo: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='100' viewBox='0 0 160 100'%3E%3Crect width='160' height='100' fill='%23bfe3fa'/%3E%3Ccircle cx='122' cy='28' r='11' fill='%23ffd75e'/%3E%3Cpath d='M0 72l38-32 26 22 36-34 60 46v26H0z' fill='%232f9d5b'/%3E%3Crect y='80' width='160' height='20' fill='%232f5fd0'/%3E%3Cpath d='M56 84h30l-5 6H61z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["写真の中央が見えていません（はみ出した分は切り取られるので、background-position: center で中央を見せます）"],
+    elements: { hero: { rect: [0, 0, 280, 140], computed: {"background-size":"cover","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-icon",
+    name: "starter",
+    messages: ["アイコンが繰り返し並んでいます（background-repeat: no-repeat で 1 つだけにします）"],
+    elements: { notice: { rect: [0, 0, 280, 42.39], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} }, text: { rect: [12, 12, 206.69, 18], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-icon",
+    name: "solution",
+    messages: [],
+    elements: { notice: { rect: [0, 0, 280, 42.39], computed: {"background-repeat":"no-repeat","background-size":"16px auto","background-position":"12px 50%"} }, text: { rect: [36, 12, 206.69, 18], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-icon",
+    name: "shorthand",
+    css: ".notice {\n  width: 280px;\n  margin: 0;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background-color: #fff3c4;\n  background-image: var(--icon);\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.notice {\n  --icon: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l11 19H1z' fill='%23e0a100'/%3E%3Cpath d='M11 8h2v7h-2zM11 17h2v2h-2z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n.notice {\n  padding-left: 36px;\n  background: #fff3c4 var(--icon) no-repeat 12px center / 16px;\n}\n",
+    messages: [],
+    elements: { notice: { rect: [0, 0, 280, 42.39], computed: {"background-repeat":"no-repeat","background-size":"16px auto","background-position":"12px 50%"} }, text: { rect: [36, 12, 206.69, 18], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-icon",
+    name: "left 12px center and 16px 16px",
+    css: ".notice {\n  width: 280px;\n  margin: 0;\n  padding: 10px 12px 10px 36px;\n  border-radius: 8px;\n  background-color: #fff3c4;\n  background-image: var(--icon);\n  background-repeat: no-repeat;\n  background-size: 16px 16px;\n  background-position: left 12px center;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.notice {\n  --icon: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l11 19H1z' fill='%23e0a100'/%3E%3Cpath d='M11 8h2v7h-2zM11 17h2v2h-2z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: [],
+    elements: { notice: { rect: [0, 0, 280, 42.39], computed: {"background-repeat":"no-repeat","background-size":"16px 16px","background-position":"12px 50%"} }, text: { rect: [36, 12, 206.69, 18], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-icon",
+    name: "padding left as it was",
+    css: ".notice {\n  width: 280px;\n  margin: 0;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background-color: #fff3c4;\n  background-image: var(--icon);\n  background-repeat: no-repeat;\n  background-size: 16px;\n  background-position: 12px center;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.notice {\n  --icon: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l11 19H1z' fill='%23e0a100'/%3E%3Cpath d='M11 8h2v7h-2zM11 17h2v2h-2z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["文字がアイコンに重なっています（左の padding を 36px にして、アイコンの分をあけます）"],
+    elements: { notice: { rect: [0, 0, 280, 42.39], computed: {"background-repeat":"no-repeat","background-size":"16px auto","background-position":"12px 50%"} }, text: { rect: [12, 12, 206.69, 18], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-icon",
+    name: "icon in the middle",
+    css: ".notice {\n  width: 280px;\n  margin: 0;\n  padding: 10px 12px 10px 36px;\n  border-radius: 8px;\n  background-color: #fff3c4;\n  background-image: var(--icon);\n  background-repeat: no-repeat;\n  background-size: 16px;\n  background-position: center;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.notice {\n  --icon: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l11 19H1z' fill='%23e0a100'/%3E%3Cpath d='M11 8h2v7h-2zM11 17h2v2h-2z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["アイコンが、左から 12px・上下の中央に来ていません（background-position: 12px center）"],
+    elements: { notice: { rect: [0, 0, 280, 42.39], computed: {"background-repeat":"no-repeat","background-size":"16px auto","background-position":"50% 50%"} }, text: { rect: [36, 12, 206.69, 18], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-icon",
+    name: "natural 24px size",
+    css: ".notice {\n  width: 280px;\n  margin: 0;\n  padding: 10px 12px 10px 36px;\n  border-radius: 8px;\n  background-color: #fff3c4;\n  background-image: var(--icon);\n  background-repeat: no-repeat;\n  background-position: 12px center;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.notice {\n  --icon: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l11 19H1z' fill='%23e0a100'/%3E%3Cpath d='M11 8h2v7h-2zM11 17h2v2h-2z' fill='%23fff'/%3E%3C/svg%3E\");\n}\n",
+    messages: ["アイコンの大きさが 16px になっていません（background-size: 16px）"],
+    elements: { notice: { rect: [0, 0, 280, 42.39], computed: {"background-repeat":"no-repeat","background-size":"auto","background-position":"12px 50%"} }, text: { rect: [36, 12, 206.69, 18], computed: {"background-repeat":"repeat","background-size":"auto","background-position":"0% 0%"} } },
+  },
+  {
+    lesson: "bg-layers",
+    name: "starter",
+    messages: ["写真の上に色が重なっていません（background-image にカンマで区切って、色の層を写真より先に書きます。background-color は写真の下に描かれます）"],
+    elements: { banner: { rect: [0, 0, 280, 140], computed: {"background-image":"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\")"} } },
+  },
+  {
+    lesson: "bg-layers",
+    name: "solution",
+    messages: [],
+    elements: { banner: { rect: [0, 0, 280, 140], computed: {"background-image":"linear-gradient(rgba(24, 32, 58, 0.55), rgba(24, 32, 58, 0.55)), url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\")"} } },
+  },
+  {
+    lesson: "bg-layers",
+    name: "gradient scrim",
+    css: ".banner {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  color: #fff;\n  background-image: var(--beach);\n  background-size: cover;\n  background-position: center;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.banner p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.banner {\n  --beach: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\");\n}\n.banner {\n  background-image: linear-gradient(transparent, rgb(24 32 58 / 0.8)), var(--beach);\n}\n",
+    messages: [],
+    elements: { banner: { rect: [0, 0, 280, 140], computed: {"background-image":"linear-gradient(rgba(0, 0, 0, 0), rgba(24, 32, 58, 0.8)), url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\")"} } },
+  },
+  {
+    lesson: "bg-layers",
+    name: "shorthand with layers",
+    css: ".banner {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  color: #fff;\n  background-image: var(--beach);\n  background-size: cover;\n  background-position: center;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.banner p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.banner {\n  --beach: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\");\n}\n.banner {\n  background: linear-gradient(rgb(24 32 58 / 0.55), rgb(24 32 58 / 0.55)), var(--beach) center / cover;\n}\n",
+    messages: [],
+    elements: { banner: { rect: [0, 0, 280, 140], computed: {"background-image":"linear-gradient(rgba(24, 32, 58, 0.55), rgba(24, 32, 58, 0.55)), url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\")"} } },
+  },
+  {
+    lesson: "bg-layers",
+    name: "background-color under the photo",
+    css: ".banner {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  color: #fff;\n  background-image: var(--beach);\n  background-size: cover;\n  background-position: center;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.banner p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.banner {\n  --beach: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\");\n}\n.banner {\n  background-color: rgb(24 32 58 / 0.55);\n}\n",
+    messages: ["写真の上に色が重なっていません（background-image にカンマで区切って、色の層を写真より先に書きます。background-color は写真の下に描かれます）"],
+    elements: { banner: { rect: [0, 0, 280, 140], computed: {"background-image":"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\")"} } },
+  },
+  {
+    lesson: "bg-layers",
+    name: "gradient after the photo",
+    css: ".banner {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  color: #fff;\n  background-image: var(--beach);\n  background-size: cover;\n  background-position: center;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.banner p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.banner {\n  --beach: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\");\n}\n.banner {\n  background-image: var(--beach), linear-gradient(rgb(24 32 58 / 0.55), rgb(24 32 58 / 0.55));\n}\n",
+    messages: ["写真の上に色が重なっていません（background-image にカンマで区切って、色の層を写真より先に書きます。background-color は写真の下に描かれます）"],
+    elements: { banner: { rect: [0, 0, 280, 140], computed: {"background-image":"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\"), linear-gradient(rgba(24, 32, 58, 0.55), rgba(24, 32, 58, 0.55))"} } },
+  },
+  {
+    lesson: "bg-layers",
+    name: "opaque layer",
+    css: ".banner {\n  width: 280px;\n  height: 140px;\n  padding: 20px;\n  border-radius: 12px;\n  color: #fff;\n  background-image: var(--beach);\n  background-size: cover;\n  background-position: center;\n}\n.banner h2 {\n  margin: 0 0 4px;\n  font-size: 22px;\n}\n.banner p {\n  margin: 0;\n}\n/* 画像のデータ（SVG）。ここは変えなくて大丈夫です */\n.banner {\n  --beach: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\");\n}\n.banner {\n  background-image: linear-gradient(#18203a, #18203a), var(--beach);\n}\n",
+    messages: ["重ねた色で、写真が見えなくなっています（rgb(24 32 58 / 0.55) のような半透明の色にしましょう）"],
+    elements: { banner: { rect: [0, 0, 280, 140], computed: {"background-image":"linear-gradient(rgb(24, 32, 58), rgb(24, 32, 58)), url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23cdeeff'/%3E%3Ccircle cx='150' cy='34' r='16' fill='%23fff6c2'/%3E%3Cpath d='M0 70q50-10 100 0t100 0v50H0z' fill='%237cc8f2'/%3E%3Cpath d='M0 96q60-12 120-2t80-4v30H0z' fill='%23f6e3b4'/%3E%3C/svg%3E\")"} } },
+  },
+  {
+    lesson: "specificity-columns",
+    name: "starter",
+    messages: ["重要なお知らせが赤くなっていません（#news p の詳細度は 1-0-1、.alert は 0-1-0 です。ID の列が多い #news p の色が勝っています）"],
+    elements: { normal: { rect: [0, 30.39, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} }, alert: { rect: [0, 58.78, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} } },
+  },
+  {
+    lesson: "specificity-columns",
+    name: "solution",
+    messages: [],
+    elements: { normal: { rect: [0, 30.39, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} }, alert: { rect: [0, 58.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "specificity-columns",
+    name: ":where() on the base rule",
+    css: ".news h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n/* お知らせ欄の文字 */\n:where(#news) p {\n  margin: 0 0 6px;\n  color: #3d4766;\n}\n/* 重要なお知らせは赤く太く */\n.alert {\n  color: #c62828;\n  font-weight: 700;\n}\n",
+    messages: [],
+    elements: { normal: { rect: [0, 30.39, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} }, alert: { rect: [0, 58.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "specificity-columns",
+    name: ".news .alert",
+    css: ".news h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n/* お知らせ欄の文字 */\n#news p {\n  margin: 0 0 6px;\n  color: #3d4766;\n}\n/* 重要なお知らせは赤く太く */\n.news .alert {\n  color: #c62828;\n  font-weight: 700;\n}\n",
+    messages: ["重要なお知らせが赤くなっていません（#news p の詳細度は 1-0-1、.alert は 0-1-0 です。ID の列が多い #news p の色が勝っています）"],
+    elements: { normal: { rect: [0, 30.39, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} }, alert: { rect: [0, 58.78, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} } },
+  },
+  {
+    lesson: "specificity-columns",
+    name: "p.alert",
+    css: ".news h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n/* お知らせ欄の文字 */\n#news p {\n  margin: 0 0 6px;\n  color: #3d4766;\n}\n/* 重要なお知らせは赤く太く */\np.alert {\n  color: #c62828;\n  font-weight: 700;\n}\n",
+    messages: ["重要なお知らせが赤くなっていません（#news p の詳細度は 1-0-1、.alert は 0-1-0 です。ID の列が多い #news p の色が勝っています）"],
+    elements: { normal: { rect: [0, 30.39, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} }, alert: { rect: [0, 58.78, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} } },
+  },
+  {
+    lesson: "specificity-columns",
+    name: "!important",
+    css: ".news h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n/* お知らせ欄の文字 */\n#news p {\n  margin: 0 0 6px;\n  color: #3d4766;\n}\n/* 重要なお知らせは赤く太く */\n.alert {\n  color: #c62828 !important;\n  font-weight: 700;\n}\n",
+    messages: ["!important を使わずに、セレクタの詳細度で勝たせましょう（!important を使うと、あとから上書きしにくくなります）"],
+    elements: { normal: { rect: [0, 30.39, 596, 22.39], computed: {"color":"rgb(61, 71, 102)"} }, alert: { rect: [0, 58.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "specificity-columns",
+    name: "base colour removed",
+    css: ".news h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n/* お知らせ欄の文字 */\n#news p {\n  margin: 0 0 6px;\n}\n/* 重要なお知らせは赤く太く */\n.alert {\n  color: #c62828;\n  font-weight: 700;\n}\n",
+    messages: ["ほかのお知らせの色が変わっています（#news p の色は残しましょう）"],
+    elements: { normal: { rect: [0, 30.39, 596, 22.39], computed: {"color":"rgb(24, 32, 58)"} }, alert: { rect: [0, 58.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "where-zero",
+    name: "starter",
+    messages: ["「登録を取り消す」が赤くなっていません（.card a の詳細度 0-1-1 が、.link-danger の 0-1-0 に勝っています）"],
+    elements: { normal: { rect: [0, 28.39, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} }, danger: { rect: [0, 56.78, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "where-zero",
+    name: "solution",
+    messages: [],
+    elements: { normal: { rect: [0, 28.39, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} }, danger: { rect: [0, 56.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "where-zero",
+    name: ":where(.card a)",
+    css: ".card p {\n  margin: 0 0 4px;\n}\n/* カードの中のリンク（共通の土台） */\n:where(.card a) {\n  display: block;\n  margin-top: 6px;\n  color: #2f5fd0;\n}\n/* 取り消しなど、注意が必要な操作のリンク */\n.link-danger {\n  color: #c62828;\n}\n",
+    messages: [],
+    elements: { normal: { rect: [0, 28.39, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} }, danger: { rect: [0, 56.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "where-zero",
+    name: ".card .link-danger",
+    css: ".card p {\n  margin: 0 0 4px;\n}\n/* カードの中のリンク（共通の土台） */\n.card a {\n  display: block;\n  margin-top: 6px;\n  color: #2f5fd0;\n}\n/* 取り消しなど、注意が必要な操作のリンク */\n.card .link-danger {\n  color: #c62828;\n}\n",
+    messages: ["土台のルール（.card a）を :where() で書き換えましょう（.link-danger のほうを強くすると、例外を足すたびにセレクタが長くなります）"],
+    elements: { normal: { rect: [0, 28.39, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} }, danger: { rect: [0, 56.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "where-zero",
+    name: ":is(.card) a",
+    css: ".card p {\n  margin: 0 0 4px;\n}\n/* カードの中のリンク（共通の土台） */\n:is(.card) a {\n  display: block;\n  margin-top: 6px;\n  color: #2f5fd0;\n}\n/* 取り消しなど、注意が必要な操作のリンク */\n.link-danger {\n  color: #c62828;\n}\n",
+    messages: ["「登録を取り消す」が赤くなっていません（.card a の詳細度 0-1-1 が、.link-danger の 0-1-0 に勝っています）"],
+    elements: { normal: { rect: [0, 28.39, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} }, danger: { rect: [0, 56.78, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "where-zero",
+    name: "!important",
+    css: ".card p {\n  margin: 0 0 4px;\n}\n/* カードの中のリンク（共通の土台） */\n.card a {\n  display: block;\n  margin-top: 6px;\n  color: #2f5fd0;\n}\n/* 取り消しなど、注意が必要な操作のリンク */\n.link-danger {\n  color: #c62828 !important;\n}\n",
+    messages: ["!important を使わずに、土台の詳細度を下げて解決しましょう"],
+    elements: { normal: { rect: [0, 28.39, 596, 22.39], computed: {"color":"rgb(47, 95, 208)"} }, danger: { rect: [0, 56.78, 596, 22.39], computed: {"color":"rgb(198, 40, 40)"} } },
+  },
+  {
+    lesson: "is-specificity",
+    name: "starter",
+    messages: ["「料金」が青くなっていません（:is(#sidebar, .menu) a は、.menu のリンクにも #sidebar の分の詳細度 1-0-1 が付き、.menu a.current の 0-2-1 に勝っています）"],
+    elements: { side: { rect: [0, 2, 64, 18], computed: {"color":"rgb(92, 102, 128)"} }, side2: { rect: [76, 2, 96, 18], computed: {"color":"rgb(92, 102, 128)"} }, home: { rect: [0, 32.39, 47.2, 18], computed: {"color":"rgb(92, 102, 128)"} }, current: { rect: [59.2, 32.39, 32, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "is-specificity",
+    name: "solution",
+    messages: [],
+    elements: { side: { rect: [0, 2, 64, 18], computed: {"color":"rgb(92, 102, 128)"} }, side2: { rect: [76, 2, 96, 18], computed: {"color":"rgb(92, 102, 128)"} }, home: { rect: [0, 32.39, 47.2, 18], computed: {"color":"rgb(92, 102, 128)"} }, current: { rect: [59.2, 32.39, 32, 18], computed: {"color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "is-specificity",
+    name: "selector list split",
+    css: "nav {\n  margin-bottom: 8px;\n}\n/* サイドバーとメニューのリンク（まとめて指定） */\n#sidebar a,\n.menu a {\n  margin-right: 12px;\n  color: #5c6680;\n}\n/* メニューの、いま開いているページ */\n.menu a.current {\n  color: #2f5fd0;\n  font-weight: 700;\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 2, 64, 18], computed: {"color":"rgb(92, 102, 128)"} }, side2: { rect: [76, 2, 96, 18], computed: {"color":"rgb(92, 102, 128)"} }, home: { rect: [0, 32.39, 47.2, 18], computed: {"color":"rgb(92, 102, 128)"} }, current: { rect: [59.2, 32.39, 32, 18], computed: {"color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "is-specificity",
+    name: "current raised with :is()",
+    css: "nav {\n  margin-bottom: 8px;\n}\n/* サイドバーとメニューのリンク（まとめて指定） */\n:is(#sidebar, .menu) a {\n  margin-right: 12px;\n  color: #5c6680;\n}\n/* メニューの、いま開いているページ */\n:is(#sidebar, .menu) a.current {\n  color: #2f5fd0;\n  font-weight: 700;\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 2, 64, 18], computed: {"color":"rgb(92, 102, 128)"} }, side2: { rect: [76, 2, 96, 18], computed: {"color":"rgb(92, 102, 128)"} }, home: { rect: [0, 32.39, 47.2, 18], computed: {"color":"rgb(92, 102, 128)"} }, current: { rect: [59.2, 32.39, 32, 18], computed: {"color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "is-specificity",
+    name: ".menu .current",
+    css: "nav {\n  margin-bottom: 8px;\n}\n/* サイドバーとメニューのリンク（まとめて指定） */\n:is(#sidebar, .menu) a {\n  margin-right: 12px;\n  color: #5c6680;\n}\n/* メニューの、いま開いているページ */\n.menu .current {\n  color: #2f5fd0;\n  font-weight: 700;\n}\n",
+    messages: ["「料金」が青くなっていません（:is(#sidebar, .menu) a は、.menu のリンクにも #sidebar の分の詳細度 1-0-1 が付き、.menu a.current の 0-2-1 に勝っています）"],
+    elements: { side: { rect: [0, 2, 64, 18], computed: {"color":"rgb(92, 102, 128)"} }, side2: { rect: [76, 2, 96, 18], computed: {"color":"rgb(92, 102, 128)"} }, home: { rect: [0, 32.39, 47.2, 18], computed: {"color":"rgb(92, 102, 128)"} }, current: { rect: [59.2, 32.39, 32, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "is-specificity",
+    name: "!important",
+    css: "nav {\n  margin-bottom: 8px;\n}\n/* サイドバーとメニューのリンク（まとめて指定） */\n:is(#sidebar, .menu) a {\n  margin-right: 12px;\n  color: #5c6680;\n}\n/* メニューの、いま開いているページ */\n.menu a.current {\n  color: #2f5fd0 !important;\n  font-weight: 700;\n}\n",
+    messages: ["!important を使わずに、まとめた指定の詳細度を見直しましょう"],
+    elements: { side: { rect: [0, 2, 64, 18], computed: {"color":"rgb(92, 102, 128)"} }, side2: { rect: [76, 2, 96, 18], computed: {"color":"rgb(92, 102, 128)"} }, home: { rect: [0, 32.39, 47.2, 18], computed: {"color":"rgb(92, 102, 128)"} }, current: { rect: [59.2, 32.39, 32, 18], computed: {"color":"rgb(47, 95, 208)"} } },
+  },
+  {
+    lesson: "text-indent",
+    name: "starter",
+    messages: ["段落の書き出しが 1 文字ぶん下がっていません（text-indent: 1em）"],
+    elements: { story: { rect: [0, 0, 280, 157.56], computed: {"text-indent":"0px"} }, p1: { rect: [0, 0, 280, 68], computed: {"text-indent":"0px"} }, s1: { rect: [0, 5, 60, 23], computed: {"text-indent":"0px"} }, p2: { rect: [0, 76, 280, 81.56], computed: {"text-indent":"0px"} }, s2: { rect: [0, 80, 48, 18], computed: {"text-indent":"0px"} } },
+  },
+  {
+    lesson: "text-indent",
+    name: "solution",
+    messages: [],
+    elements: { story: { rect: [0, 0, 280, 157.56], computed: {"text-indent":"0px"} }, p1: { rect: [0, 0, 280, 68], computed: {"text-indent":"20px"} }, s1: { rect: [20, 5, 60, 23], computed: {"text-indent":"20px"} }, p2: { rect: [0, 76, 280, 81.56], computed: {"text-indent":"16px"} }, s2: { rect: [16, 80, 48, 18], computed: {"text-indent":"16px"} } },
+  },
+  {
+    lesson: "text-indent",
+    name: "px per paragraph",
+    css: ".story {\n  width: 280px;\n}\n.story p {\n  margin: 0 0 8px;\n  line-height: 1.7;\n}\n/* 書き出しの段落は大きく */\n.lead {\n  font-size: 20px;\n}\n.story p {\n  text-indent: 16px;\n}\n.story .lead {\n  text-indent: 20px;\n}\n",
+    messages: [],
+    elements: { story: { rect: [0, 0, 280, 157.56], computed: {"text-indent":"0px"} }, p1: { rect: [0, 0, 280, 68], computed: {"text-indent":"20px"} }, s1: { rect: [20, 5, 60, 23], computed: {"text-indent":"20px"} }, p2: { rect: [0, 76, 280, 81.56], computed: {"text-indent":"16px"} }, s2: { rect: [16, 80, 48, 18], computed: {"text-indent":"16px"} } },
+  },
+  {
+    lesson: "text-indent",
+    name: "1em on .story",
+    css: ".story {\n  width: 280px;\n}\n.story p {\n  margin: 0 0 8px;\n  line-height: 1.7;\n}\n/* 書き出しの段落は大きく */\n.lead {\n  font-size: 20px;\n}\n.story {\n  text-indent: 1em;\n}\n",
+    messages: ["文字の大きい段落（20px）で、書き出しが 1 文字ぶん（20px）下がっていません（px で書いたり、親の .story に 1em と書いたりすると 16px のままです。段落の p に 1em を書きます）"],
+    elements: { story: { rect: [0, 0, 280, 157.56], computed: {"text-indent":"16px"} }, p1: { rect: [0, 0, 280, 68], computed: {"text-indent":"16px"} }, s1: { rect: [16, 5, 60, 23], computed: {"text-indent":"16px"} }, p2: { rect: [0, 76, 280, 81.56], computed: {"text-indent":"16px"} }, s2: { rect: [16, 80, 48, 18], computed: {"text-indent":"16px"} } },
+  },
+  {
+    lesson: "text-indent",
+    name: "16px",
+    css: ".story {\n  width: 280px;\n}\n.story p {\n  margin: 0 0 8px;\n  line-height: 1.7;\n  text-indent: 16px;\n}\n/* 書き出しの段落は大きく */\n.lead {\n  font-size: 20px;\n}\n",
+    messages: ["文字の大きい段落（20px）で、書き出しが 1 文字ぶん（20px）下がっていません（px で書いたり、親の .story に 1em と書いたりすると 16px のままです。段落の p に 1em を書きます）"],
+    elements: { story: { rect: [0, 0, 280, 157.56], computed: {"text-indent":"0px"} }, p1: { rect: [0, 0, 280, 68], computed: {"text-indent":"16px"} }, s1: { rect: [16, 5, 60, 23], computed: {"text-indent":"16px"} }, p2: { rect: [0, 76, 280, 81.56], computed: {"text-indent":"16px"} }, s2: { rect: [16, 80, 48, 18], computed: {"text-indent":"16px"} } },
+  },
+  {
+    lesson: "text-indent",
+    name: "padding instead",
+    css: ".story {\n  width: 280px;\n}\n.story p {\n  margin: 0 0 8px;\n  line-height: 1.7;\n}\n/* 書き出しの段落は大きく */\n.lead {\n  font-size: 20px;\n}\n.story p {\n  padding-left: 1em;\n}\n",
+    messages: ["padding や margin ではなく、text-indent で下げましょう（下がるのは 1 行目だけで、2 行目からは左端にそろいます）"],
+    elements: { story: { rect: [0, 0, 280, 184.75], computed: {"text-indent":"0px"} }, p1: { rect: [0, 0, 280, 68], computed: {"text-indent":"0px"} }, s1: { rect: [20, 5, 60, 23], computed: {"text-indent":"0px"} }, p2: { rect: [0, 76, 280, 108.75], computed: {"text-indent":"0px"} }, s2: { rect: [16, 80, 48, 18], computed: {"text-indent":"0px"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "starter",
+    messages: ["※ だけが左に出て、2 行目からの文字が ※ の右（1 文字ぶん）にそろう形になっていません（padding-left: 1em と text-indent: -1em）"],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [0, 0, 280, 44.78], computed: {"text-indent":"0px"} }, m1: { rect: [0, 2, 14, 17], computed: {"text-indent":"0px"} }, b1: { rect: [0, 2, 263.63, 39.39], computed: {"text-indent":"0px"} }, n2: { rect: [0, 50.78, 280, 44.78], computed: {"text-indent":"0px"} }, m2: { rect: [0, 52.78, 14, 17], computed: {"text-indent":"0px"} }, b2: { rect: [0, 52.78, 279.03, 39.39], computed: {"text-indent":"0px"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "solution",
+    messages: [],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [0, 0, 280, 44.78], computed: {"text-indent":"-14px"} }, m1: { rect: [0, 2, 14, 17], computed: {"text-indent":"-14px"} }, b1: { rect: [14, 2, 249.63, 39.39], computed: {"text-indent":"-14px"} }, n2: { rect: [0, 50.78, 280, 44.78], computed: {"text-indent":"-14px"} }, m2: { rect: [0, 52.78, 14, 17], computed: {"text-indent":"-14px"} }, b2: { rect: [14, 52.78, 265.03, 39.39], computed: {"text-indent":"-14px"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "hanging keyword",
+    css: ".notes {\n  width: 280px;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.note {\n  margin: 0 0 6px;\n}\n.note {\n  text-indent: 1em hanging;\n}\n",
+    messages: [],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [0, 0, 280, 44.78], computed: {"text-indent":"14px hanging"} }, m1: { rect: [0, 2, 14, 17], computed: {"text-indent":"14px hanging"} }, b1: { rect: [14, 2, 249.63, 39.39], computed: {"text-indent":"14px hanging"} }, n2: { rect: [0, 50.78, 280, 44.78], computed: {"text-indent":"14px hanging"} }, m2: { rect: [0, 52.78, 14, 17], computed: {"text-indent":"14px hanging"} }, b2: { rect: [14, 52.78, 265.03, 39.39], computed: {"text-indent":"14px hanging"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "margin-left instead of padding",
+    css: ".notes {\n  width: 280px;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.note {\n  margin: 0 0 6px;\n  margin-left: 1em;\n  text-indent: -1em;\n}\n",
+    messages: [],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [14, 0, 266, 44.78], computed: {"text-indent":"-14px"} }, m1: { rect: [0, 2, 14, 17], computed: {"text-indent":"-14px"} }, b1: { rect: [14, 2, 249.63, 39.39], computed: {"text-indent":"-14px"} }, n2: { rect: [14, 50.78, 266, 44.78], computed: {"text-indent":"-14px"} }, m2: { rect: [0, 52.78, 14, 17], computed: {"text-indent":"-14px"} }, b2: { rect: [14, 52.78, 265.03, 39.39], computed: {"text-indent":"-14px"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "padding only",
+    css: ".notes {\n  width: 280px;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.note {\n  margin: 0 0 6px;\n  padding-left: 1em;\n}\n",
+    messages: ["※ だけが左に出て、2 行目からの文字が ※ の右（1 文字ぶん）にそろう形になっていません（padding-left: 1em と text-indent: -1em）"],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [0, 0, 280, 44.78], computed: {"text-indent":"0px"} }, m1: { rect: [14, 2, 14, 17], computed: {"text-indent":"0px"} }, b1: { rect: [14, 2, 263.63, 39.39], computed: {"text-indent":"0px"} }, n2: { rect: [0, 50.78, 280, 44.78], computed: {"text-indent":"0px"} }, m2: { rect: [14, 52.78, 14, 17], computed: {"text-indent":"0px"} }, b2: { rect: [14, 52.78, 265.03, 39.39], computed: {"text-indent":"0px"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "16px values",
+    css: ".notes {\n  width: 280px;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.note {\n  margin: 0 0 6px;\n  padding-left: 16px;\n  text-indent: -16px;\n}\n",
+    messages: ["ずらす幅が、※ 1 文字ぶん（1em＝14px）になっていません（2 行目が ※ の右端とそろいません。px ではなく 1em で書くと、文字の大きさに合います）"],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [0, 0, 280, 44.78], computed: {"text-indent":"-16px"} }, m1: { rect: [0, 2, 14, 17], computed: {"text-indent":"-16px"} }, b1: { rect: [14, 2, 249.63, 39.39], computed: {"text-indent":"-16px"} }, n2: { rect: [0, 50.78, 280, 44.78], computed: {"text-indent":"-16px"} }, m2: { rect: [0, 52.78, 14, 17], computed: {"text-indent":"-16px"} }, b2: { rect: [14, 52.78, 265.03, 39.39], computed: {"text-indent":"-16px"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "absolute ※",
+    css: ".notes {\n  width: 280px;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.note {\n  margin: 0 0 6px;\n}\n.note {\n  position: relative;\n  padding-left: 1em;\n}\n.note span:first-child {\n  position: absolute;\n  left: 0;\n}\n",
+    messages: ["position や flex で ※ を動かすのではなく、padding-left と負の text-indent でぶら下げましょう（1 行目だけが左に出ます）"],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [0, 0, 280, 44.78], computed: {"text-indent":"0px"} }, m1: { rect: [0, 0, 14, 22.39], computed: {"text-indent":"0px"} }, b1: { rect: [14, 2, 249.63, 39.39], computed: {"text-indent":"0px"} }, n2: { rect: [0, 50.78, 280, 44.78], computed: {"text-indent":"0px"} }, m2: { rect: [0, 50.78, 14, 22.39], computed: {"text-indent":"0px"} }, b2: { rect: [14, 52.78, 265.03, 39.39], computed: {"text-indent":"0px"} } },
+  },
+  {
+    lesson: "hanging-indent",
+    name: "flex row",
+    css: ".notes {\n  width: 280px;\n  font-size: 14px;\n  line-height: 1.6;\n}\n.note {\n  margin: 0 0 6px;\n}\n.note {\n  display: flex;\n}\n",
+    messages: ["position や flex で ※ を動かすのではなく、padding-left と負の text-indent でぶら下げましょう（1 行目だけが左に出ます）"],
+    elements: { notes: { rect: [0, 0, 280, 95.56], computed: {"text-indent":"0px"} }, n1: { rect: [0, 0, 280, 44.78], computed: {"text-indent":"0px"} }, m1: { rect: [0, 0, 14, 44.78], computed: {"text-indent":"0px"} }, b1: { rect: [14, 0, 266, 44.78], computed: {"text-indent":"0px"} }, n2: { rect: [0, 50.78, 280, 44.78], computed: {"text-indent":"0px"} }, m2: { rect: [0, 50.78, 14, 44.78], computed: {"text-indent":"0px"} }, b2: { rect: [14, 50.78, 266, 44.78], computed: {"text-indent":"0px"} } },
+  },
+  {
+    lesson: "underline-offset",
+    name: "starter",
+    messages: ["下線が文字から少し離れていません（text-underline-offset: 0.2em など。離しすぎると、どの文字の下線か分かりにくくなります）"],
+    elements: { para: { rect: [0, 16, 280, 86.39], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, faq: { rect: [96, 21, 158.25, 18], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, chat: { rect: [0, 49.8, 271.05, 46.8], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} } },
+  },
+  {
+    lesson: "underline-offset",
+    name: "solution",
+    messages: [],
+    elements: { para: { rect: [0, 16, 280, 86.39], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, faq: { rect: [96, 21, 158.25, 18], computed: {"text-underline-offset":"3.2px","text-decoration-thickness":"1px"} }, chat: { rect: [0, 49.8, 271.05, 46.8], computed: {"text-underline-offset":"3.2px","text-decoration-thickness":"1px"} } },
+  },
+  {
+    lesson: "underline-offset",
+    name: "px values",
+    css: ".para {\n  width: 280px;\n  line-height: 1.8;\n}\n.para a {\n  color: #2f5fd0;\n  text-underline-offset: 3px;\n  text-decoration-thickness: 1px;\n}\n",
+    messages: [],
+    elements: { para: { rect: [0, 16, 280, 86.39], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, faq: { rect: [96, 21, 158.25, 18], computed: {"text-underline-offset":"3px","text-decoration-thickness":"1px"} }, chat: { rect: [0, 49.8, 271.05, 46.8], computed: {"text-underline-offset":"3px","text-decoration-thickness":"1px"} } },
+  },
+  {
+    lesson: "underline-offset",
+    name: "offset only",
+    css: ".para {\n  width: 280px;\n  line-height: 1.8;\n}\n.para a {\n  color: #2f5fd0;\n  text-underline-offset: 0.2em;\n}\n",
+    messages: ["下線の太さが 1px になっていません（text-decoration-thickness: 1px。auto のままだと、フォントやブラウザで太さが変わります）"],
+    elements: { para: { rect: [0, 16, 280, 86.39], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, faq: { rect: [96, 21, 158.25, 18], computed: {"text-underline-offset":"3.2px","text-decoration-thickness":"auto"} }, chat: { rect: [0, 49.8, 271.05, 46.8], computed: {"text-underline-offset":"3.2px","text-decoration-thickness":"auto"} } },
+  },
+  {
+    lesson: "underline-offset",
+    name: "0.1em",
+    css: ".para {\n  width: 280px;\n  line-height: 1.8;\n}\n.para a {\n  color: #2f5fd0;\n  text-underline-offset: 0.1em;\n  text-decoration-thickness: 1px;\n}\n",
+    messages: ["下線が文字から少し離れていません（text-underline-offset: 0.2em など。離しすぎると、どの文字の下線か分かりにくくなります）"],
+    elements: { para: { rect: [0, 16, 280, 86.39], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, faq: { rect: [96, 21, 158.25, 18], computed: {"text-underline-offset":"1.6px","text-decoration-thickness":"1px"} }, chat: { rect: [0, 49.8, 271.05, 46.8], computed: {"text-underline-offset":"1.6px","text-decoration-thickness":"1px"} } },
+  },
+  {
+    lesson: "underline-offset",
+    name: "0.6em",
+    css: ".para {\n  width: 280px;\n  line-height: 1.8;\n}\n.para a {\n  color: #2f5fd0;\n  text-underline-offset: 0.6em;\n  text-decoration-thickness: 1px;\n}\n",
+    messages: ["下線が文字から少し離れていません（text-underline-offset: 0.2em など。離しすぎると、どの文字の下線か分かりにくくなります）"],
+    elements: { para: { rect: [0, 16, 280, 86.39], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, faq: { rect: [96, 21, 158.25, 18], computed: {"text-underline-offset":"9.6px","text-decoration-thickness":"1px"} }, chat: { rect: [0, 49.8, 271.05, 46.8], computed: {"text-underline-offset":"9.6px","text-decoration-thickness":"1px"} } },
+  },
+  {
+    lesson: "underline-offset",
+    name: "border-bottom instead",
+    css: ".para {\n  width: 280px;\n  line-height: 1.8;\n}\n.para a {\n  color: #2f5fd0;\n}\n.para a {\n  padding-bottom: 2px;\n  border-bottom: 1px solid;\n  text-decoration: none;\n}\n",
+    messages: ["下線が文字から少し離れていません（text-underline-offset: 0.2em など。離しすぎると、どの文字の下線か分かりにくくなります）"],
+    elements: { para: { rect: [0, 16, 280, 86.39], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, faq: { rect: [96, 21, 158.25, 21], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} }, chat: { rect: [0, 49.8, 271.05, 49.8], computed: {"text-underline-offset":"auto","text-decoration-thickness":"auto"} } },
+  },
+  {
+    lesson: "list-style-none",
+    name: "starter",
+    messages: ["項目の点（•）が消えていません（list-style: none）"],
+    elements: { nav: { rect: [0, 0, 240, 139.17], computed: {"list-style-type":"disc","display":"block"} }, menu: { rect: [12, 24, 216, 91.17], computed: {"list-style-type":"disc","display":"block"} }, i1: { rect: [52, 24, 176, 30.39], computed: {"list-style-type":"disc","display":"list-item"} }, i2: { rect: [52, 54.39, 176, 30.39], computed: {"list-style-type":"disc","display":"list-item"} }, i3: { rect: [52, 84.78, 176, 30.39], computed: {"list-style-type":"disc","display":"list-item"} } },
+  },
+  {
+    lesson: "list-style-none",
+    name: "solution",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 240, 107.17], computed: {"list-style-type":"disc","display":"block"} }, menu: { rect: [12, 8, 216, 91.17], computed: {"list-style-type":"none","display":"block"} }, i1: { rect: [12, 8, 216, 30.39], computed: {"list-style-type":"none","display":"list-item"} }, i2: { rect: [12, 38.39, 216, 30.39], computed: {"list-style-type":"none","display":"list-item"} }, i3: { rect: [12, 68.78, 216, 30.39], computed: {"list-style-type":"none","display":"list-item"} } },
+  },
+  {
+    lesson: "list-style-none",
+    name: "items as blocks",
+    css: ".nav {\n  width: 240px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.menu a {\n  display: block;\n  padding: 4px 0;\n  color: #18203a;\n  text-decoration: none;\n}\n.menu {\n  margin: 0;\n  padding: 0;\n}\n.menu li {\n  display: block;\n}\n",
+    messages: [],
+    elements: { nav: { rect: [0, 0, 240, 107.17], computed: {"list-style-type":"disc","display":"block"} }, menu: { rect: [12, 8, 216, 91.17], computed: {"list-style-type":"disc","display":"block"} }, i1: { rect: [12, 8, 216, 30.39], computed: {"list-style-type":"disc","display":"block"} }, i2: { rect: [12, 38.39, 216, 30.39], computed: {"list-style-type":"disc","display":"block"} }, i3: { rect: [12, 68.78, 216, 30.39], computed: {"list-style-type":"disc","display":"block"} } },
+  },
+  {
+    lesson: "list-style-none",
+    name: "list-style only",
+    css: ".nav {\n  width: 240px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.menu a {\n  display: block;\n  padding: 4px 0;\n  color: #18203a;\n  text-decoration: none;\n}\n.menu {\n  list-style: none;\n}\n",
+    messages: ["項目がメニューの枠の左上にそろっていません（ul には、ブラウザが最初から上下の margin と左の padding を付けています。margin: 0 と padding: 0 で消します）"],
+    elements: { nav: { rect: [0, 0, 240, 139.17], computed: {"list-style-type":"disc","display":"block"} }, menu: { rect: [12, 24, 216, 91.17], computed: {"list-style-type":"none","display":"block"} }, i1: { rect: [52, 24, 176, 30.39], computed: {"list-style-type":"none","display":"list-item"} }, i2: { rect: [52, 54.39, 176, 30.39], computed: {"list-style-type":"none","display":"list-item"} }, i3: { rect: [52, 84.78, 176, 30.39], computed: {"list-style-type":"none","display":"list-item"} } },
+  },
+  {
+    lesson: "list-style-none",
+    name: "padding only",
+    css: ".nav {\n  width: 240px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.menu a {\n  display: block;\n  padding: 4px 0;\n  color: #18203a;\n  text-decoration: none;\n}\n.menu {\n  padding: 0;\n}\n",
+    messages: ["項目の点（•）が消えていません（list-style: none）"],
+    elements: { nav: { rect: [0, 0, 240, 139.17], computed: {"list-style-type":"disc","display":"block"} }, menu: { rect: [12, 24, 216, 91.17], computed: {"list-style-type":"disc","display":"block"} }, i1: { rect: [12, 24, 216, 30.39], computed: {"list-style-type":"disc","display":"list-item"} }, i2: { rect: [12, 54.39, 216, 30.39], computed: {"list-style-type":"disc","display":"list-item"} }, i3: { rect: [12, 84.78, 216, 30.39], computed: {"list-style-type":"disc","display":"list-item"} } },
+  },
+  {
+    lesson: "list-style-none",
+    name: "margins kept",
+    css: ".nav {\n  width: 240px;\n  padding: 8px 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.menu a {\n  display: block;\n  padding: 4px 0;\n  color: #18203a;\n  text-decoration: none;\n}\n.menu {\n  padding: 0;\n  list-style: none;\n}\n",
+    messages: ["項目がメニューの枠の左上にそろっていません（ul には、ブラウザが最初から上下の margin と左の padding を付けています。margin: 0 と padding: 0 で消します）"],
+    elements: { nav: { rect: [0, 0, 240, 139.17], computed: {"list-style-type":"disc","display":"block"} }, menu: { rect: [12, 24, 216, 91.17], computed: {"list-style-type":"none","display":"block"} }, i1: { rect: [12, 24, 216, 30.39], computed: {"list-style-type":"none","display":"list-item"} }, i2: { rect: [12, 54.39, 216, 30.39], computed: {"list-style-type":"none","display":"list-item"} }, i3: { rect: [12, 84.78, 216, 30.39], computed: {"list-style-type":"none","display":"list-item"} } },
+  },
+  {
+    lesson: "list-style-string",
+    name: "starter",
+    messages: ["印がチェックマークになっていません（list-style-type に \"✓ \" のような文字列を指定します。::marker の content は Safari では効きません）"],
+    elements: { features: { rect: [0, 0, 596, 86.39], computed: {"list-style-type":"disc"} }, f1: { rect: [24, 0, 572, 28.8], computed: {"list-style-type":"disc"} }, f2: { rect: [24, 28.8, 572, 28.8], computed: {"list-style-type":"disc"} }, f3: { rect: [24, 57.59, 572, 28.8], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "list-style-string",
+    name: "solution",
+    messages: [],
+    elements: { features: { rect: [0, 0, 596, 86.39], computed: {"list-style-type":"\"✓ \""} }, f1: { rect: [24, 0, 572, 28.8], computed: {"list-style-type":"\"✓ \""} }, f2: { rect: [24, 28.8, 572, 28.8], computed: {"list-style-type":"\"✓ \""} }, f3: { rect: [24, 57.59, 572, 28.8], computed: {"list-style-type":"\"✓ \""} } },
+  },
+  {
+    lesson: "list-style-string",
+    name: "list-style shorthand with ✔",
+    css: ".features {\n  margin: 0;\n  padding-left: 1.5em;\n  line-height: 1.8;\n  list-style: \"✔ \";\n}\n",
+    messages: [],
+    elements: { features: { rect: [0, 0, 596, 86.39], computed: {"list-style-type":"\"✔ \""} }, f1: { rect: [24, 0, 572, 28.8], computed: {"list-style-type":"\"✔ \""} }, f2: { rect: [24, 28.8, 572, 28.8], computed: {"list-style-type":"\"✔ \""} }, f3: { rect: [24, 57.59, 572, 28.8], computed: {"list-style-type":"\"✔ \""} } },
+  },
+  {
+    lesson: "list-style-string",
+    name: "no space",
+    css: ".features {\n  margin: 0;\n  padding-left: 1.5em;\n  line-height: 1.8;\n  list-style-type: \"✓\";\n}\n",
+    messages: ["印と文字がくっついています（\"✓ \" のように、文字列の中で印のあとにスペースを入れます）"],
+    elements: { features: { rect: [0, 0, 596, 86.39], computed: {"list-style-type":"\"✓\""} }, f1: { rect: [24, 0, 572, 28.8], computed: {"list-style-type":"\"✓\""} }, f2: { rect: [24, 28.8, 572, 28.8], computed: {"list-style-type":"\"✓\""} }, f3: { rect: [24, 57.59, 572, 28.8], computed: {"list-style-type":"\"✓\""} } },
+  },
+  {
+    lesson: "list-style-string",
+    name: "::marker content",
+    css: ".features {\n  margin: 0;\n  padding-left: 1.5em;\n  line-height: 1.8;\n}\n.features li::marker {\n  content: \"✓ \";\n}\n",
+    messages: ["印がチェックマークになっていません（list-style-type に \"✓ \" のような文字列を指定します。::marker の content は Safari では効きません）"],
+    elements: { features: { rect: [0, 0, 596, 86.39], computed: {"list-style-type":"disc"} }, f1: { rect: [24, 0, 572, 28.8], computed: {"list-style-type":"disc"} }, f2: { rect: [24, 28.8, 572, 28.8], computed: {"list-style-type":"disc"} }, f3: { rect: [24, 57.59, 572, 28.8], computed: {"list-style-type":"disc"} } },
+  },
+  {
+    lesson: "list-style-string",
+    name: "square",
+    css: ".features {\n  margin: 0;\n  padding-left: 1.5em;\n  line-height: 1.8;\n}\n.features {\n  list-style-type: square;\n}\n",
+    messages: ["印がチェックマークになっていません（list-style-type に \"✓ \" のような文字列を指定します。::marker の content は Safari では効きません）"],
+    elements: { features: { rect: [0, 0, 596, 86.39], computed: {"list-style-type":"square"} }, f1: { rect: [24, 0, 572, 28.8], computed: {"list-style-type":"square"} }, f2: { rect: [24, 28.8, 572, 28.8], computed: {"list-style-type":"square"} }, f3: { rect: [24, 57.59, 572, 28.8], computed: {"list-style-type":"square"} } },
+  },
+  {
+    lesson: "list-style-inside",
+    name: "starter",
+    messages: ["印が項目の外（左端）に出ています（list-style-position: inside で、印を項目の中に入れます）"],
+    elements: { card: { rect: [0, 0, 280, 107.17], computed: {"list-style-position":"outside","list-style-type":"disc"} }, awards: { rect: [16, 46.39, 248, 44.78], computed: {"list-style-position":"outside","list-style-type":"disc"} }, a1: { rect: [16, 46.39, 248, 22.39], computed: {"list-style-position":"outside","list-style-type":"disc"} }, a2: { rect: [16, 68.78, 248, 22.39], computed: {"list-style-position":"outside","list-style-type":"disc"} } },
+  },
+  {
+    lesson: "list-style-inside",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 107.17], computed: {"list-style-position":"outside","list-style-type":"disc"} }, awards: { rect: [16, 46.39, 248, 44.78], computed: {"list-style-position":"inside","list-style-type":"disc"} }, a1: { rect: [16, 46.39, 248, 22.39], computed: {"list-style-position":"inside","list-style-type":"disc"} }, a2: { rect: [16, 68.78, 248, 22.39], computed: {"list-style-position":"inside","list-style-type":"disc"} } },
+  },
+  {
+    lesson: "list-style-inside",
+    name: "list-style: inside",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  text-align: center;\n}\n.card h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.awards {\n  margin: 0;\n  padding: 0;\n}\n.awards {\n  list-style: inside;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 107.17], computed: {"list-style-position":"outside","list-style-type":"disc"} }, awards: { rect: [16, 46.39, 248, 44.78], computed: {"list-style-position":"inside","list-style-type":"disc"} }, a1: { rect: [16, 46.39, 248, 22.39], computed: {"list-style-position":"inside","list-style-type":"disc"} }, a2: { rect: [16, 68.78, 248, 22.39], computed: {"list-style-position":"inside","list-style-type":"disc"} } },
+  },
+  {
+    lesson: "list-style-inside",
+    name: "markers removed",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  text-align: center;\n}\n.card h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.awards {\n  margin: 0;\n  padding: 0;\n}\n.awards {\n  list-style: none inside;\n}\n",
+    messages: ["印が消えています（印は残したまま、項目の中に入れましょう）"],
+    elements: { card: { rect: [0, 0, 280, 107.17], computed: {"list-style-position":"outside","list-style-type":"disc"} }, awards: { rect: [16, 46.39, 248, 44.78], computed: {"list-style-position":"inside","list-style-type":"none"} }, a1: { rect: [16, 46.39, 248, 22.39], computed: {"list-style-position":"inside","list-style-type":"none"} }, a2: { rect: [16, 68.78, 248, 22.39], computed: {"list-style-position":"inside","list-style-type":"none"} } },
+  },
+  {
+    lesson: "list-style-inside",
+    name: "padding instead",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n  text-align: center;\n}\n.card h3 {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.awards {\n  margin: 0;\n  padding: 0;\n}\n.awards {\n  padding-left: 1.5em;\n}\n",
+    messages: ["印が項目の外（左端）に出ています（list-style-position: inside で、印を項目の中に入れます）"],
+    elements: { card: { rect: [0, 0, 280, 107.17], computed: {"list-style-position":"outside","list-style-type":"disc"} }, awards: { rect: [16, 46.39, 248, 44.78], computed: {"list-style-position":"outside","list-style-type":"disc"} }, a1: { rect: [40, 46.39, 224, 22.39], computed: {"list-style-position":"outside","list-style-type":"disc"} }, a2: { rect: [40, 68.78, 224, 22.39], computed: {"list-style-position":"outside","list-style-type":"disc"} } },
+  },
+];
+
+describe("backgrounds, specificity, typesetting and list markers: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 12 lessons", () => {
+    expect([...new Set(SURFACE_CASES.map((c) => c.lesson))].sort()).toEqual([...SURFACE_LESSONS].sort());
+    for (const id of SURFACE_LESSONS) {
+      const names = SURFACE_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of SURFACE_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of SURFACE_LESSONS) {
+      const starter = SURFACE_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = SURFACE_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the measurements the lessons are about", () => {
+    const rect = (id: string, name: string, el: string): readonly number[] =>
+      SURFACE_CASES.find((c) => c.lesson === id && c.name === name)!.elements[el]!.rect!;
+    const from = (id: string, name: string, outer: string, el: string): number => rect(id, name, el)[0]! - rect(id, name, outer)[0]!;
+    // text-indent: 1em on each paragraph indents the 20px lead by 20px and the rest by 16px;
+    // 1em on the parent hands its computed 16px down to the lead as well.
+    expect(from("text-indent", "solution", "story", "s1")).toBe(20);
+    expect(from("text-indent", "solution", "story", "s2")).toBe(16);
+    expect(from("text-indent", "1em on .story", "story", "s1")).toBe(16);
+    // The hanging notes: the ※ sits at the edge and the wrapped text starts one 14px em in.
+    expect(from("hanging-indent", "starter", "notes", "b1")).toBe(0);
+    expect(from("hanging-indent", "solution", "notes", "m1")).toBe(0);
+    expect(from("hanging-indent", "solution", "notes", "b1")).toBe(14);
+    // The default list padding (40px) and top margin (16px) push the first item away from the box.
+    expect(from("list-style-none", "starter", "nav", "i1")).toBe(52);
+    expect(rect("list-style-none", "starter", "i1")[1]! - rect("list-style-none", "starter", "nav")[1]!).toBe(24);
+    expect(from("list-style-none", "solution", "nav", "i1")).toBe(12);
+    // The notice text starts after the 12px offset, the 16px icon and a gap.
+    expect(from("bg-icon", "solution", "notice", "text")).toBe(36);
+  });
+});
