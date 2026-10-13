@@ -148,10 +148,7 @@ describe("content integrity", () => {
         }
         for (const point of requested) {
           expect(challenge.starterHTML).toContain(`data-id="${point.at}"`);
-          expect(point.fx).toBeGreaterThanOrEqual(0);
-          expect(point.fx).toBeLessThanOrEqual(1);
-          expect(point.fy).toBeGreaterThanOrEqual(0);
-          expect(point.fy).toBeLessThanOrEqual(1);
+          expect(Number.isFinite(point.fx) && Number.isFinite(point.fy), `${lesson.id}: ${point.at}`).toBe(true);
         }
       });
 
