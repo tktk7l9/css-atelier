@@ -8006,3 +8006,453 @@ describe("icons beside text, fixed positioning and sticky in practice: recorded 
     expect(rect("sticky-parent-box", "solution", "row")[1]).toBe(0);
   });
 });
+
+const GRID_MARGIN_MATH_LESSONS = [
+  "auto-flow-column",
+  "minus-one-explicit",
+  "rows-stretch",
+  "negative-bleed",
+  "negative-overlap",
+  "negative-breakout",
+  "max-gutter",
+  "minmax-min",
+  "pow-scale",
+];
+
+const GRID_MARGIN_MATH_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "auto-flow-column",
+    name: "starter",
+    messages: ["カードが横 1 列に並んでいません（グリッドは、ふつう行を足しながら並べます。grid-auto-flow: column にすると、列を足しながら横に並べます）"],
+    elements: { row: { rect: [0, 0, 581, 287.95], computed: {"overflow-x":"visible"} }, c1: { rect: [0, 0, 581, 46.39], computed: {"overflow-x":"visible"} }, c2: { rect: [0, 58.39, 581, 46.39], computed: {"overflow-x":"visible"} }, c3: { rect: [0, 116.78, 581, 46.39], computed: {"overflow-x":"visible"} }, c4: { rect: [0, 175.17, 581, 46.39], computed: {"overflow-x":"visible"} }, c5: { rect: [0, 233.56, 581, 46.39], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "auto-flow-column",
+    name: "solution",
+    messages: [],
+    elements: { row: { rect: [0, 0, 596, 69.39], computed: {"overflow-x":"auto"} }, c1: { rect: [0, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c2: { rect: [152, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c3: { rect: [304, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c4: { rect: [456, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c5: { rect: [608, 0, 140, 46.39], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "auto-flow-column",
+    name: "flex row",
+    css: ".row {\n  display: grid;\n  gap: 12px;\n  margin: 0;\n  padding: 0 0 8px;\n  list-style: none;\n}\n.row li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.row {\n  display: flex;\n  overflow-x: auto;\n}\n.row li {\n  flex: 0 0 140px;\n}\n",
+    messages: [],
+    elements: { row: { rect: [0, 0, 596, 69.39], computed: {"overflow-x":"auto"} }, c1: { rect: [0, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c2: { rect: [152, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c3: { rect: [304, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c4: { rect: [456, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c5: { rect: [608, 0, 140, 46.39], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "auto-flow-column",
+    name: "five explicit columns",
+    css: ".row {\n  display: grid;\n  gap: 12px;\n  margin: 0;\n  padding: 0 0 8px;\n  list-style: none;\n}\n.row li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.row {\n  grid-template-columns: repeat(5, 140px);\n  overflow-x: auto;\n}\n",
+    messages: [],
+    elements: { row: { rect: [0, 0, 596, 69.39], computed: {"overflow-x":"auto"} }, c1: { rect: [0, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c2: { rect: [152, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c3: { rect: [304, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c4: { rect: [456, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c5: { rect: [608, 0, 140, 46.39], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "auto-flow-column",
+    name: "no overflow-x",
+    css: ".row {\n  display: grid;\n  gap: 12px;\n  grid-auto-flow: column;\n  grid-auto-columns: 140px;\n  margin: 0;\n  padding: 0 0 8px;\n  list-style: none;\n}\n.row li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["入りきらないカードが、一覧の箱の中で横にスクロールしません（overflow-x: auto）"],
+    elements: { row: { rect: [0, 0, 596, 54.39], computed: {"overflow-x":"visible"} }, c1: { rect: [0, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c2: { rect: [152, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c3: { rect: [304, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c4: { rect: [456, 0, 140, 46.39], computed: {"overflow-x":"visible"} }, c5: { rect: [608, 0, 140, 46.39], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "auto-flow-column",
+    name: "no grid-auto-columns",
+    css: ".row {\n  display: grid;\n  gap: 12px;\n  grid-auto-flow: column;\n  overflow-x: auto;\n  margin: 0;\n  padding: 0 0 8px;\n  list-style: none;\n}\n.row li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["カードの幅が 140px になっていません（自動で足される列の幅は grid-auto-columns で決めます）"],
+    elements: { row: { rect: [0, 0, 596, 54.39], computed: {"overflow-x":"auto"} }, c1: { rect: [0, 0, 109.59, 46.39], computed: {"overflow-x":"visible"} }, c2: { rect: [121.59, 0, 109.59, 46.39], computed: {"overflow-x":"visible"} }, c3: { rect: [243.19, 0, 109.59, 46.39], computed: {"overflow-x":"visible"} }, c4: { rect: [364.78, 0, 109.61, 46.39], computed: {"overflow-x":"visible"} }, c5: { rect: [486.39, 0, 109.61, 46.39], computed: {"overflow-x":"visible"} } },
+  },
+  {
+    lesson: "minus-one-explicit",
+    name: "starter",
+    messages: ["目次が、3 つの区画の上端から下端まで伸びていません（-1 は grid-template-rows で作った行の最後の線で、自動で足された行には届きません。grid-row: 1 / span 3 で 3 行ぶんまたがせます）"],
+    elements: { side: { rect: [0, 0, 100, 46.39] }, a: { rect: [108, 0, 488, 46.39] }, b: { rect: [108, 54.39, 488, 46.39] }, c: { rect: [108, 108.78, 488, 46.39] } },
+  },
+  {
+    lesson: "minus-one-explicit",
+    name: "solution",
+    messages: [],
+    elements: { side: { rect: [0, 0, 100, 155.17] }, a: { rect: [108, 0, 488, 46.39] }, b: { rect: [108, 54.39, 488, 46.39] }, c: { rect: [108, 108.78, 488, 46.39] } },
+  },
+  {
+    lesson: "minus-one-explicit",
+    name: "span 3",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 100px 1fr;\n  gap: 8px;\n}\n/* 目次を、左の列の上から下まで通したい */\n.side {\n  grid-column: 1;\n  grid-row: span 3;\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.block {\n  grid-column: 2;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 0, 100, 155.17] }, a: { rect: [108, 0, 488, 46.39] }, b: { rect: [108, 54.39, 488, 46.39] }, c: { rect: [108, 108.78, 488, 46.39] } },
+  },
+  {
+    lesson: "minus-one-explicit",
+    name: "three explicit rows",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 100px 1fr;\n  gap: 8px;\n}\n/* 目次を、左の列の上から下まで通したい */\n.side {\n  grid-column: 1;\n  grid-row: 1 / -1;\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.block {\n  grid-column: 2;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.page {\n  grid-template-rows: repeat(3, auto);\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 0, 100, 155.17] }, a: { rect: [108, 0, 488, 46.39] }, b: { rect: [108, 54.39, 488, 46.39] }, c: { rect: [108, 108.78, 488, 46.39] } },
+  },
+  {
+    lesson: "minus-one-explicit",
+    name: "1 / 4",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 100px 1fr;\n  gap: 8px;\n}\n/* 目次を、左の列の上から下まで通したい */\n.side {\n  grid-column: 1;\n  grid-row: 1 / 4;\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.block {\n  grid-column: 2;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n",
+    messages: [],
+    elements: { side: { rect: [0, 0, 100, 155.17] }, a: { rect: [108, 0, 488, 46.39] }, b: { rect: [108, 54.39, 488, 46.39] }, c: { rect: [108, 108.78, 488, 46.39] } },
+  },
+  {
+    lesson: "minus-one-explicit",
+    name: "1 / -2",
+    css: ".page {\n  display: grid;\n  grid-template-columns: 100px 1fr;\n  gap: 8px;\n}\n/* 目次を、左の列の上から下まで通したい */\n.side {\n  grid-column: 1;\n  grid-row: 1 / -2;\n  padding: 8px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.block {\n  grid-column: 2;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n",
+    messages: ["目次が、3 つの区画の上端から下端まで伸びていません（-1 は grid-template-rows で作った行の最後の線で、自動で足された行には届きません。grid-row: 1 / span 3 で 3 行ぶんまたがせます）"],
+    elements: { side: { rect: [0, 0, 100, 46.39] }, a: { rect: [108, 0, 488, 46.39] }, b: { rect: [108, 54.39, 488, 46.39] }, c: { rect: [108, 108.78, 488, 46.39] } },
+  },
+  {
+    lesson: "rows-stretch",
+    name: "starter",
+    messages: ["カードが、中身の高さより縦に伸びています（箱の余った高さが auto の行に配られています。align-content: start で行を上に詰めます）"],
+    elements: { grid: { rect: [0, 0, 596, 240] }, c1: { rect: [0, 0, 292, 114] }, c2: { rect: [304, 0, 292, 114] }, c3: { rect: [0, 126, 292, 114] }, c4: { rect: [304, 126, 292, 114] } },
+  },
+  {
+    lesson: "rows-stretch",
+    name: "solution",
+    messages: [],
+    elements: { grid: { rect: [0, 0, 596, 240] }, c1: { rect: [0, 0, 292, 46.39] }, c2: { rect: [304, 0, 292, 46.39] }, c3: { rect: [0, 58.39, 292, 46.39] }, c4: { rect: [304, 58.39, 292, 46.39] } },
+  },
+  {
+    lesson: "rows-stretch",
+    name: "grid-auto-rows: max-content",
+    css: "/* 一覧の箱に高さを付けた（カードが増えたらスクロール） */\n.grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  height: 240px;\n  overflow-y: auto;\n  grid-auto-rows: max-content;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.grid li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: [],
+    elements: { grid: { rect: [0, 0, 596, 240] }, c1: { rect: [0, 0, 292, 46.39] }, c2: { rect: [304, 0, 292, 46.39] }, c3: { rect: [0, 58.39, 292, 46.39] }, c4: { rect: [304, 58.39, 292, 46.39] } },
+  },
+  {
+    lesson: "rows-stretch",
+    name: "align-content: flex-start",
+    css: "/* 一覧の箱に高さを付けた（カードが増えたらスクロール） */\n.grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  height: 240px;\n  overflow-y: auto;\n  align-content: flex-start;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.grid li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: [],
+    elements: { grid: { rect: [0, 0, 596, 240] }, c1: { rect: [0, 0, 292, 46.39] }, c2: { rect: [304, 0, 292, 46.39] }, c3: { rect: [0, 58.39, 292, 46.39] }, c4: { rect: [304, 58.39, 292, 46.39] } },
+  },
+  {
+    lesson: "rows-stretch",
+    name: "align-items: start",
+    css: "/* 一覧の箱に高さを付けた（カードが増えたらスクロール） */\n.grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  height: 240px;\n  overflow-y: auto;\n  align-items: start;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.grid li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["2 段目のカードが、1 段目のすぐ下（12px）に来ていません（align-items: start はカードを縮めるだけで、行は伸びたままです。行そのものを上に詰めるのは align-content: start です）"],
+    elements: { grid: { rect: [0, 0, 596, 240] }, c1: { rect: [0, 0, 292, 46.39] }, c2: { rect: [304, 0, 292, 46.39] }, c3: { rect: [0, 126, 292, 46.39] }, c4: { rect: [304, 126, 292, 46.39] } },
+  },
+  {
+    lesson: "rows-stretch",
+    name: "height removed",
+    css: "/* 一覧の箱に高さを付けた（カードが増えたらスクロール） */\n.grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n  overflow-y: auto;\n  align-content: start;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.grid li {\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["一覧の箱の高さは 240px のままにしましょう"],
+    elements: { grid: { rect: [0, 0, 596, 104.78] }, c1: { rect: [0, 0, 292, 46.39] }, c2: { rect: [304, 0, 292, 46.39] }, c3: { rect: [0, 58.39, 292, 46.39] }, c4: { rect: [304, 58.39, 292, 46.39] } },
+  },
+  {
+    lesson: "negative-bleed",
+    name: "starter",
+    messages: ["写真が、カードの左右の端まで広がっていません（padding の内側の要素は、負の margin-inline で余白の外へ広げられます）"],
+    elements: { card: { rect: [0, 0, 240, 214.98] }, photo: { rect: [16, 16, 208, 96] }, title: { rect: [16, 124, 208, 26.2] } },
+  },
+  {
+    lesson: "negative-bleed",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 240, 214.98] }, photo: { rect: [0, 16, 240, 96] }, title: { rect: [16, 124, 208, 26.2] } },
+  },
+  {
+    lesson: "negative-bleed",
+    name: "width and margin-left",
+    css: ".card {\n  width: 240px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.photo {\n  height: 96px;\n  margin-bottom: 12px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  width: calc(100% + 32px);\n  margin-left: -16px;\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 240, 214.98] }, photo: { rect: [0, 16, 240, 96] }, title: { rect: [16, 124, 208, 26.2] } },
+  },
+  {
+    lesson: "negative-bleed",
+    name: "margin shorthand",
+    css: ".card {\n  width: 240px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.photo {\n  height: 96px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin: 0 -16px 12px;\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 240, 214.98] }, photo: { rect: [0, 16, 240, 96] }, title: { rect: [16, 124, 208, 26.2] } },
+  },
+  {
+    lesson: "negative-bleed",
+    name: "card padding 0",
+    css: ".card {\n  width: 240px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.photo {\n  height: 96px;\n  margin-bottom: 12px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0;\n}\n.card {\n  padding: 0;\n}\n",
+    messages: ["見出しが、カードの余白（16px）の内側からはみ出しました（写真にだけ負のマージンを付けます）"],
+    elements: { card: { rect: [0, 0, 240, 182.98] }, photo: { rect: [0, 0, 240, 96] }, title: { rect: [0, 108, 240, 26.2] } },
+  },
+  {
+    lesson: "negative-bleed",
+    name: "photo width 100%",
+    css: ".card {\n  width: 240px;\n  padding: 16px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.photo {\n  height: 96px;\n  margin-bottom: 12px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0;\n}\n.photo {\n  width: 100%;\n}\n",
+    messages: ["写真が、カードの左右の端まで広がっていません（padding の内側の要素は、負の margin-inline で余白の外へ広げられます）"],
+    elements: { card: { rect: [0, 0, 240, 214.98] }, photo: { rect: [16, 16, 208, 96] }, title: { rect: [16, 124, 208, 26.2] } },
+  },
+  {
+    lesson: "negative-overlap",
+    name: "starter",
+    messages: ["アイコンが、表紙の写真に 32px（半分）重なっていません（負の margin-top で、前の要素の側へ引き寄せます）"],
+    elements: { cover: { rect: [0, 0, 260, 80] }, avatar: { rect: [16, 80, 64, 64] }, name: { rect: [16, 152, 228, 25.19] } },
+  },
+  {
+    lesson: "negative-overlap",
+    name: "solution",
+    messages: [],
+    elements: { cover: { rect: [0, 0, 260, 80] }, avatar: { rect: [16, 48, 64, 64] }, name: { rect: [16, 120, 228, 25.19] } },
+  },
+  {
+    lesson: "negative-overlap",
+    name: "margin-block-start",
+    css: ".profile {\n  width: 260px;\n  padding-bottom: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.cover {\n  height: 80px;\n  border-radius: 12px 12px 0 0;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.avatar {\n  width: 64px;\n  height: 64px;\n  margin-left: 16px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #f5c400;\n  margin-block-start: -32px;\n}\n.name {\n  margin: 8px 16px 0;\n  font-size: 18px;\n}\n.bio {\n  margin: 4px 16px 0;\n}\n",
+    messages: [],
+    elements: { cover: { rect: [0, 0, 260, 80] }, avatar: { rect: [16, 48, 64, 64] }, name: { rect: [16, 120, 228, 25.19] } },
+  },
+  {
+    lesson: "negative-overlap",
+    name: "half of the height",
+    css: ".profile {\n  width: 260px;\n  padding-bottom: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.cover {\n  height: 80px;\n  border-radius: 12px 12px 0 0;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.avatar {\n  width: 64px;\n  height: 64px;\n  margin-left: 16px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #f5c400;\n  margin-top: calc(64px / -2);\n}\n.name {\n  margin: 8px 16px 0;\n  font-size: 18px;\n}\n.bio {\n  margin: 4px 16px 0;\n}\n",
+    messages: [],
+    elements: { cover: { rect: [0, 0, 260, 80] }, avatar: { rect: [16, 48, 64, 64] }, name: { rect: [16, 120, 228, 25.19] } },
+  },
+  {
+    lesson: "negative-overlap",
+    name: "position relative",
+    css: ".profile {\n  width: 260px;\n  padding-bottom: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.cover {\n  height: 80px;\n  border-radius: 12px 12px 0 0;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.avatar {\n  width: 64px;\n  height: 64px;\n  margin-left: 16px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #f5c400;\n  position: relative;\n  top: -32px;\n}\n.name {\n  margin: 8px 16px 0;\n  font-size: 18px;\n}\n.bio {\n  margin: 4px 16px 0;\n}\n",
+    messages: ["名前がアイコンのすぐ下（8px）についてきていません（position: relative や transform は見た目だけを動かし、もとの場所が空いたままになります。負の margin-top なら、あとの要素もいっしょに上がります）"],
+    elements: { cover: { rect: [0, 0, 260, 80] }, avatar: { rect: [16, 48, 64, 64] }, name: { rect: [16, 152, 228, 25.19] } },
+  },
+  {
+    lesson: "negative-overlap",
+    name: "translate",
+    css: ".profile {\n  width: 260px;\n  padding-bottom: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.cover {\n  height: 80px;\n  border-radius: 12px 12px 0 0;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.avatar {\n  width: 64px;\n  height: 64px;\n  margin-left: 16px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #f5c400;\n  translate: 0 -32px;\n}\n.name {\n  margin: 8px 16px 0;\n  font-size: 18px;\n}\n.bio {\n  margin: 4px 16px 0;\n}\n",
+    messages: ["名前がアイコンのすぐ下（8px）についてきていません（position: relative や transform は見た目だけを動かし、もとの場所が空いたままになります。負の margin-top なら、あとの要素もいっしょに上がります）"],
+    elements: { cover: { rect: [0, 0, 260, 80] }, avatar: { rect: [16, 48, 64, 64] }, name: { rect: [16, 152, 228, 25.19] } },
+  },
+  {
+    lesson: "negative-overlap",
+    name: "-16px",
+    css: ".profile {\n  width: 260px;\n  padding-bottom: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.cover {\n  height: 80px;\n  border-radius: 12px 12px 0 0;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.avatar {\n  width: 64px;\n  height: 64px;\n  margin-left: 16px;\n  border: 3px solid #fff;\n  border-radius: 50%;\n  background: #f5c400;\n  margin-top: -16px;\n}\n.name {\n  margin: 8px 16px 0;\n  font-size: 18px;\n}\n.bio {\n  margin: 4px 16px 0;\n}\n",
+    messages: ["アイコンが、表紙の写真に 32px（半分）重なっていません（負の margin-top で、前の要素の側へ引き寄せます）"],
+    elements: { cover: { rect: [0, 0, 260, 80] }, avatar: { rect: [16, 64, 64, 64] }, name: { rect: [16, 136, 228, 25.19] } },
+  },
+  {
+    lesson: "negative-breakout",
+    name: "starter",
+    messages: ["写真が、ページの端から端まで広がっていません（列の幅の半分（50%）とページの幅の半分（50cqi）の差だけ、左右のマージンを負にします）"],
+    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [138, 30.39, 320, 72] } },
+  },
+  {
+    lesson: "negative-breakout",
+    name: "solution",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
+  },
+  {
+    lesson: "negative-breakout",
+    name: "solution @300",
+    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin-inline: calc(50% - 50cqi);\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 300, 140.78] }, column: { rect: [0, 0, 300, 132.78] }, p1: { rect: [0, 0, 300, 22.39] }, photo: { rect: [0, 30.39, 300, 72] } },
+  },
+  {
+    lesson: "negative-breakout",
+    name: "100cqi wide",
+    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  width: 100cqi;\n  margin-left: calc(50% - 50cqi);\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
+  },
+  {
+    lesson: "negative-breakout",
+    name: "vw",
+    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin-inline: calc(50% - 50vw);\n}\n",
+    messages: [],
+    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [138, 0, 320, 132.78] }, p1: { rect: [138, 0, 320, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
+  },
+  {
+    lesson: "negative-breakout",
+    name: "fixed -138px @300",
+    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n  margin-inline: -138px;\n}\n",
+    messages: ["写真が、ページの端から端まで広がっていません（列の幅の半分（50%）とページの幅の半分（50cqi）の差だけ、左右のマージンを負にします）"],
+    elements: { page: { rect: [0, 0, 300, 140.78] }, column: { rect: [0, 0, 300, 132.78] }, p1: { rect: [0, 0, 300, 22.39] }, photo: { rect: [-138, 30.39, 576, 72] } },
+  },
+  {
+    lesson: "negative-breakout",
+    name: "column max-width removed",
+    css: "/* ページ全体をコンテナにする（cqi の基準） */\n.page {\n  container-type: inline-size;\n}\n/* 文章は 320px の列で真ん中に */\n.column {\n  max-width: 320px;\n  margin-inline: auto;\n}\n.column p {\n  margin: 0 0 8px;\n}\n.photo {\n  height: 72px;\n  margin-bottom: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.column {\n  max-width: none;\n}\n",
+    messages: ["文章が、幅 320px の列の中に収まっていません（列はそのままにして、写真にだけ負のマージンを付けます）"],
+    elements: { page: { rect: [0, 0, 596, 140.78] }, column: { rect: [0, 0, 596, 132.78] }, p1: { rect: [0, 0, 596, 22.39] }, photo: { rect: [0, 30.39, 596, 72] } },
+  },
+  {
+    lesson: "max-gutter",
+    name: "starter",
+    messages: ["幅 320px で、文章の左右に 16px の余白がありません（(100% - 480px) / 2 は狭い画面で負になり、padding には負の値を使えないので、余白がなくなります。max(16px, …) なら 16px より小さくなりません）"],
+    elements: { band: { rect: [0, 0, 560, 68.78] }, text: { rect: [40, 12, 480, 44.78] } },
+    states: { 320: { band: { rect: [0, 0, 320, 91.17] }, text: { rect: [0, 12, 320, 67.17] } } },
+  },
+  {
+    lesson: "max-gutter",
+    name: "solution",
+    messages: [],
+    elements: { band: { rect: [0, 0, 560, 68.78] }, text: { rect: [40, 12, 480, 44.78] } },
+    states: { 320: { band: { rect: [0, 0, 320, 91.17] }, text: { rect: [16, 12, 288, 67.17] } } },
+  },
+  {
+    lesson: "max-gutter",
+    name: "50% - 240px",
+    css: "/* 帯の背景は端から端まで、文章は 480px の幅で真ん中に */\n.band {\n  padding-block: 12px;\n  padding-inline: max(16px, 50% - 240px);\n  background: #dbe4fb;\n}\n.band p {\n  margin: 0;\n}\n",
+    messages: [],
+    elements: { band: { rect: [0, 0, 560, 68.78] }, text: { rect: [40, 12, 480, 44.78] } },
+    states: { 320: { band: { rect: [0, 0, 320, 91.17] }, text: { rect: [16, 12, 288, 67.17] } } },
+  },
+  {
+    lesson: "max-gutter",
+    name: "media query",
+    css: "/* 帯の背景は端から端まで、文章は 480px の幅で真ん中に */\n.band {\n  padding-block: 12px;\n  padding-inline: calc((100% - 480px) / 2);\n  background: #dbe4fb;\n}\n.band p {\n  margin: 0;\n}\n@media (width < 512px) {\n  .band {\n    padding-inline: 16px;\n  }\n}\n",
+    messages: [],
+    elements: { band: { rect: [0, 0, 560, 68.78] }, text: { rect: [40, 12, 480, 44.78] } },
+    states: { 320: { band: { rect: [0, 0, 320, 91.17] }, text: { rect: [16, 12, 288, 67.17] } } },
+  },
+  {
+    lesson: "max-gutter",
+    name: "forgot / 2",
+    css: "/* 帯の背景は端から端まで、文章は 480px の幅で真ん中に */\n.band {\n  padding-block: 12px;\n  padding-inline: max(16px, 100% - 480px);\n  background: #dbe4fb;\n}\n.band p {\n  margin: 0;\n}\n",
+    messages: ["幅 560px で、文章が 480px の幅で真ん中に来ていません（広い画面は今のままにします）"],
+    elements: { band: { rect: [0, 0, 560, 68.78] }, text: { rect: [80, 12, 400, 44.78] } },
+    states: { 320: { band: { rect: [0, 0, 320, 91.17] }, text: { rect: [16, 12, 288, 67.17] } } },
+  },
+  {
+    lesson: "max-gutter",
+    name: "min()",
+    css: "/* 帯の背景は端から端まで、文章は 480px の幅で真ん中に */\n.band {\n  padding-block: 12px;\n  padding-inline: min(16px, (100% - 480px) / 2);\n  background: #dbe4fb;\n}\n.band p {\n  margin: 0;\n}\n",
+    messages: ["幅 560px で、文章が 480px の幅で真ん中に来ていません（広い画面は今のままにします）","幅 320px で、文章の左右に 16px の余白がありません（(100% - 480px) / 2 は狭い画面で負になり、padding には負の値を使えないので、余白がなくなります。max(16px, …) なら 16px より小さくなりません）"],
+    elements: { band: { rect: [0, 0, 560, 68.78] }, text: { rect: [16, 12, 528, 44.78] } },
+    states: { 320: { band: { rect: [0, 0, 320, 91.17] }, text: { rect: [0, 12, 320, 67.17] } } },
+  },
+  {
+    lesson: "max-gutter",
+    name: "fixed 16px",
+    css: "/* 帯の背景は端から端まで、文章は 480px の幅で真ん中に */\n.band {\n  padding-block: 12px;\n  padding-inline: 16px;\n  background: #dbe4fb;\n}\n.band p {\n  margin: 0;\n}\n",
+    messages: ["幅 560px で、文章が 480px の幅で真ん中に来ていません（広い画面は今のままにします）"],
+    elements: { band: { rect: [0, 0, 560, 68.78] }, text: { rect: [16, 12, 528, 44.78] } },
+    states: { 320: { band: { rect: [0, 0, 320, 91.17] }, text: { rect: [16, 12, 288, 67.17] } } },
+  },
+  {
+    lesson: "minmax-min",
+    name: "starter",
+    messages: ["サイドバーのカードが、幅 160px の一覧からはみ出しています（minmax の最小 200px は、一覧が狭くても守られます。最小を min(200px, 100%) にすると、狭いときは一覧の幅になります）"],
+    elements: { main: { rect: [0, 0, 560, 42.39] }, m1: { rect: [0, 0, 274, 42.39] }, m2: { rect: [286, 0, 274, 42.39] }, side: { rect: [0, 58.39, 160, 96.78] }, s1: { rect: [0, 58.39, 200, 42.39] }, s2: { rect: [0, 112.78, 200, 42.39] } },
+    states: { 360: { main: { rect: [0, 0, 360, 96.78] }, m1: { rect: [0, 0, 360, 42.39] }, m2: { rect: [0, 54.39, 360, 42.39] }, side: { rect: [0, 112.78, 160, 96.78] }, s1: { rect: [0, 112.78, 200, 42.39] }, s2: { rect: [0, 167.17, 200, 42.39] } } },
+  },
+  {
+    lesson: "minmax-min",
+    name: "solution",
+    messages: [],
+    elements: { main: { rect: [0, 0, 560, 42.39] }, m1: { rect: [0, 0, 274, 42.39] }, m2: { rect: [286, 0, 274, 42.39] }, side: { rect: [0, 58.39, 160, 96.78] }, s1: { rect: [0, 58.39, 160, 42.39] }, s2: { rect: [0, 112.78, 160, 42.39] } },
+    states: { 360: { main: { rect: [0, 0, 360, 96.78] }, m1: { rect: [0, 0, 360, 42.39] }, m2: { rect: [0, 54.39, 360, 42.39] }, side: { rect: [0, 112.78, 160, 96.78] }, s1: { rect: [0, 112.78, 160, 42.39] }, s2: { rect: [0, 167.17, 160, 42.39] } } },
+  },
+  {
+    lesson: "minmax-min",
+    name: "min(100%, 200px)",
+    css: ".layout {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.cards {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));\n  gap: 12px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n/* サイドバーの一覧は幅 160px */\n.side {\n  width: 160px;\n}\n.cards li {\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: [],
+    elements: { main: { rect: [0, 0, 560, 42.39] }, m1: { rect: [0, 0, 274, 42.39] }, m2: { rect: [286, 0, 274, 42.39] }, side: { rect: [0, 58.39, 160, 96.78] }, s1: { rect: [0, 58.39, 160, 42.39] }, s2: { rect: [0, 112.78, 160, 42.39] } },
+    states: { 360: { main: { rect: [0, 0, 360, 96.78] }, m1: { rect: [0, 0, 360, 42.39] }, m2: { rect: [0, 54.39, 360, 42.39] }, side: { rect: [0, 112.78, 160, 96.78] }, s1: { rect: [0, 112.78, 160, 42.39] }, s2: { rect: [0, 167.17, 160, 42.39] } } },
+  },
+  {
+    lesson: "minmax-min",
+    name: "160px minimum",
+    css: ".layout {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.cards {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));\n  gap: 12px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n/* サイドバーの一覧は幅 160px */\n.side {\n  width: 160px;\n}\n.cards li {\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["幅 360px で、広い一覧のカードが 1 列になっていません（最小の幅を 200px より小さくすると、列の数が変わります。min(200px, 100%) なら、広い一覧では 200px のままです）"],
+    elements: { main: { rect: [0, 0, 560, 42.39] }, m1: { rect: [0, 0, 178.66, 42.39] }, m2: { rect: [190.66, 0, 178.67, 42.39] }, side: { rect: [0, 58.39, 160, 96.78] }, s1: { rect: [0, 58.39, 160, 42.39] }, s2: { rect: [0, 112.78, 160, 42.39] } },
+    states: { 360: { main: { rect: [0, 0, 360, 42.39] }, m1: { rect: [0, 0, 174, 42.39] }, m2: { rect: [186, 0, 174, 42.39] }, side: { rect: [0, 58.39, 160, 96.78] }, s1: { rect: [0, 58.39, 160, 42.39] }, s2: { rect: [0, 112.78, 160, 42.39] } } },
+  },
+  {
+    lesson: "minmax-min",
+    name: "one column",
+    css: ".layout {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.cards {\n  display: grid;\n  grid-template-columns: 1fr;\n  gap: 12px;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n/* サイドバーの一覧は幅 160px */\n.side {\n  width: 160px;\n}\n.cards li {\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["幅 560px で、広い一覧のカードが 2 列に並んでいません（広い一覧は今のままにします）"],
+    elements: { main: { rect: [0, 0, 560, 96.78] }, m1: { rect: [0, 0, 560, 42.39] }, m2: { rect: [0, 54.39, 560, 42.39] }, side: { rect: [0, 112.78, 160, 96.78] }, s1: { rect: [0, 112.78, 160, 42.39] }, s2: { rect: [0, 167.17, 160, 42.39] } },
+    states: { 360: { main: { rect: [0, 0, 360, 96.78] }, m1: { rect: [0, 0, 360, 42.39] }, m2: { rect: [0, 54.39, 360, 42.39] }, side: { rect: [0, 112.78, 160, 96.78] }, s1: { rect: [0, 112.78, 160, 42.39] }, s2: { rect: [0, 167.17, 160, 42.39] } } },
+  },
+  {
+    lesson: "pow-scale",
+    name: "starter",
+    messages: ["比 1.25 の記事で、見出しが 20px・25px・31.25px（1.25 の 1 乗・2 乗・3 乗）になっていません"],
+    elements: { "h1-0": { rect: [0, 0, 596, 41.59], computed: {"font-size":"32px"} }, "h2-0": { rect: [0, 41.59, 596, 31.19], computed: {"font-size":"24px"} }, "h3-0": { rect: [0, 72.78, 596, 26], computed: {"font-size":"20px"} }, "h1-1": { rect: [0, 110.78, 596, 41.59], computed: {"font-size":"32px"} }, "h2-1": { rect: [0, 152.38, 596, 31.19], computed: {"font-size":"24px"} }, "h3-1": { rect: [0, 183.56, 596, 24.95], computed: {"font-size":"19.2px"} } },
+  },
+  {
+    lesson: "pow-scale",
+    name: "solution",
+    messages: [],
+    elements: { "h1-0": { rect: [0, 0, 596, 40.63], computed: {"font-size":"31.25px"} }, "h2-0": { rect: [0, 40.63, 596, 32.5], computed: {"font-size":"25px"} }, "h3-0": { rect: [0, 73.13, 596, 26], computed: {"font-size":"20px"} }, "h1-1": { rect: [0, 111.13, 596, 35.92], computed: {"font-size":"27.648px"} }, "h2-1": { rect: [0, 147.05, 596, 29.95], computed: {"font-size":"23.04px"} }, "h3-1": { rect: [0, 177, 596, 24.95], computed: {"font-size":"19.2px"} } },
+  },
+  {
+    lesson: "pow-scale",
+    name: "multiplied out",
+    css: ".doc {\n  --ratio: 1.25;\n  margin-bottom: 12px;\n}\n/* 詰めた記事は、比を小さくする */\n.doc.compact {\n  --ratio: 1.2;\n}\n.doc h1,\n.doc h2,\n.doc h3 {\n  margin: 0;\n  line-height: 1.3;\n}\n/* 見出しは、本文（1rem）に --ratio を 1 回・2 回・3 回かけた大きさ */\n.doc h3 {\n  font-size: calc(1rem * var(--ratio));\n}\n.doc h2 {\n  font-size: calc(1rem * var(--ratio) * var(--ratio));\n}\n.doc h1 {\n  font-size: calc(1rem * var(--ratio) * var(--ratio) * var(--ratio));\n}\n",
+    messages: [],
+    elements: { "h1-0": { rect: [0, 0, 596, 40.63], computed: {"font-size":"31.25px"} }, "h2-0": { rect: [0, 40.63, 596, 32.5], computed: {"font-size":"25px"} }, "h3-0": { rect: [0, 73.13, 596, 26], computed: {"font-size":"20px"} }, "h1-1": { rect: [0, 111.13, 596, 35.92], computed: {"font-size":"27.648px"} }, "h2-1": { rect: [0, 147.05, 596, 29.95], computed: {"font-size":"23.04px"} }, "h3-1": { rect: [0, 177, 596, 24.95], computed: {"font-size":"19.2px"} } },
+  },
+  {
+    lesson: "pow-scale",
+    name: "px written out",
+    css: ".doc {\n  --ratio: 1.25;\n  margin-bottom: 12px;\n}\n/* 詰めた記事は、比を小さくする */\n.doc.compact {\n  --ratio: 1.2;\n}\n.doc h1,\n.doc h2,\n.doc h3 {\n  margin: 0;\n  line-height: 1.3;\n}\n/* 見出しは、本文（1rem）に --ratio を 1 回・2 回・3 回かけた大きさ */\n.doc h3 {\n  font-size: calc(1rem * var(--ratio));\n}\n.doc h2 {\n  font-size: 25px;\n}\n.doc h1 {\n  font-size: 31.25px;\n}\n",
+    messages: ["比 1.2 の詰めた記事で、見出しが比に合わせて小さくなっていません（px で書くと比を変えても変わりません。calc(1rem * pow(var(--ratio), 2)) のように --ratio から計算します）"],
+    elements: { "h1-0": { rect: [0, 0, 596, 40.63], computed: {"font-size":"31.25px"} }, "h2-0": { rect: [0, 40.63, 596, 32.5], computed: {"font-size":"25px"} }, "h3-0": { rect: [0, 73.13, 596, 26], computed: {"font-size":"20px"} }, "h1-1": { rect: [0, 111.13, 596, 40.63], computed: {"font-size":"31.25px"} }, "h2-1": { rect: [0, 151.75, 596, 32.5], computed: {"font-size":"25px"} }, "h3-1": { rect: [0, 184.25, 596, 24.95], computed: {"font-size":"19.2px"} } },
+  },
+  {
+    lesson: "pow-scale",
+    name: "pow of 1.25 written in",
+    css: ".doc {\n  --ratio: 1.25;\n  margin-bottom: 12px;\n}\n/* 詰めた記事は、比を小さくする */\n.doc.compact {\n  --ratio: 1.2;\n}\n.doc h1,\n.doc h2,\n.doc h3 {\n  margin: 0;\n  line-height: 1.3;\n}\n/* 見出しは、本文（1rem）に --ratio を 1 回・2 回・3 回かけた大きさ */\n.doc h3 {\n  font-size: calc(1rem * var(--ratio));\n}\n.doc h2 {\n  font-size: calc(1rem * pow(1.25, 2));\n}\n.doc h1 {\n  font-size: calc(1rem * pow(1.25, 3));\n}\n",
+    messages: ["比 1.2 の詰めた記事で、見出しが比に合わせて小さくなっていません（px で書くと比を変えても変わりません。calc(1rem * pow(var(--ratio), 2)) のように --ratio から計算します）"],
+    elements: { "h1-0": { rect: [0, 0, 596, 40.63], computed: {"font-size":"31.25px"} }, "h2-0": { rect: [0, 40.63, 596, 32.5], computed: {"font-size":"25px"} }, "h3-0": { rect: [0, 73.13, 596, 26], computed: {"font-size":"20px"} }, "h1-1": { rect: [0, 111.13, 596, 40.63], computed: {"font-size":"31.25px"} }, "h2-1": { rect: [0, 151.75, 596, 32.5], computed: {"font-size":"25px"} }, "h3-1": { rect: [0, 184.25, 596, 24.95], computed: {"font-size":"19.2px"} } },
+  },
+];
+
+describe("implicit grid tracks, negative margins and math functions in practice: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 9 lessons", () => {
+    expect([...new Set(GRID_MARGIN_MATH_CASES.map((c) => c.lesson))].sort()).toEqual([...GRID_MARGIN_MATH_LESSONS].sort());
+    for (const id of GRID_MARGIN_MATH_LESSONS) {
+      const names = GRID_MARGIN_MATH_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of GRID_MARGIN_MATH_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of GRID_MARGIN_MATH_LESSONS) {
+      const starter = GRID_MARGIN_MATH_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = GRID_MARGIN_MATH_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the measurements the lessons are about", () => {
+    const find = (id: string, name: string): RecordedCase =>
+      GRID_MARGIN_MATH_CASES.find((c) => c.lesson === id && c.name === name)!;
+    const rect = (id: string, name: string, el: string): readonly number[] => find(id, name).elements[el]!.rect!;
+    const computed = (id: string, name: string, el: string, prop: string): string | undefined =>
+      find(id, name).elements[el]!.computed?.[prop];
+    // The cards stack in one column, then run along one row 140px wide and 12px apart.
+    expect(rect("auto-flow-column", "starter", "c2")[1]).toBeGreaterThan(0);
+    expect(rect("auto-flow-column", "solution", "c5")[0]).toBe(608);
+    // 1 / -1 stops at the first row; span 3 reaches the third section's bottom.
+    expect(rect("minus-one-explicit", "starter", "side")[3]).toBeCloseTo(rect("minus-one-explicit", "starter", "a")[3]!, 1);
+    expect(rect("minus-one-explicit", "solution", "side")[3]).toBeCloseTo(155.17, 1);
+    // The 240px box stretches two auto rows to 114px each; align-content: start keeps them at 46.39px.
+    expect(rect("rows-stretch", "starter", "c1")[3]).toBe(114);
+    expect(rect("rows-stretch", "solution", "c3")[1]).toBeCloseTo(58.39, 1);
+    // The photo reaches the card's edges; the avatar overlaps the 80px cover by 32px; the photo spans the page.
+    expect(rect("negative-bleed", "solution", "photo")[2]).toBe(240);
+    expect(rect("negative-overlap", "solution", "avatar")[1]).toBe(48);
+    expect(rect("negative-breakout", "solution", "photo")[2]).toBe(596);
+    // max() keeps 16px of padding at 320px where the plain calc() went negative and collapsed to 0.
+    expect(find("max-gutter", "starter").states![320]!.text!.rect![0]).toBe(0);
+    expect(find("max-gutter", "solution").states![320]!.text!.rect![0]).toBe(16);
+    // min(200px, 100%) fits the 160px list instead of overflowing it at 200px.
+    expect(rect("minmax-min", "starter", "s1")[2]).toBe(200);
+    expect(rect("minmax-min", "solution", "s1")[2]).toBe(160);
+    // pow() gives 1.25 to the 3rd power (31.25px) and 1.2 to the 3rd (27.648px).
+    expect(computed("pow-scale", "solution", "h1-0", "font-size")).toBe("31.25px");
+    expect(computed("pow-scale", "solution", "h1-1", "font-size")).toBe("27.648px");
+  });
+});

@@ -138,8 +138,8 @@ export const negativeMarginsTrack: Track = {
               },
               {
                 kind: "allOf",
-                of: spans("column", "p1"),
-                message: "文章が、真ん中の列からはみ出しました（写真にだけ負のマージンを付けます）",
+                of: [...spans("column", "p1"), { kind: "offset", a: "p1", b: "p1", edgeA: "left", edgeB: "right", max: 320.5 }],
+                message: "文章が、幅 320px の列の中に収まっていません（列はそのままにして、写真にだけ負のマージンを付けます）",
               },
             ],
           },
