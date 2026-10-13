@@ -52,6 +52,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * basics); the nesting and cascade-layer practice tracks follow their basics.
  * White space follows the other text tracks, and the practice tracks for the
  * structural pseudo-classes and custom properties follow their basics.
+ * The page grids (named lines, auto-fit, a footer at the bottom) follow grid
+ * placement, and the card rows (flex and grid together) follow them, before
+ * subgrid lines up what is inside the cards; container queries in practice
+ * follow their basics.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -476,6 +480,28 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "grid-layouts",
+    title: "ページのグリッド（名前付きの線・auto-fit・下端のフッター）",
+    summary: "名前を付けた線で本文・少し広い範囲・全幅を使い分け、auto-fit で少ないカードを行いっぱいに広げ、auto 1fr auto でフッターを画面の下端に置く。",
+    emoji: "🗺️",
+    lessons: [
+      { id: "named-lines", title: "名前付きの線で幅を使い分ける: grid-column: wide" },
+      { id: "auto-fit", title: "少ないカードを広げる: auto-fill と auto-fit" },
+      { id: "sticky-footer", title: "フッターを下端に: grid-template-rows: auto 1fr auto" },
+    ],
+  },
+  {
+    id: "card-rows",
+    title: "カードの並び（ボタンを下端に・高さをそろえる・最後の行）",
+    summary: "縦向きの flex と margin-top: auto でボタンを下端にそろえ、li に包まれたカードを li いっぱいに伸ばし、space-between で離れる最後の行を gap で左から詰める。",
+    emoji: "🃏",
+    lessons: [
+      { id: "push-footer", title: "ボタンを下端にそろえる: margin-top: auto" },
+      { id: "stretch-cards", title: "li に包んだカードの高さをそろえる: li もグリッドに" },
+      { id: "last-row", title: "最後の行が離れる: space-between の代わりに gap" },
+    ],
+  },
+  {
     id: "subgrid",
     title: "サブグリッド",
     summary: "入れ子のグリッドを親のトラックにそろえる subgrid。",
@@ -712,6 +738,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "container-queries-in-practice",
+    title: "コンテナクエリの応用（cqi・container-name・幅がつぶれる落とし穴）",
+    summary: "cqi でカードの幅に合わせて文字を大きくし、container-name で入れ子の外側のコンテナを名指しし、コンテナにしてつぶれた幅を明示して直す。",
+    emoji: "🥡",
+    lessons: [
+      { id: "cq-units", title: "カードの幅に合わせる: cqi 単位" },
+      { id: "container-name", title: "外側のコンテナを名指しする: container-name" },
+      { id: "inline-size-zero", title: "コンテナにしたら幅がつぶれた: 幅を明示する" },
+    ],
+  },
+  {
     id: "supports",
     title: "機能クエリ（@supports）",
     summary: "@supports で、ブラウザが対応しているかどうかに応じて CSS を切り替え、古いブラウザ向けの指定を分けておく。",
@@ -934,6 +971,8 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "grid-alignment": () => import("./grid-alignment.js").then((m) => m.gridAlignmentTrack),
   "grid-patterns": () => import("./grid-patterns.js").then((m) => m.gridPatternsTrack),
   "grid-placement": () => import("./grid-placement.js").then((m) => m.gridPlacementTrack),
+  "grid-layouts": () => import("./grid-layouts.js").then((m) => m.gridLayoutsTrack),
+  "card-rows": () => import("./card-rows.js").then((m) => m.cardRowsTrack),
   subgrid: () => import("./subgrid.js").then((m) => m.subgridTrack),
   "intrinsic-sizing": () => import("./intrinsic-sizing.js").then((m) => m.intrinsicSizingTrack),
   multicol: () => import("./multicol.js").then((m) => m.multicolTrack),
@@ -956,6 +995,8 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "scroll-snap": () => import("./scroll-snap.js").then((m) => m.scrollSnapTrack),
   "media-queries": () => import("./media-queries.js").then((m) => m.mediaQueriesTrack),
   "container-queries": () => import("./container-queries.js").then((m) => m.containerQueriesTrack),
+  "container-queries-in-practice": () =>
+    import("./container-queries-in-practice.js").then((m) => m.containerQueriesInPracticeTrack),
   supports: () => import("./supports.js").then((m) => m.supportsTrack),
   layers: () => import("./layers.js").then((m) => m.layersTrack),
   "layers-in-practice": () => import("./layers-in-practice.js").then((m) => m.layersInPracticeTrack),
