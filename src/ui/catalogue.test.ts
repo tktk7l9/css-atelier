@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getAllByRole, getByRole, getByText, queryByRole } from "@testing-library/dom";
+import { getAllByRole, getByRole, getByText, queryByRole, within } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import { LESSONS, TRACKS } from "../engine/content/index.js";
 import type { ProgressStore } from "../engine/progress.js";
@@ -34,15 +34,19 @@ describe("renderCatalogue", () => {
     const { root } = mount(memStore());
     expect(getByRole(root, "heading", { level: 1 }).textContent).toBe("CSS Atelier");
     expect(getByText(root, /解説を読み、エディタに CSS を書いて/)).toBeTruthy();
-    expect(root.querySelectorAll(".track-card").length).toBe(TRACKS.length);
+    const cards = [...root.querySelectorAll<HTMLElement>(".track-card")];
+    expect(cards.length).toBe(TRACKS.length);
     // Track names sit one level under the page title (heading order, SHIG 59).
     expect(getAllByRole(root, "heading", { level: 2 }).map((h) => h.textContent)).toEqual(
       TRACKS.map((t) => t.title),
     );
-    for (const track of TRACKS) {
-      expect(getByText(root, track.title)).toBeTruthy();
-      expect(getByText(root, track.summary)).toBeTruthy();
-    }
+    // Each card shows its own track's title and summary. The queries stay
+    // inside the card: scanning the whole catalogue once per track grows with
+    // the square of the track count and outran the test timeout under coverage.
+    TRACKS.forEach((track, i) => {
+      expect(within(cards[i]).getByText(track.title)).toBeTruthy();
+      expect(within(cards[i]).getByText(track.summary)).toBeTruthy();
+    });
   });
 
   it("offers the first lesson to a new learner", async () => {
