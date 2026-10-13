@@ -114,7 +114,7 @@ export const layersInPracticeTrack: Track = {
               },
               {
                 kind: "sourceMatches",
-                pattern: "^\\s*@layer\\s+reset\\s*,\\s*components\\s*;",
+                pattern: "^\\s*(?:/\\*[\\s\\S]*?\\*/\\s*)*@layer\\s+reset\\s*,\\s*components\\s*;",
                 message: "CSS の先頭に @layer reset, components; と順番を宣言しましょう（ファイルの並びに左右されなくなります）",
               },
             ],
