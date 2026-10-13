@@ -6,7 +6,7 @@
 // testable. Prefer geometry validators (they accept any correct solution) and
 // use declaration/computed validators only when a property name is the lesson.
 
-import type { ElementSnapshot, ParsedRule, Snapshot, ValidationResult } from "./snapshot.js";
+import type { ElementSnapshot, HitPoint, ParsedRule, Snapshot, ValidationResult } from "./snapshot.js";
 import { normalizeProp, normalizeSelector, normalizeValue } from "./css-parse.js";
 
 const TOL = 2;
@@ -39,11 +39,23 @@ export type ValidatorSpec =
    *  lies further right / down) stays within [min, max]; either bound may be
    *  left out. Reads gaps between boxes and how far one line starts after another. */
   | (Base & { kind: "offset"; a: string; b: string; edgeA: Edge; edgeB: Edge; min?: number; max?: number })
+  /** At a point inside `at`'s box (fractions `fx`, `fy` of its width and
+   *  height; the centre by default), the pointer reaches `top`: the topmost
+   *  element there, or its nearest ancestor with a data-id. Reads what rects
+   *  and computed values cannot: which box is drawn on top (z-index, stacking
+   *  contexts) and which one takes the click (pointer-events). The challenge
+   *  lists the point in its snapshot request, and the sandbox hit-tests it. */
+  | (Base & { kind: "hitTarget"; at: string; fx?: number; fy?: number; top: string })
   | (Base & { kind: "allOf"; of: readonly ValidatorSpec[] })
   | (Base & { kind: "anyOf"; of: readonly ValidatorSpec[] });
 
 const ok: ValidationResult = { pass: true, message: "" };
 const fail = (message: string): ValidationResult => ({ pass: false, message });
+
+/** The point a `hitTarget` validator reads, with its default fractions filled in. */
+export function hitPointOf(spec: { at: string; fx?: number; fy?: number }): HitPoint {
+  return { at: spec.at, fx: spec.fx ?? 0.5, fy: spec.fy ?? 0.5 };
+}
 
 function getEl(s: Snapshot, id: string): ElementSnapshot | undefined {
   return s.elements.find((e) => e.id === id);
@@ -231,6 +243,14 @@ function dispatch(spec: ValidatorSpec, s: Snapshot): ValidationResult {
       return tooSmall || tooLarge
         ? fail(`${spec.a} の ${spec.edgeA} と ${spec.b} の ${spec.edgeB} の間隔が合っていません（現在 ${Math.round(d)}px）`)
         : ok;
+    }
+    case "hitTarget": {
+      const { at, fx, fy } = hitPointOf(spec);
+      const hit = s.hits?.find((h) => h.at === at && h.fx === fx && h.fy === fy);
+      if (!hit) return fail(`${at} の上の点（${fx}, ${fy}）の重なりが計測されていません`);
+      return hit.top === spec.top
+        ? ok
+        : fail(`${at} の上の点で、いちばん手前が ${spec.top} になっていません（現在 ${hit.top ?? "なし"}）`);
     }
     case "allOf": {
       for (const child of spec.of) {

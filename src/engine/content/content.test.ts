@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { LESSONS, TRACKS, lessonById, loadLesson, loadTrack, nextLesson, trackOf } from "./index.js";
-import type { ValidatorSpec } from "../validate/primitives.js";
+import { hitPointOf, type ValidatorSpec } from "../validate/primitives.js";
 import type { Challenge, Lesson, Track } from "./types.js";
 import { normalizeProp, normalizeSelector, normalizeValue, parseCss } from "../validate/css-parse.js";
 
@@ -53,6 +53,8 @@ function referencedIds(spec: ValidatorSpec): string[] {
     case "relativeSize":
     case "offset":
       return [spec.a, spec.b];
+    case "hitTarget":
+      return [spec.at, spec.top];
     default:
       return [];
   }
@@ -134,6 +136,22 @@ describe("content integrity", () => {
           if (spec.kind === "computedEquals" || spec.kind === "computedMatches") {
             expect(props.has(spec.prop), `${lesson.id}: snapshot does not request ${spec.prop}`).toBe(true);
           }
+        }
+      });
+
+      it("hit-tests every point its validators read, on boxes in the starter HTML", () => {
+        const requested = challenge.snapshot.hits ?? [];
+        for (const spec of flatten(allSpecs(challenge))) {
+          if (spec.kind === "hitTarget") {
+            expect(requested, `${lesson.id}: snapshot does not hit-test ${spec.at}`).toContainEqual(hitPointOf(spec));
+          }
+        }
+        for (const point of requested) {
+          expect(challenge.starterHTML).toContain(`data-id="${point.at}"`);
+          expect(point.fx).toBeGreaterThanOrEqual(0);
+          expect(point.fx).toBeLessThanOrEqual(1);
+          expect(point.fy).toBeGreaterThanOrEqual(0);
+          expect(point.fy).toBeLessThanOrEqual(1);
         }
       });
 

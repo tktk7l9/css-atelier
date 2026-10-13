@@ -3,7 +3,7 @@ import { TRACKS, loadTrack } from "./index.js";
 import type { Lesson } from "./types.js";
 import { evaluate } from "../validate/run.js";
 import { parseCss } from "../validate/css-parse.js";
-import type { Snapshot } from "../validate/snapshot.js";
+import type { HitResult, Snapshot } from "../validate/snapshot.js";
 
 // Lessons load with their track on demand; load them all once to replay them.
 const LOADED = new Map<string, Lesson>(
@@ -613,8 +613,9 @@ const NEW_GEOMETRY_LESSONS = [
   "table-caption",
 ];
 
-function geometrySnapshot(css: string, rec: Recorded): Snapshot {
+function geometrySnapshot(css: string, rec: Recorded, hits?: readonly HitResult[]): Snapshot {
   return {
+    ...(hits ? { hits } : {}),
     viewport: { w: 800, h: 600 },
     elements: Object.entries(rec).map(([id, { rect = [0, 0, 0, 0], computed = {} }], order) => ({
       id,
@@ -1855,6 +1856,10 @@ interface RecordedCase {
   readonly messages: readonly string[];
   readonly elements: Recorded;
   readonly states?: Readonly<Record<number, Recorded>>;
+  /** What the pointer reached at the challenge's hit points, at the lesson viewport. */
+  readonly hits?: readonly HitResult[];
+  /** The same at each extra state's viewport. */
+  readonly stateHits?: Readonly<Record<number, readonly HitResult[]>>;
 }
 
 const PATTERN_LESSONS = [
@@ -2535,11 +2540,11 @@ const PATTERN_CASES: readonly RecordedCase[] = [
 function messagesFor(c: RecordedCase): string[] {
   const { challenge } = lessonById(c.lesson)!;
   const css = c.css ?? (c.name === "starter" ? challenge.starterCSS : challenge.solution);
-  const messages = [...evaluate(challenge.validators, geometrySnapshot(css, c.elements)).failures];
+  const messages = [...evaluate(challenge.validators, geometrySnapshot(css, c.elements, c.hits)).failures];
   for (const state of challenge.states ?? []) {
     const recorded = c.states?.[state.viewport];
     if (!recorded) throw new Error(`${c.lesson} / ${c.name}: nothing recorded at ${state.viewport}px`);
-    messages.push(...evaluate(state.validators, geometrySnapshot(css, recorded)).failures);
+    messages.push(...evaluate(state.validators, geometrySnapshot(css, recorded, c.stateHits?.[state.viewport])).failures);
   }
   return messages;
 }

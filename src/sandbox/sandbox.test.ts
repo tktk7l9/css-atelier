@@ -136,6 +136,50 @@ describe("createSandbox", () => {
     ]);
   });
 
+  it("hit-tests each requested point inside its box and names the nearest data-id owner", async () => {
+    const iframe = mountFrame();
+    const sandbox = createSandbox(iframe);
+    await sandbox.load(
+      '<div data-id="card"><p>text <b>bold</b></p></div><nav data-id="menu"><a href="#">link</a></nav><i>loose</i>',
+      "",
+    );
+    const doc = iframe.contentDocument!;
+    vi.spyOn(frameEl(iframe, "menu"), "getBoundingClientRect").mockReturnValue(new DOMRect(100, 40, 200, 100));
+    const bold = doc.querySelector("b")!;
+    const loose = doc.querySelector("i")!;
+    const elementFromPoint = vi.fn((x: number, y: number) => (y > 100 ? bold : x > 250 ? loose : null));
+    Object.defineProperty(doc, "elementFromPoint", { value: elementFromPoint, configurable: true });
+
+    const snap = sandbox.snapshot({
+      props: [],
+      hits: [
+        { at: "menu", fx: 0.5, fy: 0.8 },
+        { at: "menu", fx: 0.9, fy: 0.1 },
+        { at: "menu", fx: 0.1, fy: 0.1 },
+        { at: "gone", fx: 0.5, fy: 0.5 },
+      ],
+    });
+    // The point is placed by the box's fractions, in the frame's own coordinates.
+    expect(elementFromPoint).toHaveBeenNthCalledWith(1, 200, 120);
+    expect(elementFromPoint).toHaveBeenNthCalledWith(2, 280, 50);
+    expect(snap.hits).toEqual([
+      // The <b> inside the card's paragraph belongs to the card.
+      { at: "menu", fx: 0.5, fy: 0.8, top: "card" },
+      // An element with no data-id above it names nothing; so does an empty spot.
+      { at: "menu", fx: 0.9, fy: 0.1, top: null },
+      { at: "menu", fx: 0.1, fy: 0.1, top: null },
+      // A point placed on a box that is not in the preview is not hit-tested.
+      { at: "gone", fx: 0.5, fy: 0.5, top: null },
+    ]);
+    expect(elementFromPoint).toHaveBeenCalledTimes(3);
+  });
+
+  it("returns no hits when none are requested", async () => {
+    const sandbox = createSandbox(mountFrame());
+    await sandbox.load('<div data-id="a">1</div>', "");
+    expect(sandbox.snapshot({ props: [] }).hits).toEqual([]);
+  });
+
   it("returns an empty snapshot when the frame has no document", () => {
     const iframe = document.createElement("iframe");
     const sandbox = createSandbox(iframe);
