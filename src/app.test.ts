@@ -220,9 +220,12 @@ describe("createApp: opening a lesson", () => {
   it("loads the 3D visualizer only for 3D lessons and tears the scene down for 2D ones", async () => {
     const { app, root } = mount({ reducedMotion: true });
     const stage = root.querySelector(".viz__stage") as HTMLElement;
+    // The "no 3D on this device" note only replaces a stage that failed to start.
+    const note = root.querySelector(".viz__note") as HTMLElement;
     await app.open(loaded(CLASS));
     expect(fakes.state.viz.created).toBe(0);
     expect(stage.classList.contains("hidden")).toBe(true);
+    expect(note.classList.contains("hidden")).toBe(true);
     expect(getByText(root, "プレビュー", { selector: ".viz__badge" })).toBeTruthy();
 
     await app.open(loaded(PADDING));
@@ -230,6 +233,7 @@ describe("createApp: opening a lesson", () => {
     expect(fakes.state.viz.reducedMotion).toBe(true);
     expect(fakes.state.viz.concepts).toEqual(["box-model"]);
     expect(stage.classList.contains("hidden")).toBe(false);
+    expect(note.classList.contains("hidden")).toBe(true);
 
     await app.open(loaded(CLASS));
     expect(stage.classList.contains("hidden")).toBe(true);

@@ -673,6 +673,17 @@ main {
   border-radius: 999px;
   padding: 3px 10px;
 }
+/* Takes the stage's place when this device cannot draw the 3D view (no WebGL). */
+.viz__note {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: #f7f9fd;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
 
 .preview {
   border-radius: var(--radius);

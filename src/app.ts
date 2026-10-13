@@ -108,6 +108,13 @@ export function createApp(callbacks: AppCallbacks): AppController {
   const canvas = el("canvas", { attrs: { id: "scene", "aria-hidden": "true" } });
   const badge = el("div", { class: "viz__badge" });
   stage.append(canvas, badge);
+  // Takes the stage's place when this device cannot draw the 3D view (no
+  // WebGL). The preview and the checks do not need it, so the lesson goes on;
+  // the note says so in plain words, without naming the technology (SHIG 20, 57, 11).
+  const vizNote = el("p", {
+    class: "viz__note hidden",
+    text: "この端末では 3D の図を表示できません。プレビューと採点はそのまま使えます。",
+  });
 
   const preview = el("div", { class: "preview" });
   const previewHead = el("div", { class: "preview__head", text: "プレビュー" });
@@ -126,11 +133,14 @@ export function createApp(callbacks: AppCallbacks): AppController {
   preview.append(previewHead, frame);
 
   const viz = el("div", { class: "viz" });
-  viz.append(stage, preview);
+  viz.append(stage, vizNote, preview);
   root.append(doc, viz);
 
   const sandbox: Sandbox = createSandbox(iframe);
   let visualizer: Visualizer | null = null;
+  // Set once creating the visualizer has failed, so later 3D lessons show the
+  // note right away instead of trying (and failing) again on every open.
+  let vizUnavailable = false;
   let current: Lesson | null = null;
   let hintsShown = 0;
   let undoCSS: string | null = null;
@@ -353,18 +363,27 @@ export function createApp(callbacks: AppCallbacks): AppController {
     title.focus({ preventScroll: true });
 
     // Lazily attach the 3D visualizer — Three.js loads only for 3D lessons.
-    if (lesson.viz.concept === "none") {
-      stage.classList.add("hidden");
+    const wants3D = lesson.viz.concept !== "none";
+    stage.classList.toggle("hidden", !wants3D || vizUnavailable);
+    vizNote.classList.toggle("hidden", !wants3D || !vizUnavailable);
+    if (!wants3D) {
       // Tear the previous concept down too; otherwise the hidden canvas keeps
       // animating and re-rendering a stale scene from the last 3D lesson.
       visualizer?.setConcept("none");
-    } else {
-      stage.classList.remove("hidden");
+    } else if (!vizUnavailable) {
       if (!visualizer) {
-        const { createVisualizer } = await import("./viz/index.js");
-        visualizer = createVisualizer(canvas, callbacks.reducedMotion);
+        try {
+          const { createVisualizer } = await import("./viz/index.js");
+          visualizer = createVisualizer(canvas, callbacks.reducedMotion);
+        } catch {
+          // No WebGL here (Three.js cannot create its renderer), or the 3D code
+          // failed to load: carry on to the preview without the 3D view.
+          vizUnavailable = true;
+          stage.classList.add("hidden");
+          vizNote.classList.remove("hidden");
+        }
       }
-      visualizer.setConcept(lesson.viz.concept);
+      visualizer?.setConcept(lesson.viz.concept);
     }
 
     await sandbox.load(lesson.challenge.starterHTML, css);
