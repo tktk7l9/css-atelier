@@ -41,6 +41,10 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * text tracks; specificity follows :is() and the :has() patterns, whose
  * selectors it weighs; and list markers follow generated content and its
  * counters.
+ * Stacking (z-index, stacking contexts, isolation) and what a click reaches
+ * (pointer-events, stretched links, 44px targets) follow absolute positioning
+ * and the ways of hiding, whose positioned boxes they stack; the form states
+ * that a learner cannot change from the preview follow the form styling track.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -485,6 +489,28 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "stacking",
+    title: "重なり順（z-index・重ね合わせコンテキスト・isolation）",
+    summary: "z-index で後ろの要素に隠れたメニューを手前に出し、重ね合わせコンテキストの中では z-index を大きくしても外に勝てないことを知り、isolation: isolate で飾りを文字の下に置く。",
+    emoji: "📚",
+    lessons: [
+      { id: "z-index-order", title: "後ろの要素に隠れたメニューを出す: z-index" },
+      { id: "stacking-context", title: "z-index: 999 でも出ない: 重ね合わせコンテキスト" },
+      { id: "isolation-isolate", title: "飾りを背景の上・文字の下に: isolation: isolate" },
+    ],
+  },
+  {
+    id: "hit-areas",
+    title: "押せる範囲（pointer-events・カード全体のリンク・44px）",
+    summary: "pointer-events: none で飾りの下のボタンを押せるようにし、リンクの ::after をカード全体に広げ、padding で小さなアイコンのボタンを 44px 四方に広げる。",
+    emoji: "👆",
+    lessons: [
+      { id: "pointer-events-none", title: "飾りの下のボタンを押せるように: pointer-events: none" },
+      { id: "stretched-link", title: "カード全体をリンクに: ::after を inset: 0 で広げる" },
+      { id: "tap-target", title: "押せる範囲を広げる: padding で 44px 四方に" },
+    ],
+  },
+  {
     id: "shapes",
     title: "回り込みと図形（float・shape-outside）",
     summary: "float で文章を写真の横に流し、shape-outside で円に沿わせ、shape-margin で余白を取る。",
@@ -644,6 +670,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "form-states",
+    title: "フォームの状態で選ぶ（:disabled・:read-only・:default）",
+    summary: ":disabled で fieldset ごと無効になった欄まで灰色にし、:read-only で確認画面の欄を文字だけの表示にし、:default で最初から選ばれていたおすすめのプランに印を付ける。",
+    emoji: "🔒",
+    lessons: [
+      { id: "disabled-fieldset", title: "無効な部品をすべて選ぶ: :disabled" },
+      { id: "read-only-fields", title: "書き換えられない欄を文字だけに: :read-only" },
+      { id: "default-option", title: "最初の選択に印を残す: :default" },
+    ],
+  },
+  {
     id: "transitions",
     title: "トランジション & 変形",
     summary: "transition で滑らかに、transform で拡大・回転。",
@@ -782,6 +819,8 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "writing-modes": () => import("./writing-modes.js").then((m) => m.writingModesTrack),
   positioning: () => import("./positioning.js").then((m) => m.positioningTrack),
   hiding: () => import("./hiding.js").then((m) => m.hidingTrack),
+  stacking: () => import("./stacking.js").then((m) => m.stackingTrack),
+  "hit-areas": () => import("./hit-areas.js").then((m) => m.hitAreasTrack),
   shapes: () => import("./shapes.js").then((m) => m.shapesTrack),
   "formatting-contexts": () => import("./formatting-contexts.js").then((m) => m.formattingContextsTrack),
   "aspect-ratio": () => import("./aspect-ratio.js").then((m) => m.aspectRatioTrack),
@@ -797,6 +836,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "clip-mask": () => import("./clip-mask.js").then((m) => m.clipMaskTrack),
   filters: () => import("./filters.js").then((m) => m.filtersTrack),
   forms: () => import("./forms.js").then((m) => m.formsTrack),
+  "form-states": () => import("./form-states.js").then((m) => m.formStatesTrack),
   transitions: () => import("./transitions.js").then((m) => m.transitionsTrack),
   "transforms-2d": () => import("./transforms-2d.js").then((m) => m.transforms2dTrack),
   "transforms-3d": () => import("./transforms-3d.js").then((m) => m.transforms3dTrack),

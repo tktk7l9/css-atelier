@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ElementSnapshot, ParsedRule, Rect, Snapshot } from "./snapshot.js";
-import { runSpec, type ValidatorSpec } from "./primitives.js";
+import type { ElementSnapshot, HitResult, ParsedRule, Rect, Snapshot } from "./snapshot.js";
+import { hitPointOf, runSpec, type ValidatorSpec } from "./primitives.js";
 
 function elem(
   id: string,
@@ -247,6 +247,43 @@ describe("offset", () => {
   it("fails when either element is missing", () => {
     expect(pass(gap({ min: 0 }, { a: "x" }), s)).toBe(false);
     expect(pass(gap({ min: 0 }, { b: "y" }), s)).toBe(false);
+  });
+});
+
+describe("hitTarget", () => {
+  // The menu's lower half overlaps the card that follows it.
+  const hits: HitResult[] = [
+    { at: "menu", fx: 0.5, fy: 0.5, top: "menu" },
+    { at: "menu", fx: 0.5, fy: 0.8, top: "card" },
+    { at: "card", fx: 0.9, fy: 0.9, top: null },
+  ];
+  const s: Snapshot = { ...snap([]), hits };
+  it("passes when the element on top at the point is the expected one", () => {
+    expect(pass({ kind: "hitTarget", at: "menu", top: "menu" }, s)).toBe(true);
+    expect(pass({ kind: "hitTarget", at: "menu", fx: 0.5, fy: 0.8, top: "card" }, s)).toBe(true);
+  });
+  it("fails and names what is on top instead", () => {
+    expect(runSpec({ kind: "hitTarget", at: "menu", fx: 0.5, fy: 0.8, top: "menu" }, s)).toEqual({
+      pass: false,
+      message: "menu の上の点で、いちばん手前が menu になっていません（現在 card）",
+    });
+  });
+  it("says so when nothing with a data-id is under the point", () => {
+    expect(runSpec({ kind: "hitTarget", at: "card", fx: 0.9, fy: 0.9, top: "card" }, s).message).toBe(
+      "card の上の点で、いちばん手前が card になっていません（現在 なし）",
+    );
+  });
+  it("fails when the point was not measured, rather than guessing", () => {
+    expect(runSpec({ kind: "hitTarget", at: "menu", fx: 0.25, fy: 0.5, top: "menu" }, s)).toEqual({
+      pass: false,
+      message: "menu の上の点（0.25, 0.5）の重なりが計測されていません",
+    });
+    expect(pass({ kind: "hitTarget", at: "menu", top: "menu" }, snap([]))).toBe(false);
+  });
+  it("defaults the point to the centre of the box", () => {
+    expect(hitPointOf({ at: "menu" })).toEqual({ at: "menu", fx: 0.5, fy: 0.5 });
+    expect(hitPointOf({ at: "menu", fx: 0.2 })).toEqual({ at: "menu", fx: 0.2, fy: 0.5 });
+    expect(hitPointOf({ at: "menu", fy: 0.9 })).toEqual({ at: "menu", fx: 0.5, fy: 0.9 });
   });
 });
 

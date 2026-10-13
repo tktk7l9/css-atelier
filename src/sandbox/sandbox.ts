@@ -8,7 +8,7 @@
 // build the pure Snapshot the validators consume.
 
 import { parseCss } from "../engine/validate/css-parse.js";
-import type { ElementSnapshot, Snapshot, SnapshotRequest } from "../engine/validate/snapshot.js";
+import type { ElementSnapshot, HitPoint, Snapshot, SnapshotRequest } from "../engine/validate/snapshot.js";
 
 // Trusted reset that makes geometry deterministic across machines. Applied as a
 // constructable sheet (an inline <style> in srcdoc would be CSP-blocked).
@@ -75,6 +75,21 @@ export interface Sandbox {
   /** Resize the iframe (responsive challenges). Pass null to reset to default. */
   setViewport(width: number | null): void;
   destroy(): void;
+}
+
+/**
+ * Hit-tests a point inside the box of the element with data-id `point.at` (see
+ * HitPoint) and names what the pointer reaches there: the topmost element, or
+ * its nearest ancestor carrying a data-id. Both the box and elementFromPoint
+ * use the frame's own viewport coordinates, and the frame runs no script, so
+ * the answer depends only on the markup, the CSS and the frame's size.
+ */
+function hitTest(doc: Document, nodes: readonly HTMLElement[], point: HitPoint): string | null {
+  const box = nodes.find((n) => n.dataset.id === point.at);
+  if (!box) return null;
+  const r = box.getBoundingClientRect();
+  const hit = doc.elementFromPoint(r.left + r.width * point.fx, r.top + r.height * point.fy);
+  return hit?.closest<HTMLElement>("[data-id]")?.dataset.id ?? null;
 }
 
 export function createSandbox(iframe: HTMLIFrameElement): Sandbox {
@@ -149,11 +164,13 @@ export function createSandbox(iframe: HTMLIFrameElement): Sandbox {
         order: index,
       };
     });
+    const hits = (req.hits ?? []).map((point) => ({ ...point, top: hitTest(doc, nodes, point) }));
     return {
       viewport: { w: win.innerWidth, h: win.innerHeight },
       elements,
       declarations: parseCss(lastCss),
       css: lastCss,
+      hits,
     };
   }
 

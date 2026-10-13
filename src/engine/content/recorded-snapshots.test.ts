@@ -3,7 +3,7 @@ import { TRACKS, loadTrack } from "./index.js";
 import type { Lesson } from "./types.js";
 import { evaluate } from "../validate/run.js";
 import { parseCss } from "../validate/css-parse.js";
-import type { Snapshot } from "../validate/snapshot.js";
+import type { HitResult, Snapshot } from "../validate/snapshot.js";
 
 // Lessons load with their track on demand; load them all once to replay them.
 const LOADED = new Map<string, Lesson>(
@@ -613,8 +613,9 @@ const NEW_GEOMETRY_LESSONS = [
   "table-caption",
 ];
 
-function geometrySnapshot(css: string, rec: Recorded): Snapshot {
+function geometrySnapshot(css: string, rec: Recorded, hits?: readonly HitResult[]): Snapshot {
   return {
+    ...(hits ? { hits } : {}),
     viewport: { w: 800, h: 600 },
     elements: Object.entries(rec).map(([id, { rect = [0, 0, 0, 0], computed = {} }], order) => ({
       id,
@@ -1855,6 +1856,10 @@ interface RecordedCase {
   readonly messages: readonly string[];
   readonly elements: Recorded;
   readonly states?: Readonly<Record<number, Recorded>>;
+  /** What the pointer reached at the challenge's hit points, at the lesson viewport. */
+  readonly hits?: readonly HitResult[];
+  /** The same at each extra state's viewport. */
+  readonly stateHits?: Readonly<Record<number, readonly HitResult[]>>;
 }
 
 const PATTERN_LESSONS = [
@@ -2535,11 +2540,11 @@ const PATTERN_CASES: readonly RecordedCase[] = [
 function messagesFor(c: RecordedCase): string[] {
   const { challenge } = lessonById(c.lesson)!;
   const css = c.css ?? (c.name === "starter" ? challenge.starterCSS : challenge.solution);
-  const messages = [...evaluate(challenge.validators, geometrySnapshot(css, c.elements)).failures];
+  const messages = [...evaluate(challenge.validators, geometrySnapshot(css, c.elements, c.hits)).failures];
   for (const state of challenge.states ?? []) {
     const recorded = c.states?.[state.viewport];
     if (!recorded) throw new Error(`${c.lesson} / ${c.name}: nothing recorded at ${state.viewport}px`);
-    messages.push(...evaluate(state.validators, geometrySnapshot(css, recorded)).failures);
+    messages.push(...evaluate(state.validators, geometrySnapshot(css, recorded, c.stateHits?.[state.viewport])).failures);
   }
   return messages;
 }
@@ -4847,5 +4852,439 @@ describe("backgrounds, specificity, typesetting and list markers: recorded answe
     expect(from("list-style-none", "solution", "nav", "i1")).toBe(12);
     // The notice text starts after the 12px offset, the 16px icon and a gap.
     expect(from("bg-icon", "solution", "notice", "text")).toBe(36);
+  });
+});
+
+const LAYER_LESSONS = [
+  "z-index-order",
+  "stacking-context",
+  "isolation-isolate",
+  "pointer-events-none",
+  "stretched-link",
+  "tap-target",
+  "disabled-fieldset",
+  "read-only-fields",
+  "default-option",
+];
+
+const LAYER_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "z-index-order",
+    name: "starter",
+    messages: ["メニューが、あとに続くカードの下に隠れています（どちらも position 付きで z-index がないので、HTML で後ろにあるカードが上に描かれます）"],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 39.67, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"card"},{"at":"menu","fx":0.02,"fy":0.4,"top":"card"}],
+  },
+  {
+    lesson: "z-index-order",
+    name: "solution",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 39.67, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "z-index-order",
+    name: "z-index on the header",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n.bar {\n  z-index: 1;\n}\n",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 39.67, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "z-index-order",
+    name: "card made static",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n.card {\n  position: static;\n}\n",
+    messages: ["カードの「NEW」の位置が変わっています（カードの position: relative は残して、メニューのほうを手前に出します）"],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, -8, 39.67, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "z-index-order",
+    name: "only the links raised",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n.menu a {\n  position: relative;\n  z-index: 1;\n}\n",
+    messages: ["メニューが、あとに続くカードの下に隠れています（どちらも position 付きで z-index がないので、HTML で後ろにあるカードが上に描かれます）"],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 39.67, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"card"}],
+  },
+  {
+    lesson: "z-index-order",
+    name: "z-index on a static menu wrapper",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n.menu {\n  position: static;\n  z-index: 10;\n}\n",
+    messages: ["メニューやカードの位置が変わっています（メニューは position: absolute のまま、ヘッダーのすぐ下に重ねて開きます）"],
+    elements: { bar: { rect: [0, 0, 596, 133.17] }, menu: { rect: [434, 10, 150, 113.17] }, card: { rect: [0, 145.17, 596, 58.39] }, badge: { rect: [12, 137.17, 39.67, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "stacking-context",
+    name: "starter",
+    messages: ["メニューが、あとに続く枠の下に隠れています（ヘッダーの z-index: 1 が重ね合わせコンテキストを作るので、中のメニューの 999 は外と比べられません。比べられるのは、ヘッダーの 1 と枠の 2 です）"],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 36, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"card"},{"at":"menu","fx":0.02,"fy":0.4,"top":"card"}],
+  },
+  {
+    lesson: "stacking-context",
+    name: "solution",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 36, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "stacking-context",
+    name: "card z-index removed",
+    css: ".bar {\n  position: relative;\n  z-index: 1;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  z-index: 999;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 36, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "stacking-context",
+    name: "header z-index removed",
+    css: ".bar {\n  position: relative;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  z-index: 999;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  /* 中の写真の矢印を前に出すため */\n  z-index: 2;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 36, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "stacking-context",
+    name: "menu z-index 9999",
+    css: ".bar {\n  position: relative;\n  z-index: 1;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  z-index: 9999;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  /* 中の写真の矢印を前に出すため */\n  z-index: 2;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n",
+    messages: ["メニューが、あとに続く枠の下に隠れています（ヘッダーの z-index: 1 が重ね合わせコンテキストを作るので、中のメニューの 999 は外と比べられません。比べられるのは、ヘッダーの 1 と枠の 2 です）"],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, 46.39, 36, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"card"},{"at":"menu","fx":0.02,"fy":0.4,"top":"card"}],
+  },
+  {
+    lesson: "stacking-context",
+    name: "card made static",
+    css: ".bar {\n  position: relative;\n  z-index: 1;\n  display: flex;\n  justify-content: space-between;\n  padding: 10px 12px;\n  border-radius: 8px;\n  background: #18203a;\n  color: #fff;\n}\n/* 開いたメニュー */\n.menu {\n  position: absolute;\n  z-index: 999;\n  top: 100%;\n  right: 12px;\n  display: grid;\n  width: 150px;\n  padding: 4px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  background: #fff;\n}\n.menu a {\n  padding: 6px 8px;\n  color: #18203a;\n  text-decoration: none;\n}\n.card {\n  position: relative;\n  /* 中の写真の矢印を前に出すため */\n  z-index: 2;\n  margin-top: 12px;\n  padding: 20px 16px 16px;\n  border-radius: 12px;\n  background: #dbe4fb;\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  left: 12px;\n  padding: 0 6px;\n  border-radius: 999px;\n  background: #c62828;\n  color: #fff;\n  font-size: 12px;\n}\n.card p {\n  margin: 0;\n}\n.card {\n  position: static;\n}\n",
+    messages: ["枠の「特集」の位置が変わっています（枠の position: relative は残して、z-index を見直します）"],
+    elements: { bar: { rect: [0, 0, 596, 42.39] }, menu: { rect: [434, 42.39, 150, 113.17] }, card: { rect: [0, 54.39, 596, 58.39] }, badge: { rect: [12, -8, 36, 16.8] } },
+    hits: [{"at":"menu","fx":0.5,"fy":0.4,"top":"menu"},{"at":"menu","fx":0.02,"fy":0.4,"top":"menu"}],
+  },
+  {
+    lesson: "isolation-isolate",
+    name: "starter",
+    messages: ["飾りの丸が、カードの背景の下に隠れています（カードが重ね合わせコンテキストを作っていないので、z-index: -1 の飾りはページ全体の下のほうまで沈みます）"],
+    elements: { card: { rect: [0, 0, 280, 118.78], computed: {"background-color":"rgb(255, 255, 255)"} }, blob: { rect: [179, -19, 120, 120], computed: {"background-color":"rgb(255, 215, 94)"} }, title: { rect: [21, 21, 238, 28], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+    hits: [{"at":"blob","fx":0.75,"fy":0.5,"top":"card"},{"at":"title","fx":0.9,"fy":0.5,"top":"title"}],
+  },
+  {
+    lesson: "isolation-isolate",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 118.78], computed: {"background-color":"rgb(255, 255, 255)"} }, blob: { rect: [179, -19, 120, 120], computed: {"background-color":"rgb(255, 215, 94)"} }, title: { rect: [21, 21, 238, 28], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+    hits: [{"at":"blob","fx":0.75,"fy":0.5,"top":"blob"},{"at":"title","fx":0.9,"fy":0.5,"top":"title"}],
+  },
+  {
+    lesson: "isolation-isolate",
+    name: "z-index: 0 on the card",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 20px;\n  overflow: hidden;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n/* 右上の飾りの丸（文字の下に置きたい） */\n.blob {\n  position: absolute;\n  z-index: -1;\n  top: -20px;\n  right: -20px;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #ffd75e;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 20px;\n}\n.card p {\n  margin: 0;\n}\n.card {\n  z-index: 0;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 118.78], computed: {"background-color":"rgb(255, 255, 255)"} }, blob: { rect: [179, -19, 120, 120], computed: {"background-color":"rgb(255, 215, 94)"} }, title: { rect: [21, 21, 238, 28], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+    hits: [{"at":"blob","fx":0.75,"fy":0.5,"top":"blob"},{"at":"title","fx":0.9,"fy":0.5,"top":"title"}],
+  },
+  {
+    lesson: "isolation-isolate",
+    name: "blob z-index removed",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 20px;\n  overflow: hidden;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n/* 右上の飾りの丸（文字の下に置きたい） */\n.blob {\n  position: absolute;\n  top: -20px;\n  right: -20px;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #ffd75e;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 20px;\n}\n.card p {\n  margin: 0;\n}\n",
+    messages: ["飾りの丸が、見出しの文字の上に重なっています（飾りの z-index: -1 は残して、文字の下に置きます）"],
+    elements: { card: { rect: [0, 0, 280, 118.78], computed: {"background-color":"rgb(255, 255, 255)"} }, blob: { rect: [179, -19, 120, 120], computed: {"background-color":"rgb(255, 215, 94)"} }, title: { rect: [21, 21, 238, 28], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+    hits: [{"at":"blob","fx":0.75,"fy":0.5,"top":"blob"},{"at":"title","fx":0.9,"fy":0.5,"top":"blob"}],
+  },
+  {
+    lesson: "isolation-isolate",
+    name: "card background removed",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 20px;\n  overflow: hidden;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n/* 右上の飾りの丸（文字の下に置きたい） */\n.blob {\n  position: absolute;\n  z-index: -1;\n  top: -20px;\n  right: -20px;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #ffd75e;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 20px;\n}\n.card p {\n  margin: 0;\n}\n.card {\n  background: none;\n}\n",
+    messages: ["カードの白い背景が変わっています（背景は白のまま、飾りをその上に出します）"],
+    elements: { card: { rect: [0, 0, 280, 118.78], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, blob: { rect: [179, -19, 120, 120], computed: {"background-color":"rgb(255, 215, 94)"} }, title: { rect: [21, 21, 238, 28], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+    hits: [{"at":"blob","fx":0.75,"fy":0.5,"top":"card"},{"at":"title","fx":0.9,"fy":0.5,"top":"title"}],
+  },
+  {
+    lesson: "pointer-events-none",
+    name: "starter",
+    messages: ["「特集を読む」ボタンを押しても、ボタンが反応しません（上に重なった光の飾りが受け止めています。飾りのほうに pointer-events: none）"],
+    elements: { card: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"auto"} }, more: { rect: [16, 102.98, 112, 38.39], computed: {"display":"inline-block","visibility":"visible","pointer-events":"auto"} }, shine: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"auto"} } },
+    hits: [{"at":"more","fx":0.5,"fy":0.5,"top":"shine"}],
+  },
+  {
+    lesson: "pointer-events-none",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"auto"} }, more: { rect: [16, 102.98, 112, 38.39], computed: {"display":"inline-block","visibility":"visible","pointer-events":"auto"} }, shine: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"none"} } },
+    hits: [{"at":"more","fx":0.5,"fy":0.5,"top":"more"}],
+  },
+  {
+    lesson: "pointer-events-none",
+    name: "button raised above the shine",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  overflow: hidden;\n  border-radius: 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0 0 12px;\n}\n.more {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n/* カード全体に重ねた光の飾り */\n.shine {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(120deg, transparent 30%, rgb(255 255 255 / 0.3) 45%, transparent 60%);\n}\n.more {\n  position: relative;\n  z-index: 1;\n}\n",
+    messages: ["ボタンを前に出すと、光がボタンにかからなくなります。飾りのほうに pointer-events: none を指定しましょう"],
+    elements: { card: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"auto"} }, more: { rect: [16, 102.98, 112, 38.39], computed: {"display":"inline-block","visibility":"visible","pointer-events":"auto"} }, shine: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"auto"} } },
+    hits: [{"at":"more","fx":0.5,"fy":0.5,"top":"more"}],
+  },
+  {
+    lesson: "pointer-events-none",
+    name: "shine hidden",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  overflow: hidden;\n  border-radius: 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0 0 12px;\n}\n.more {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n/* カード全体に重ねた光の飾り */\n.shine {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(120deg, transparent 30%, rgb(255 255 255 / 0.3) 45%, transparent 60%);\n}\n.shine {\n  visibility: hidden;\n}\n",
+    messages: ["光の飾りが見えなくなっています（見た目は残して、押した反応だけを下に通します）"],
+    elements: { card: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"auto"} }, more: { rect: [16, 102.98, 112, 38.39], computed: {"display":"inline-block","visibility":"visible","pointer-events":"auto"} }, shine: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"hidden","pointer-events":"auto"} } },
+    hits: [{"at":"more","fx":0.5,"fy":0.5,"top":"more"}],
+  },
+  {
+    lesson: "pointer-events-none",
+    name: "shine removed",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  overflow: hidden;\n  border-radius: 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0 0 12px;\n}\n.more {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n/* カード全体に重ねた光の飾り */\n.shine {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(120deg, transparent 30%, rgb(255 255 255 / 0.3) 45%, transparent 60%);\n}\n.shine {\n  display: none;\n}\n",
+    messages: ["光の飾りが見えなくなっています（見た目は残して、押した反応だけを下に通します）"],
+    elements: { card: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"auto"} }, more: { rect: [16, 102.98, 112, 38.39], computed: {"display":"inline-block","visibility":"visible","pointer-events":"auto"} }, shine: { rect: [0, 0, 0, 0], computed: {"display":"none","visibility":"visible","pointer-events":"auto"} } },
+    hits: [{"at":"more","fx":0.5,"fy":0.5,"top":"more"}],
+  },
+  {
+    lesson: "pointer-events-none",
+    name: "pointer-events: none on the card",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  overflow: hidden;\n  border-radius: 12px;\n  background: #2f5fd0;\n  color: #fff;\n}\n.card h3 {\n  margin: 0 0 4px;\n}\n.card p {\n  margin: 0 0 12px;\n}\n.more {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 999px;\n  background: #fff;\n  color: #2f5fd0;\n  font: inherit;\n}\n/* カード全体に重ねた光の飾り */\n.shine {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(120deg, transparent 30%, rgb(255 255 255 / 0.3) 45%, transparent 60%);\n}\n.card {\n  pointer-events: none;\n}\n",
+    messages: ["「特集を読む」ボタンを押しても、ボタンが反応しません（上に重なった光の飾りが受け止めています。飾りのほうに pointer-events: none）"],
+    elements: { card: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"none"} }, more: { rect: [16, 102.98, 112, 38.39], computed: {"display":"inline-block","visibility":"visible","pointer-events":"none"} }, shine: { rect: [0, 0, 280, 157.38], computed: {"display":"block","visibility":"visible","pointer-events":"none"} } },
+    hits: [{"at":"more","fx":0.5,"fy":0.5,"top":null}],
+  },
+  {
+    lesson: "stretched-link",
+    name: "starter",
+    messages: ["写真や説明文を押しても、リンクが反応しません（リンクの ::after を position: absolute と inset: 0 でカード全体に広げます）"],
+    elements: { card: { rect: [0, 0, 280, 197.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, desc: { rect: [17, 136.19, 246, 44.78] }, note: { rect: [0, 209.97, 596, 22.39] } },
+    hits: [{"at":"photo","fx":0.5,"fy":0.5,"top":"photo"},{"at":"desc","fx":0.5,"fy":0.5,"top":"desc"},{"at":"note","fx":0.5,"fy":0.5,"top":"note"}],
+  },
+  {
+    lesson: "stretched-link",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 197.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, desc: { rect: [17, 136.19, 246, 44.78] }, note: { rect: [0, 209.97, 596, 22.39] } },
+    hits: [{"at":"photo","fx":0.5,"fy":0.5,"top":"link"},{"at":"desc","fx":0.5,"fy":0.5,"top":"link"},{"at":"note","fx":0.5,"fy":0.5,"top":"note"}],
+  },
+  {
+    lesson: "stretched-link",
+    name: "::before instead",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n.note {\n  margin: 12px 0 0;\n}\n/* リンクの ::after をカード全体に広げる */\n.card a::before {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 280, 197.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, desc: { rect: [17, 136.19, 246, 44.78] }, note: { rect: [0, 209.97, 596, 22.39] } },
+    hits: [{"at":"photo","fx":0.5,"fy":0.5,"top":"link"},{"at":"desc","fx":0.5,"fy":0.5,"top":"link"},{"at":"note","fx":0.5,"fy":0.5,"top":"note"}],
+  },
+  {
+    lesson: "stretched-link",
+    name: "card not positioned",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n.note {\n  margin: 12px 0 0;\n}\n.card a::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n}\n",
+    messages: ["カードの外の文章まで、リンクになっています（.card に position: relative を付けて、::after の基準をカードにします）"],
+    elements: { card: { rect: [0, 0, 280, 197.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, desc: { rect: [17, 136.19, 246, 44.78] }, note: { rect: [0, 209.97, 596, 22.39] } },
+    hits: [{"at":"photo","fx":0.5,"fy":0.5,"top":"link"},{"at":"desc","fx":0.5,"fy":0.5,"top":"link"},{"at":"note","fx":0.5,"fy":0.5,"top":"link"}],
+  },
+  {
+    lesson: "stretched-link",
+    name: "the link itself stretched",
+    css: ".card {\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n.note {\n  margin: 12px 0 0;\n}\n.card {\n  position: relative;\n}\n.card a {\n  position: absolute;\n  inset: 0;\n}\n",
+    messages: ["見出しのリンクの位置が変わっています（リンクそのものではなく、::after をカード全体に広げます）"],
+    elements: { card: { rect: [0, 0, 280, 168.78] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [1, 1, 278, 166.78] }, desc: { rect: [17, 107, 246, 44.78] }, note: { rect: [0, 180.78, 596, 22.39] } },
+    hits: [{"at":"photo","fx":0.5,"fy":0.5,"top":"link"},{"at":"desc","fx":0.5,"fy":0.5,"top":"link"},{"at":"note","fx":0.5,"fy":0.5,"top":"note"}],
+  },
+  {
+    lesson: "stretched-link",
+    name: "::after without content",
+    css: ".card {\n  position: relative;\n  width: 280px;\n  padding: 16px;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n}\n.photo {\n  height: 80px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.title {\n  margin: 10px 0 4px;\n  font-size: 18px;\n}\n.card p {\n  margin: 0;\n}\n.note {\n  margin: 12px 0 0;\n}\n/* リンクの ::after をカード全体に広げる */\n.card a::after {\n  position: absolute;\n  inset: 0;\n}\n",
+    messages: ["写真や説明文を押しても、リンクが反応しません（リンクの ::after を position: absolute と inset: 0 でカード全体に広げます）"],
+    elements: { card: { rect: [0, 0, 280, 197.97] }, photo: { rect: [17, 17, 246, 80] }, link: { rect: [17, 109, 156.92, 21] }, desc: { rect: [17, 136.19, 246, 44.78] }, note: { rect: [0, 209.97, 596, 22.39] } },
+    hits: [{"at":"photo","fx":0.5,"fy":0.5,"top":"photo"},{"at":"desc","fx":0.5,"fy":0.5,"top":"desc"},{"at":"note","fx":0.5,"fy":0.5,"top":"note"}],
+  },
+  {
+    lesson: "tap-target",
+    name: "starter",
+    messages: ["アイコンのすぐ外を押しても、ボタンが反応しません（ボタンに padding: 14px を付けて、押せる範囲を広げます）"],
+    elements: { bar: { rect: [0, 0, 596, 40] }, b1: { rect: [12, 12, 16, 16] }, i1: { rect: [12, 12, 16, 16] }, b2: { rect: [36, 12, 16, 16] }, i2: { rect: [36, 12, 16, 16] }, b3: { rect: [60, 12, 16, 16] }, i3: { rect: [60, 12, 16, 16] } },
+    hits: [{"at":"i1","fx":-0.5,"fy":0.5,"top":"bar"},{"at":"i1","fx":0.5,"fy":-0.5,"top":"bar"}],
+  },
+  {
+    lesson: "tap-target",
+    name: "solution",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 68] }, b1: { rect: [12, 12, 44, 44] }, i1: { rect: [26, 26, 16, 16] }, b2: { rect: [64, 12, 44, 44] }, i2: { rect: [78, 26, 16, 16] }, b3: { rect: [116, 12, 44, 44] }, i3: { rect: [130, 26, 16, 16] } },
+    hits: [{"at":"i1","fx":-0.5,"fy":0.5,"top":"b1"},{"at":"i1","fx":0.5,"fy":-0.5,"top":"b1"}],
+  },
+  {
+    lesson: "tap-target",
+    name: "min-width and min-height",
+    css: ".tools {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n/* アイコンだけのボタン */\n.icon {\n  display: grid;\n  place-items: center;\n  padding: 0;\n  min-width: 44px;\n  min-height: 44px;\n  border: 0;\n  border-radius: 8px;\n  background: transparent;\n  color: #2f5fd0;\n}\n.icon svg {\n  display: block;\n}\n",
+    messages: [],
+    elements: { bar: { rect: [0, 0, 596, 68] }, b1: { rect: [12, 12, 44, 44] }, i1: { rect: [26, 26, 16, 16] }, b2: { rect: [64, 12, 44, 44] }, i2: { rect: [78, 26, 16, 16] }, b3: { rect: [116, 12, 44, 44] }, i3: { rect: [130, 26, 16, 16] } },
+    hits: [{"at":"i1","fx":-0.5,"fy":0.5,"top":"b1"},{"at":"i1","fx":0.5,"fy":-0.5,"top":"b1"}],
+  },
+  {
+    lesson: "tap-target",
+    name: "padding 8px",
+    css: ".tools {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n/* アイコンだけのボタン */\n.icon {\n  display: grid;\n  place-items: center;\n  padding: 8px;\n  border: 0;\n  border-radius: 8px;\n  background: transparent;\n  color: #2f5fd0;\n}\n.icon svg {\n  display: block;\n}\n",
+    messages: ["ボタンが 44px 四方になっていません（16px のアイコンに、上下左右 14px の padding）"],
+    elements: { bar: { rect: [0, 0, 596, 56] }, b1: { rect: [12, 12, 32, 32] }, i1: { rect: [20, 20, 16, 16] }, b2: { rect: [52, 12, 32, 32] }, i2: { rect: [60, 20, 16, 16] }, b3: { rect: [92, 12, 32, 32] }, i3: { rect: [100, 20, 16, 16] } },
+    hits: [{"at":"i1","fx":-0.5,"fy":0.5,"top":"b1"},{"at":"i1","fx":0.5,"fy":-0.5,"top":"b1"}],
+  },
+  {
+    lesson: "tap-target",
+    name: "icons enlarged",
+    css: ".tools {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n/* アイコンだけのボタン */\n.icon {\n  display: grid;\n  place-items: center;\n  padding: 0;\n  border: 0;\n  border-radius: 8px;\n  background: transparent;\n  color: #2f5fd0;\n}\n.icon svg {\n  display: block;\n}\n.icon svg {\n  width: 44px;\n  height: 44px;\n}\n",
+    messages: ["アイコンのすぐ外を押しても、ボタンが反応しません（ボタンに padding: 14px を付けて、押せる範囲を広げます）"],
+    elements: { bar: { rect: [0, 0, 596, 68] }, b1: { rect: [12, 12, 44, 44] }, i1: { rect: [12, 12, 44, 44] }, b2: { rect: [64, 12, 44, 44] }, i2: { rect: [64, 12, 44, 44] }, b3: { rect: [116, 12, 44, 44] }, i3: { rect: [116, 12, 44, 44] } },
+    hits: [{"at":"i1","fx":-0.5,"fy":0.5,"top":null},{"at":"i1","fx":0.5,"fy":-0.5,"top":null}],
+  },
+  {
+    lesson: "disabled-fieldset",
+    name: "starter",
+    messages: ["fieldset ごと無効になった欄が、灰色になっていません（disabled 属性は fieldset に付いているので、[disabled] では中の欄を選べません。:disabled なら選べます）"],
+    elements: { ship: { rect: [0, 0, 280, 122.17], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, zip: { rect: [13, 30.39, 254, 36.39], computed: {"background-color":"rgb(255, 255, 255)"} }, addr: { rect: [13, 72.78, 254, 36.39], computed: {"background-color":"rgb(255, 255, 255)"} }, code: { rect: [0, 156.56, 280, 36.39], computed: {"background-color":"rgb(255, 255, 255)"} }, send: { rect: [0, 200.95, 280, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "disabled-fieldset",
+    name: "solution",
+    messages: [],
+    elements: { ship: { rect: [0, 0, 280, 122.17], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, zip: { rect: [13, 30.39, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, addr: { rect: [13, 72.78, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, code: { rect: [0, 156.56, 280, 36.39], computed: {"background-color":"rgb(255, 255, 255)"} }, send: { rect: [0, 200.95, 280, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "disabled-fieldset",
+    name: "fieldset[disabled] descendants",
+    css: ".order {\n  display: grid;\n  gap: 8px;\n  width: 280px;\n}\n.ship {\n  display: grid;\n  gap: 6px;\n  margin: 0;\n  padding: 8px 12px 12px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.coupon {\n  display: grid;\n  gap: 4px;\n}\ninput,\nbutton {\n  padding: 6px 10px;\n  border: 1px solid #9fb2e6;\n  border-radius: 6px;\n  background: #fff;\n  color: #18203a;\n  font: inherit;\n}\n/* 押せない・入力できない部品は灰色に */\ninput[disabled],\nbutton[disabled] {\n  background: #eef1f8;\n  color: #8a94b3;\n}\nfieldset[disabled] input {\n  background: #eef1f8;\n  color: #8a94b3;\n}\n",
+    messages: [],
+    elements: { ship: { rect: [0, 0, 280, 122.17], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, zip: { rect: [13, 30.39, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, addr: { rect: [13, 72.78, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, code: { rect: [0, 156.56, 280, 36.39], computed: {"background-color":"rgb(255, 255, 255)"} }, send: { rect: [0, 200.95, 280, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "disabled-fieldset",
+    name: "every input grey",
+    css: ".order {\n  display: grid;\n  gap: 8px;\n  width: 280px;\n}\n.ship {\n  display: grid;\n  gap: 6px;\n  margin: 0;\n  padding: 8px 12px 12px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.coupon {\n  display: grid;\n  gap: 4px;\n}\ninput,\nbutton {\n  padding: 6px 10px;\n  border: 1px solid #9fb2e6;\n  border-radius: 6px;\n  background: #fff;\n  color: #18203a;\n  font: inherit;\n}\n/* 押せない・入力できない部品は灰色に */\ninput[disabled],\nbutton[disabled] {\n  background: #eef1f8;\n  color: #8a94b3;\n}\ninput {\n  background: #eef1f8;\n}\n",
+    messages: ["入力できるクーポンの欄まで灰色になっています（無効な部品だけを選びます）"],
+    elements: { ship: { rect: [0, 0, 280, 122.17], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, zip: { rect: [13, 30.39, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, addr: { rect: [13, 72.78, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, code: { rect: [0, 156.56, 280, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, send: { rect: [0, 200.95, 280, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "disabled-fieldset",
+    name: ":disabled on inputs only",
+    css: ".order {\n  display: grid;\n  gap: 8px;\n  width: 280px;\n}\n.ship {\n  display: grid;\n  gap: 6px;\n  margin: 0;\n  padding: 8px 12px 12px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\n.coupon {\n  display: grid;\n  gap: 4px;\n}\ninput,\nbutton {\n  padding: 6px 10px;\n  border: 1px solid #9fb2e6;\n  border-radius: 6px;\n  background: #fff;\n  color: #18203a;\n  font: inherit;\n}\n/* 押せない・入力できない部品は灰色に */\ninput:disabled {\n  background: #eef1f8;\n  color: #8a94b3;\n}\n",
+    messages: ["無効な「注文する」ボタンが、灰色になっていません"],
+    elements: { ship: { rect: [0, 0, 280, 122.17], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, zip: { rect: [13, 30.39, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, addr: { rect: [13, 72.78, 254, 36.39], computed: {"background-color":"rgb(238, 241, 248)"} }, code: { rect: [0, 156.56, 280, 36.39], computed: {"background-color":"rgb(255, 255, 255)"} }, send: { rect: [0, 200.95, 280, 36.39], computed: {"background-color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "read-only-fields",
+    name: "starter",
+    messages: ["読み取り専用の欄に、まだ枠か背景が残っています（input:read-only で選び、border-color と background を transparent に）"],
+    elements: { name: { rect: [0, 26.39, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgb(255, 255, 255)"} }, mail: { rect: [0, 97.17, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgb(255, 255, 255)"} }, note: { rect: [0, 167.95, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "read-only-fields",
+    name: "solution",
+    messages: [],
+    elements: { name: { rect: [0, 26.39, 280, 36.39], computed: {"border-top-color":"rgba(0, 0, 0, 0)","border-top-style":"solid","background-color":"rgba(0, 0, 0, 0)"} }, mail: { rect: [0, 97.17, 280, 36.39], computed: {"border-top-color":"rgba(0, 0, 0, 0)","border-top-style":"solid","background-color":"rgba(0, 0, 0, 0)"} }, note: { rect: [0, 167.95, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "read-only-fields",
+    name: "[readonly] with border: 0",
+    css: ".confirm {\n  width: 280px;\n}\n.row {\n  display: grid;\n  gap: 4px;\n  margin-bottom: 8px;\n}\ninput {\n  padding: 6px 10px;\n  border: 1px solid #9fb2e6;\n  border-radius: 6px;\n  background: #fff;\n  color: #18203a;\n  font: inherit;\n}\ninput[readonly] {\n  border: 0;\n  background: none;\n}\n",
+    messages: [],
+    elements: { name: { rect: [0, 26.39, 280, 34.39], computed: {"border-top-color":"rgb(24, 32, 58)","border-top-style":"none","background-color":"rgba(0, 0, 0, 0)"} }, mail: { rect: [0, 95.17, 280, 34.39], computed: {"border-top-color":"rgb(24, 32, 58)","border-top-style":"none","background-color":"rgba(0, 0, 0, 0)"} }, note: { rect: [0, 163.95, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "read-only-fields",
+    name: "every input",
+    css: ".confirm {\n  width: 280px;\n}\n.row {\n  display: grid;\n  gap: 4px;\n  margin-bottom: 8px;\n}\ninput {\n  padding: 6px 10px;\n  border: 1px solid #9fb2e6;\n  border-radius: 6px;\n  background: #fff;\n  color: #18203a;\n  font: inherit;\n}\ninput {\n  border-color: transparent;\n  background: transparent;\n}\n",
+    messages: ["入力できる「ご要望」の欄の枠や背景まで消えています（書き換えられない欄だけを選びます）"],
+    elements: { name: { rect: [0, 26.39, 280, 36.39], computed: {"border-top-color":"rgba(0, 0, 0, 0)","border-top-style":"solid","background-color":"rgba(0, 0, 0, 0)"} }, mail: { rect: [0, 97.17, 280, 36.39], computed: {"border-top-color":"rgba(0, 0, 0, 0)","border-top-style":"solid","background-color":"rgba(0, 0, 0, 0)"} }, note: { rect: [0, 167.95, 280, 36.39], computed: {"border-top-color":"rgba(0, 0, 0, 0)","border-top-style":"solid","background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "read-only-fields",
+    name: "background only",
+    css: ".confirm {\n  width: 280px;\n}\n.row {\n  display: grid;\n  gap: 4px;\n  margin-bottom: 8px;\n}\ninput {\n  padding: 6px 10px;\n  border: 1px solid #9fb2e6;\n  border-radius: 6px;\n  background: #fff;\n  color: #18203a;\n  font: inherit;\n}\ninput:read-only {\n  background: transparent;\n}\n",
+    messages: ["読み取り専用の欄に、まだ枠か背景が残っています（input:read-only で選び、border-color と background を transparent に）"],
+    elements: { name: { rect: [0, 26.39, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgba(0, 0, 0, 0)"} }, mail: { rect: [0, 97.17, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgba(0, 0, 0, 0)"} }, note: { rect: [0, 167.95, 280, 36.39], computed: {"border-top-color":"rgb(159, 178, 230)","border-top-style":"solid","background-color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "default-option",
+    name: "starter",
+    messages: ["おすすめの「スタンダード」の枠が、黄色になっていません（最初から選ばれていたラジオボタンは :default で選べます）"],
+    elements: { p1: { rect: [25, 0, 76, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} }, p2: { rect: [134, 0, 122.56, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} }, p3: { rect: [289.56, 0, 60, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "default-option",
+    name: "solution",
+    messages: [],
+    elements: { p1: { rect: [25, 0, 76, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} }, p2: { rect: [134, 0, 122.56, 38.39], computed: {"border-top-color":"rgb(245, 196, 0)"} }, p3: { rect: [289.56, 0, 60, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "default-option",
+    name: "[checked] attribute",
+    css: ".plans {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.opt {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n.opt label {\n  padding: 6px 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n/* いま選んでいるプラン */\n.opt input:checked + label {\n  background: #eef1f8;\n}\n.opt input[checked] + label {\n  border-color: #f5c400;\n}\n",
+    messages: [],
+    elements: { p1: { rect: [25, 0, 76, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} }, p2: { rect: [134, 0, 122.56, 38.39], computed: {"border-top-color":"rgb(245, 196, 0)"} }, p3: { rect: [289.56, 0, 60, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "default-option",
+    name: ":has(:default)",
+    css: ".plans {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.opt {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n.opt label {\n  padding: 6px 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n/* いま選んでいるプラン */\n.opt input:checked + label {\n  background: #eef1f8;\n}\n.opt:has(:default) label {\n  border-color: #f5c400;\n}\n",
+    messages: [],
+    elements: { p1: { rect: [25, 0, 76, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} }, p2: { rect: [134, 0, 122.56, 38.39], computed: {"border-top-color":"rgb(245, 196, 0)"} }, p3: { rect: [289.56, 0, 60, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "default-option",
+    name: ":checked instead",
+    css: ".plans {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.opt {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n.opt label {\n  padding: 6px 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n/* いま選んでいるプラン */\n.opt input:checked + label {\n  background: #eef1f8;\n}\n.opt input:checked + label {\n  border-color: #f5c400;\n}\n",
+    messages: [":checked だと、ほかのプランを選び直したときに印が移ってしまいます。最初から選ばれていたものを選ぶ :default を使いましょう"],
+    elements: { p1: { rect: [25, 0, 76, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} }, p2: { rect: [134, 0, 122.56, 38.39], computed: {"border-top-color":"rgb(245, 196, 0)"} }, p3: { rect: [289.56, 0, 60, 38.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "default-option",
+    name: "every label yellow",
+    css: ".plans {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.opt {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n.opt label {\n  padding: 6px 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n/* いま選んでいるプラン */\n.opt input:checked + label {\n  background: #eef1f8;\n}\n.opt label {\n  border-color: #f5c400;\n}\n/* :default */\n",
+    messages: ["ほかのプランの枠まで黄色になっています（おすすめのプランだけに印を付けます）"],
+    elements: { p1: { rect: [25, 0, 76, 38.39], computed: {"border-top-color":"rgb(245, 196, 0)"} }, p2: { rect: [134, 0, 122.56, 38.39], computed: {"border-top-color":"rgb(245, 196, 0)"} }, p3: { rect: [289.56, 0, 60, 38.39], computed: {"border-top-color":"rgb(245, 196, 0)"} } },
+  },
+];
+
+describe("stacking, click areas and form states: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 9 lessons", () => {
+    expect([...new Set(LAYER_CASES.map((c) => c.lesson))].sort()).toEqual([...LAYER_LESSONS].sort());
+    for (const id of LAYER_LESSONS) {
+      const names = LAYER_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of LAYER_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of LAYER_LESSONS) {
+      const starter = LAYER_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = LAYER_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps what the pointer reached, which the lessons are about", () => {
+    const top = (id: string, name: string, at: string, fx = 0.5, fy = 0.5): string | null | undefined =>
+      LAYER_CASES.find((c) => c.lesson === id && c.name === name)!.hits?.find((h) => h.at === at && h.fx === fx && h.fy === fy)?.top;
+    // The card that comes later covers the menu until the menu gets a z-index.
+    expect(top("z-index-order", "starter", "menu", 0.5, 0.4)).toBe("card");
+    expect(top("z-index-order", "solution", "menu", 0.5, 0.4)).toBe("menu");
+    // Links raised on their own still leave the menu's edge under the card.
+    expect(top("z-index-order", "only the links raised", "menu", 0.5, 0.4)).toBe("menu");
+    expect(top("z-index-order", "only the links raised", "menu", 0.02, 0.4)).toBe("card");
+    // 9999 inside the header's stacking context still loses to the card's 2.
+    expect(top("stacking-context", "menu z-index 9999", "menu", 0.5, 0.4)).toBe("card");
+    // Without a stacking context on the card, z-index: -1 sinks under its background.
+    expect(top("isolation-isolate", "starter", "blob", 0.75)).toBe("card");
+    expect(top("isolation-isolate", "solution", "blob", 0.75)).toBe("blob");
+    expect(top("isolation-isolate", "blob z-index removed", "title", 0.9)).toBe("blob");
+    // The overlay takes the click until pointer-events: none lets it through.
+    expect(top("pointer-events-none", "starter", "more")).toBe("shine");
+    expect(top("pointer-events-none", "solution", "more")).toBe("more");
+    // The stretched ::after makes the photo a link, and only inside the positioned card.
+    expect(top("stretched-link", "starter", "photo")).toBe("photo");
+    expect(top("stretched-link", "solution", "photo")).toBe("link");
+    expect(top("stretched-link", "card not positioned", "note")).toBe("link");
+    // 14px of padding catches a press half an icon away; without it nothing does.
+    expect(top("tap-target", "starter", "i1", -0.5)).toBe("bar");
+    expect(top("tap-target", "solution", "i1", -0.5)).toBe("b1");
   });
 });
