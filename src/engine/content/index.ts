@@ -36,6 +36,11 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * the box model; outlines, shadows and radii follow the colour and gradient
  * tracks; the flex sizing and grid placement tracks follow the pattern tracks
  * of their layout modes.
+ * Background images (size, position, layers) follow the gradients they
+ * stack with; the typesetting track (indents, underlines) follows the other
+ * text tracks; specificity follows :is() and the :has() patterns, whose
+ * selectors it weighs; and list markers follow generated content and its
+ * counters.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -185,6 +190,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "backgrounds",
+    title: "背景画像の置き方（background-size・background-position・重ね方）",
+    summary: "background-size: cover で写真を枠いっぱいに広げ、no-repeat と位置・大きさでアイコンを 1 つだけ置き、背景を重ねて写真の上に色をかぶせる。",
+    emoji: "🌄",
+    lessons: [
+      { id: "bg-cover", title: "写真で埋める: background-size: cover" },
+      { id: "bg-icon", title: "アイコンを 1 つだけ置く: no-repeat と位置・大きさ" },
+      { id: "bg-layers", title: "写真の上に色を重ねる: 背景を複数指定する" },
+    ],
+  },
+  {
     id: "outline-shadow",
     title: "枠線と影（outline・box-shadow・border-radius）",
     summary: "outline で大きさを変えずに選択を示し、box-shadow を重ねて自然に浮かせ、border-radius で丸い写真とピル形のボタンを作る。",
@@ -217,6 +233,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "typesetting",
+    title: "文字の組み方（字下げ・ぶら下げ・下線の位置）",
+    summary: "text-indent で段落の頭を 1 字下げ、負の text-indent で ※ の注記をぶら下げ、text-underline-offset でリンクの下線を文字から離す。",
+    emoji: "✒️",
+    lessons: [
+      { id: "text-indent", title: "段落の頭を 1 字下げる: text-indent: 1em" },
+      { id: "hanging-indent", title: "※ の注記をぶら下げる: 負の text-indent" },
+      { id: "underline-offset", title: "下線を文字から離す: text-underline-offset" },
+    ],
+  },
+  {
     id: "modern-selectors",
     title: "モダンセレクタ",
     summary: ":has() と :is() — 親を狙う / まとめて狙う新しい武器。",
@@ -238,6 +265,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "specificity",
+    title: "詳細度（ID・クラス・:where()・:is()）",
+    summary: "ID・クラス・要素の 3 つの数で詳細度を比べ、:where() で土台の詳細度を 0 にし、:is() がいちばん強い引数の詳細度になることを知って、!important なしで上書きする。",
+    emoji: "🥇",
+    lessons: [
+      { id: "specificity-columns", title: "どちらが勝つか: 詳細度の比べ方" },
+      { id: "where-zero", title: "上書きしやすい土台: :where() で詳細度を 0 に" },
+      { id: "is-specificity", title: ":is() の詳細度は、中でいちばん強いもの" },
+    ],
+  },
+  {
     id: "generated-content",
     title: "生成コンテンツ（::before・::after）",
     summary: "::before と ::after で HTML にない飾りや印を足し、属性セレクタで付ける相手を選び、CSS カウンターで番号を振る。",
@@ -246,6 +284,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "before-content", title: "飾りを足す: ::before と content" },
       { id: "after-attribute", title: "外部リンクに印を付ける: [href^=…]::after" },
       { id: "counter-chapters", title: "番号を自動で振る: counter-reset と counter()" },
+    ],
+  },
+  {
+    id: "list-markers",
+    title: "リストの印（消す・変える・中に入れる）",
+    summary: "list-style: none と余白のリセットでメニューの点を消し、list-style-type に文字列を指定して印を変え、list-style-position: inside で印を文字といっしょに並べる。",
+    emoji: "📋",
+    lessons: [
+      { id: "list-style-none", title: "メニューの点と字下げを消す: list-style: none" },
+      { id: "list-style-string", title: "印を文字に変える: list-style-type: \"✓ \"" },
+      { id: "list-style-inside", title: "印を文字といっしょに並べる: list-style-position: inside" },
     ],
   },
   {
@@ -706,12 +755,16 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   color: () => import("./color.js").then((m) => m.colorTrack),
   "color-functions": () => import("./color-functions.js").then((m) => m.colorFunctionsTrack),
   gradients: () => import("./gradients.js").then((m) => m.gradientsTrack),
+  backgrounds: () => import("./backgrounds.js").then((m) => m.backgroundsTrack),
   "outline-shadow": () => import("./outline-shadow.js").then((m) => m.outlineShadowTrack),
   "text-wrap": () => import("./text-wrap.js").then((m) => m.textWrapTrack),
   "text-overflow": () => import("./text-overflow.js").then((m) => m.textOverflowTrack),
+  typesetting: () => import("./typesetting.js").then((m) => m.typesettingTrack),
   "modern-selectors": () => import("./modern-selectors.js").then((m) => m.modernSelectorsTrack),
   "has-patterns": () => import("./has-patterns.js").then((m) => m.hasPatternsTrack),
+  specificity: () => import("./specificity.js").then((m) => m.specificityTrack),
   "generated-content": () => import("./generated-content.js").then((m) => m.generatedContentTrack),
+  "list-markers": () => import("./list-markers.js").then((m) => m.listMarkersTrack),
   nesting: () => import("./nesting.js").then((m) => m.nestingTrack),
   scope: () => import("./scope.js").then((m) => m.scopeTrack),
   flexbox: () => import("./flexbox.js").then((m) => m.flexboxTrack),
