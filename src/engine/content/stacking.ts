@@ -6,7 +6,9 @@ import type { Track } from "./types.js";
 // Rects and computed values cannot show it: a menu hidden under a card has the
 // same box either way. The points sit inside the overlapping boxes (as
 // fractions of their size), so they stay on the overlap at any preview width.
-// The badge check keeps the card's position: relative, which the badge needs.
+// The layout checks keep the menu a dropdown over the card (a menu put back
+// into the header's flow no longer overlaps anything), and the badge check
+// keeps the card's position: relative, which the badge needs.
 
 const NAV_HTML = (label: string, text: string): string =>
   '<header data-id="bar" class="bar"><span>Atelier</span><nav data-id="menu" class="menu"><a href="#">ホーム</a><a href="#">講座の一覧</a><a href="#">お問い合わせ</a></nav></header>' +
@@ -21,8 +23,28 @@ const BLOB_HTML =
 const BLOB_CSS = (extra: string): string =>
   `.card {\n  position: relative;\n  width: 280px;\n  padding: 20px;\n  overflow: hidden;\n  border: 1px solid #c5cde0;\n  border-radius: 12px;\n  background: #fff;\n${extra}}\n/* 右上の飾りの丸（文字の下に置きたい） */\n.blob {\n  position: absolute;\n  z-index: -1;\n  top: -20px;\n  right: -20px;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #ffd75e;\n}\n.card h3 {\n  margin: 0 0 4px;\n  font-size: 20px;\n}\n.card p {\n  margin: 0;\n}\n`;
 
-/** Where the open menu overlaps the card below it. */
-const MENU_OVER_CARD = { at: "menu", fx: 0.5, fy: 0.4 } as const;
+/** Where the open menu overlaps the card below it: in the middle, and on the
+ *  menu's own 5px edge (border and padding), which only the menu's box covers. */
+const MENU_POINTS = [
+  { at: "menu", fx: 0.5, fy: 0.4 },
+  { at: "menu", fx: 0.02, fy: 0.4 },
+] as const;
+
+const menuOnTop = (message: string): ValidatorSpec => ({
+  kind: "allOf",
+  of: MENU_POINTS.map((p): ValidatorSpec => ({ kind: "hitTarget", ...p, top: "menu" })),
+  message,
+});
+
+/** The menu still opens right under the header, over the card, which keeps its place. */
+const layoutKept: ValidatorSpec = {
+  kind: "allOf",
+  of: [
+    { kind: "offset", a: "bar", b: "menu", edgeA: "bottom", edgeB: "top", min: -0.5, max: 0.5 },
+    { kind: "offset", a: "bar", b: "card", edgeA: "bottom", edgeB: "top", min: 11.5, max: 12.5 },
+  ],
+  message: "メニューやカードの位置が変わっています（メニューは position: absolute のまま、ヘッダーのすぐ下に重ねて開きます）",
+};
 
 /** The badge still sits on the card's top-left corner, so the card keeps its position. */
 const badgeOnCard: ValidatorSpec = {
@@ -50,17 +72,13 @@ export const stackingTrack: Track = {
         starterHTML: NAV_HTML("NEW", "春の講座の受付を始めました。定員になりしだい締め切ります。"),
         starterCSS: NAV_CSS("", "", ""),
         task: "開いたメニューの一部が、あとに続くカードの下に隠れています。メニューをカードより手前に出そう（カードの position: relative は「NEW」の位置に使っているので残す）。",
-        snapshot: { props: [], hits: [MENU_OVER_CARD] },
+        snapshot: { props: [], hits: [...MENU_POINTS] },
         validators: [
           {
             kind: "allOf",
             of: [
-              {
-                kind: "hitTarget",
-                ...MENU_OVER_CARD,
-                top: "menu",
-                message: "メニューが、あとに続くカードの下に隠れています（どちらも position 付きで z-index がないので、HTML で後ろにあるカードが上に描かれます）",
-              },
+              menuOnTop("メニューが、あとに続くカードの下に隠れています（どちらも position 付きで z-index がないので、HTML で後ろにあるカードが上に描かれます）"),
+              layoutKept,
               { ...badgeOnCard, message: "カードの「NEW」の位置が変わっています（カードの position: relative は残して、メニューのほうを手前に出します）" },
             ],
           },
@@ -80,17 +98,13 @@ export const stackingTrack: Track = {
         starterHTML: NAV_HTML("特集", "夏の旅特集を公開しました。写真をめくって、行き先を選べます。"),
         starterCSS: NAV_CSS("  z-index: 1;\n", "  z-index: 999;\n", "  /* 中の写真の矢印を前に出すため */\n  z-index: 2;\n"),
         task: "メニューに z-index: 999 を付けているのに、あとに続く枠の下に隠れています。メニューの数をさらに大きくしても出ない理由を考えて、メニューを手前に出そう（枠の position: relative は残す）。",
-        snapshot: { props: [], hits: [MENU_OVER_CARD] },
+        snapshot: { props: [], hits: [...MENU_POINTS] },
         validators: [
           {
             kind: "allOf",
             of: [
-              {
-                kind: "hitTarget",
-                ...MENU_OVER_CARD,
-                top: "menu",
-                message: "メニューが、あとに続く枠の下に隠れています（ヘッダーの z-index: 1 が重ね合わせコンテキストを作るので、中のメニューの 999 は外と比べられません。比べられるのは、ヘッダーの 1 と枠の 2 です）",
-              },
+              menuOnTop("メニューが、あとに続く枠の下に隠れています（ヘッダーの z-index: 1 が重ね合わせコンテキストを作るので、中のメニューの 999 は外と比べられません。比べられるのは、ヘッダーの 1 と枠の 2 です）"),
+              layoutKept,
               { ...badgeOnCard, message: "枠の「特集」の位置が変わっています（枠の position: relative は残して、z-index を見直します）" },
             ],
           },
@@ -111,7 +125,7 @@ export const stackingTrack: Track = {
         starterCSS: BLOB_CSS(""),
         task: "カードの右上に置いた黄色い丸の飾り（z-index: -1）が見えません。飾りを、カードの白い背景の上・見出しの文字の下に表示しよう。",
         snapshot: {
-          props: [],
+          props: ["background-color"],
           hits: [
             { at: "blob", fx: 0.75, fy: 0.5 },
             { at: "title", fx: 0.9, fy: 0.5 },
@@ -121,6 +135,13 @@ export const stackingTrack: Track = {
           {
             kind: "allOf",
             of: [
+              {
+                kind: "computedEquals",
+                id: "card",
+                prop: "background-color",
+                value: "rgb(255, 255, 255)",
+                message: "カードの白い背景が変わっています（背景は白のまま、飾りをその上に出します）",
+              },
               {
                 kind: "hitTarget",
                 at: "blob",

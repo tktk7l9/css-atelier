@@ -59,7 +59,7 @@ export const hitAreasTrack: Track = {
                 kind: "hitTarget",
                 at: "more",
                 top: "more",
-                message: "「特集を読む」ボタンを押すと、上に重なった光の飾りが反応してしまいます（飾りに pointer-events: none）",
+                message: "「特集を読む」ボタンを押しても、ボタンが反応しません（上に重なった光の飾りが受け止めています。飾りのほうに pointer-events: none）",
               },
               {
                 kind: "allOf",
