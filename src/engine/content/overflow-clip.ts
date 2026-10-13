@@ -6,7 +6,8 @@ import type { Track } from "./types.js";
 // reaches the box behind it), while the badge sticking out above it must still
 // be there. The sticky lesson starts scrolled to the far end (column-reverse,
 // as in the sticky track), where only a heading stuck to the box's top edge is
-// in view; the float lesson measures whether the card reaches below the photo.
+// in view; the float lesson measures whether the card reaches below the photo
+// while the text still runs beside it.
 
 const between = (a: string, b: string, edgeA: Edge, edgeB: Edge, px: number): ValidatorSpec => ({
   kind: "offset",
@@ -29,17 +30,20 @@ const BADGE_CSS = (overflow: string): string =>
 
 const NEWS = ["年末年始の営業について", "新しい講座を追加しました", "メンテナンスのお知らせ", "夏季休業のご案内", "料金改定のお知らせ", "アプリを更新しました", "店舗が移転します"];
 
+// The card sits in a plain block (.page): a flex item that is itself a scroll
+// container (overflow: hidden) may shrink below its content, which would fit
+// the card into the box and leave nothing to scroll.
 const STICKY_HTML =
-  '<div data-id="box" class="box"><section class="card"><h2 data-id="head" class="head">お知らせ</h2>' +
+  '<div data-id="box" class="box"><div class="page"><section class="card"><h2 data-id="head" class="head">お知らせ</h2>' +
   NEWS.map((t) => `<p class="item">${t}</p>`).join("") +
-  '<div data-id="ribbon" class="ribbon"></div></section></div>';
+  '<div data-id="ribbon" class="ribbon"></div></section></div></div>';
 
 const STICKY_CSS = (overflow: string): string =>
   `/* プレビューは、一番下までスクロールした位置から始まります\n   （.box の column-reverse はそのための仕掛けです。このままで OK） */\n.box {\n  display: flex;\n  flex-direction: column-reverse;\n  height: 240px;\n  overflow-y: auto;\n}\n.card {\n  width: 240px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* 右へはみ出す帯を切る */\n  overflow: ${overflow};\n}\n.head {\n  position: sticky;\n  top: 0;\n  margin: 0;\n  padding: 8px 12px;\n  background: #2f5fd0;\n  color: #fff;\n  font-size: 16px;\n}\n.item {\n  margin: 0;\n  padding: 8px 12px;\n  border-top: 1px solid #d6dded;\n}\n.ribbon {\n  height: 10px;\n  margin-right: -40px;\n${RIBBON}}\n`;
 
 const FLOAT_HTML =
   '<article data-id="card" class="card"><div data-id="photo" class="photo"></div>' +
-  '<p class="text">海辺の町を歩く、日帰りの講座です。</p></article><p class="next">次の講座</p>';
+  '<p class="text"><span data-id="text">海辺の町を歩く、日帰りの講座です。</span></p></article><p class="next">次の講座</p>';
 
 const FLOAT_CSS = (extra: string): string =>
   `.card {\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  /* スクロールの箱にしないよう、hidden から clip に変えた */\n  overflow: clip;\n${extra}}\n.photo {\n  float: left;\n  width: 96px;\n  height: 96px;\n  margin-right: 12px;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #9fd3f5, #2f5fd0);\n}\n.text {\n  margin: 0;\n}\n.next {\n  margin: 12px 0 0;\n}\n`;
@@ -145,7 +149,7 @@ export const overflowClipTrack: Track = {
       id: "clip-flow-root",
       title: "clip では float を囲めない: display: flow-root と組む",
       explanation:
-        "<p><code>overflow</code> の <code>hidden</code>・<code>scroll</code>・<code>auto</code> は新しいブロック整形文脈を作るので、中の float を囲みます。<code>clip</code> は（<code>visible</code> と同じく）作らないので、<code>hidden</code> から <code>clip</code> に変えると、カードは float の写真を囲まなくなり、カードの下にはみ出した部分が切り取られます。</p><p>clip のまま float を囲むには、<code>display: flow-root</code> を足します。MDN でも、clip で整形文脈がほしいときはこの組み合わせを勧めています。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
+        "<p><code>overflow</code> の <code>hidden</code>・<code>scroll</code>・<code>auto</code> は新しいブロック整形文脈を作るので、中の float を囲みます。<code>clip</code> は（<code>visible</code> と同じく）作らないので、<code>hidden</code> から <code>clip</code> に変えると、カードは float の写真を囲まなくなり、カードの下にはみ出した部分が切り取られます。次の段落も、写真のあった場所をよけて始まります。</p><p>clip のまま float を囲むには、<code>display: flow-root</code> を足します。MDN でも、clip で整形文脈がほしいときはこの組み合わせを勧めています。主要ブラウザすべてで使えます（Baseline: 広く利用可能）。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/overflow",
       viz: { concept: "none" },
       challenge: {
@@ -158,8 +162,12 @@ export const overflowClipTrack: Track = {
             kind: "allOf",
             of: [
               {
+                ...between("photo", "text", "right", "left", 12),
+                message: "写真の横に文章が並んでいません（写真の float はそのままにします）",
+              },
+              {
                 ...between("photo", "card", "bottom", "bottom", 12),
-                message: "写真の下がカードからはみ出して、切れています（clip は hidden と違って新しいブロック整形文脈を作らないので、float を囲みません。display: flow-root を足すと囲みます）",
+                message: "カードが写真（float）を囲まず、写真の下がはみ出して切れています（clip は hidden と違って新しいブロック整形文脈を作らないので、float を囲みません。display: flow-root を足すと囲みます）",
               },
               {
                 kind: "computedEquals",
