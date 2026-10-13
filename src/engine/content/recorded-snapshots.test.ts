@@ -5830,3 +5830,399 @@ describe("stacking pitfalls, press comfort, ARIA states and text effects: record
     expect(find("aria-expanded", "solution").elements.a2!.rect!.slice(2)).toEqual([0, 0]);
   });
 });
+
+const CASCADE_LESSONS = [
+  "sibling-collapse",
+  "parent-collapse",
+  "flex-no-collapse",
+  "nesting-compound",
+  "nesting-media",
+  "nesting-append",
+  "unlayered-wins",
+  "layer-order-statement",
+  "important-reverses",
+];
+
+const CASCADE_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "sibling-collapse",
+    name: "starter",
+    messages: ["見出しと段落の間が 32px になっていません（上下のマージンは足されず、大きいほうだけになります。どちらかを 32px に）"],
+    elements: { title: { rect: [0, 0, 596, 30.8] }, text: { rect: [0, 46.8, 596, 22.39] } },
+  },
+  {
+    lesson: "sibling-collapse",
+    name: "solution",
+    messages: [],
+    elements: { title: { rect: [0, 0, 596, 30.8] }, text: { rect: [0, 62.8, 596, 22.39] } },
+  },
+  {
+    lesson: "sibling-collapse",
+    name: "paragraph margin 32px",
+    css: ".post h2 {\n  margin: 0 0 16px;\n  font-size: 22px;\n}\n.post p {\n  margin: 32px 0 0;\n}\n",
+    messages: [],
+    elements: { title: { rect: [0, 0, 596, 30.8] }, text: { rect: [0, 62.8, 596, 22.39] } },
+  },
+  {
+    lesson: "sibling-collapse",
+    name: "both margins 24px",
+    css: ".post h2 {\n  margin: 0 0 24px;\n  font-size: 22px;\n}\n.post p {\n  margin: 24px 0 0;\n}\n",
+    messages: ["見出しと段落の間が 32px になっていません（上下のマージンは足されず、大きいほうだけになります。どちらかを 32px に）"],
+    elements: { title: { rect: [0, 0, 596, 30.8] }, text: { rect: [0, 54.8, 596, 22.39] } },
+  },
+  {
+    lesson: "sibling-collapse",
+    name: "16px kept on both",
+    css: ".post h2 {\n  margin: 0 0 16px;\n  font-size: 22px;\n}\n.post p {\n  margin: 16px 0 0;\n}\n.post h2 {\n  margin-bottom: 16px;\n}\n",
+    messages: ["見出しと段落の間が 32px になっていません（上下のマージンは足されず、大きいほうだけになります。どちらかを 32px に）"],
+    elements: { title: { rect: [0, 0, 596, 30.8] }, text: { rect: [0, 46.8, 596, 22.39] } },
+  },
+  {
+    lesson: "parent-collapse",
+    name: "starter",
+    messages: ["見出しが、カードの上端から 24px 下にありません（見出しのマージンが、カードの外に突き抜けています）"],
+    elements: { intro: { rect: [0, 0, 596, 22.39] }, card: { rect: [0, 46.39, 596, 56.59] }, title: { rect: [16, 46.39, 564, 26.2] } },
+  },
+  {
+    lesson: "parent-collapse",
+    name: "solution",
+    messages: [],
+    elements: { intro: { rect: [0, 0, 596, 22.39] }, card: { rect: [0, 22.39, 596, 96.59] }, title: { rect: [16, 46.39, 564, 26.2] } },
+  },
+  {
+    lesson: "parent-collapse",
+    name: "padding-top instead",
+    css: ".intro {\n  margin: 0;\n}\n.card {\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 24px 16px 8px;\n}\n.card p {\n  margin: 0 16px 16px;\n}\n.card {\n  padding-top: 24px;\n}\n.card h3 {\n  margin-top: 0;\n}\n",
+    messages: [],
+    elements: { intro: { rect: [0, 0, 596, 22.39] }, card: { rect: [0, 22.39, 596, 80.59] }, title: { rect: [16, 46.39, 564, 26.2] } },
+  },
+  {
+    lesson: "parent-collapse",
+    name: "overflow: hidden",
+    css: ".intro {\n  margin: 0;\n}\n.card {\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 24px 16px 8px;\n}\n.card p {\n  margin: 0 16px 16px;\n}\n.card {\n  overflow: hidden;\n}\n",
+    messages: [],
+    elements: { intro: { rect: [0, 0, 596, 22.39] }, card: { rect: [0, 22.39, 596, 96.59] }, title: { rect: [16, 46.39, 564, 26.2] } },
+  },
+  {
+    lesson: "parent-collapse",
+    name: "heading margin removed",
+    css: ".intro {\n  margin: 0;\n}\n.card {\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 24px 16px 8px;\n}\n.card p {\n  margin: 0 16px 16px;\n}\n.card h3 {\n  margin-top: 0;\n}\n",
+    messages: ["見出しが、カードの上端から 24px 下にありません（見出しのマージンが、カードの外に突き抜けています）"],
+    elements: { intro: { rect: [0, 0, 596, 22.39] }, card: { rect: [0, 22.39, 596, 56.59] }, title: { rect: [16, 22.39, 564, 26.2] } },
+  },
+  {
+    lesson: "parent-collapse",
+    name: "padding added, margin kept",
+    css: ".intro {\n  margin: 0;\n}\n.card {\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.card h3 {\n  margin: 24px 16px 8px;\n}\n.card p {\n  margin: 0 16px 16px;\n}\n.card {\n  padding-top: 24px;\n}\n",
+    messages: ["見出しが、カードの上端から 24px 下にありません（見出しのマージンが、カードの外に突き抜けています）"],
+    elements: { intro: { rect: [0, 0, 596, 22.39] }, card: { rect: [0, 22.39, 596, 104.59] }, title: { rect: [16, 70.39, 564, 26.2] } },
+  },
+  {
+    lesson: "flex-no-collapse",
+    name: "starter",
+    messages: ["カードの間が 12px になっていません（flex の中ではマージンが相殺されず、12px + 12px になります）"],
+    elements: { list: { rect: [0, 0, 596, 211.17] }, c1: { rect: [12, 12, 572, 46.39] }, c2: { rect: [12, 82.39, 572, 46.39] }, c3: { rect: [12, 152.78, 572, 46.39] } },
+  },
+  {
+    lesson: "flex-no-collapse",
+    name: "solution",
+    messages: [],
+    elements: { list: { rect: [0, 0, 596, 163.17] }, c1: { rect: [12, 0, 572, 46.39] }, c2: { rect: [12, 58.39, 572, 46.39] }, c3: { rect: [12, 116.78, 572, 46.39] } },
+  },
+  {
+    lesson: "flex-no-collapse",
+    name: "bottom margins, last one removed",
+    css: ".list {\n  display: flex;\n  flex-direction: column;\n  padding: 0 12px;\n  background: #f6f7fb;\n}\n.item {\n  margin: 0 0 12px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.item:last-child {\n  margin-bottom: 0;\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 0, 596, 163.17] }, c1: { rect: [12, 0, 572, 46.39] }, c2: { rect: [12, 58.39, 572, 46.39] }, c3: { rect: [12, 116.78, 572, 46.39] } },
+  },
+  {
+    lesson: "flex-no-collapse",
+    name: "back to block layout",
+    css: ".list {\n  display: flex;\n  flex-direction: column;\n  padding: 0 12px;\n  background: #f6f7fb;\n}\n.item {\n  margin: 12px 0;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.list {\n  display: block;\n}\n",
+    messages: [],
+    elements: { list: { rect: [0, 12, 596, 163.17] }, c1: { rect: [12, 12, 572, 46.39] }, c2: { rect: [12, 70.39, 572, 46.39] }, c3: { rect: [12, 128.78, 572, 46.39] } },
+  },
+  {
+    lesson: "flex-no-collapse",
+    name: "gap added, margins kept",
+    css: ".list {\n  display: flex;\n  flex-direction: column;\n  padding: 0 12px;\n  background: #f6f7fb;\n}\n.item {\n  margin: 12px 0;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n.list {\n  gap: 12px;\n}\n",
+    messages: ["カードの間が 12px になっていません（flex の中ではマージンが相殺されず、12px + 12px になります）"],
+    elements: { list: { rect: [0, 0, 596, 235.17] }, c1: { rect: [12, 12, 572, 46.39] }, c2: { rect: [12, 94.39, 572, 46.39] }, c3: { rect: [12, 176.78, 572, 46.39] } },
+  },
+  {
+    lesson: "flex-no-collapse",
+    name: "margins halved",
+    css: ".list {\n  display: flex;\n  flex-direction: column;\n  padding: 0 12px;\n  background: #f6f7fb;\n}\n.item {\n  margin: 6px 0;\n  padding: 12px;\n  border-radius: 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["最初と最後のカードの外側に余白があります（gap ならアイテムのあいだだけに入ります）"],
+    elements: { list: { rect: [0, 0, 596, 175.17] }, c1: { rect: [12, 6, 572, 46.39] }, c2: { rect: [12, 64.39, 572, 46.39] }, c3: { rect: [12, 122.78, 572, 46.39] } },
+  },
+  {
+    lesson: "nesting-compound",
+    name: "starter",
+    messages: ["選んでいるタブが太字になっていません（& .is-active は「.tab の中にある .is-active」です。同じ要素なら &.is-active）"],
+    elements: { t1: { rect: [0, 0, 70.89, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} }, t2: { rect: [74.89, 0, 56, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} }, t3: { rect: [134.89, 0, 88, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "nesting-compound",
+    name: "solution",
+    messages: [],
+    elements: { t1: { rect: [0, 0, 70.89, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} }, t2: { rect: [74.89, 0, 56, 38.39], computed: {"font-weight":"700","color":"rgb(24, 32, 58)"} }, t3: { rect: [134.89, 0, 88, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "nesting-compound",
+    name: "flat .tab.is-active",
+    css: ".tabs {\n  display: flex;\n  gap: 4px;\n}\n.tab {\n  padding: 8px 12px;\n  color: #5c6680;\n  text-decoration: none;\n  /* 選んでいるタブ */\n  & .is-active {\n    color: #18203a;\n    font-weight: 700;\n  }\n}\n.tab.is-active {\n  color: #18203a;\n  font-weight: 700;\n}\n",
+    messages: [".tab の入れ子のまま、&.is-active と書きましょう"],
+    elements: { t1: { rect: [0, 0, 70.89, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} }, t2: { rect: [74.89, 0, 56, 38.39], computed: {"font-weight":"700","color":"rgb(24, 32, 58)"} }, t3: { rect: [134.89, 0, 88, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "nesting-compound",
+    name: "nested without &",
+    css: ".tabs {\n  display: flex;\n  gap: 4px;\n}\n.tab {\n  padding: 8px 12px;\n  color: #5c6680;\n  text-decoration: none;\n  /* 選んでいるタブ */\n  .is-active {\n    color: #18203a;\n    font-weight: 700;\n  }\n}\n",
+    messages: ["選んでいるタブが太字になっていません（& .is-active は「.tab の中にある .is-active」です。同じ要素なら &.is-active）"],
+    elements: { t1: { rect: [0, 0, 70.89, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} }, t2: { rect: [74.89, 0, 56, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} }, t3: { rect: [134.89, 0, 88, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "nesting-compound",
+    name: "&.is-active with a :not",
+    css: ".tabs {\n  display: flex;\n  gap: 4px;\n}\n.tab {\n  padding: 8px 12px;\n  color: #5c6680;\n  text-decoration: none;\n  /* 選んでいるタブ */\n  &.is-active:not(.is-disabled) {\n    color: #18203a;\n    font-weight: 700;\n  }\n}\n",
+    messages: [],
+    elements: { t1: { rect: [0, 0, 70.89, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} }, t2: { rect: [74.89, 0, 56, 38.39], computed: {"font-weight":"700","color":"rgb(24, 32, 58)"} }, t3: { rect: [134.89, 0, 88, 38.39], computed: {"font-weight":"400","color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "nesting-media",
+    name: "starter",
+    messages: ["幅 560px で、写真（120px）が左、文章が右に並んでいません"],
+    elements: { card: { rect: [0, 0, 560, 184.59] }, photo: { rect: [12, 12, 536, 96] }, body: { rect: [12, 120, 536, 52.59] } },
+    states: { 320: { card: { rect: [0, 0, 320, 206.98] }, photo: { rect: [12, 12, 296, 96] }, body: { rect: [12, 120, 296, 74.98] } } },
+  },
+  {
+    lesson: "nesting-media",
+    name: "solution",
+    messages: [],
+    elements: { card: { rect: [0, 0, 560, 120] }, photo: { rect: [12, 12, 120, 96] }, body: { rect: [144, 12, 404, 96] } },
+    states: { 320: { card: { rect: [0, 0, 320, 206.98] }, photo: { rect: [12, 12, 296, 96] }, body: { rect: [12, 120, 296, 74.98] } } },
+  },
+  {
+    lesson: "nesting-media",
+    name: "min-width syntax",
+    css: ".card {\n  display: grid;\n  gap: 12px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n  @media (min-width: 480px) {\n    grid-template-columns: 120px 1fr;\n  }\n}\n.photo {\n  height: 96px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.body h3 {\n  margin: 0 0 4px;\n}\n.body p {\n  margin: 0;\n}\n",
+    messages: [],
+    elements: { card: { rect: [0, 0, 560, 120] }, photo: { rect: [12, 12, 120, 96] }, body: { rect: [144, 12, 404, 96] } },
+    states: { 320: { card: { rect: [0, 0, 320, 206.98] }, photo: { rect: [12, 12, 296, 96] }, body: { rect: [12, 120, 296, 74.98] } } },
+  },
+  {
+    lesson: "nesting-media",
+    name: "top-level @media",
+    css: ".card {\n  display: grid;\n  gap: 12px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.photo {\n  height: 96px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.body h3 {\n  margin: 0 0 4px;\n}\n.body p {\n  margin: 0;\n}\n@media (width >= 480px) {\n  .card {\n    grid-template-columns: 120px 1fr;\n  }\n}\n",
+    messages: ["@media を .card のルールの外ではなく、中に入れ子で書きましょう（部品のスタイルがひとまとまりになります）"],
+    elements: { card: { rect: [0, 0, 560, 120] }, photo: { rect: [12, 12, 120, 96] }, body: { rect: [144, 12, 404, 96] } },
+    states: { 320: { card: { rect: [0, 0, 320, 206.98] }, photo: { rect: [12, 12, 296, 96] }, body: { rect: [12, 120, 296, 74.98] } } },
+  },
+  {
+    lesson: "nesting-media",
+    name: "columns at every width",
+    css: ".card {\n  display: grid;\n  gap: 12px;\n  padding: 12px;\n  border-radius: 12px;\n  background: #eef1f8;\n}\n.photo {\n  height: 96px;\n  border-radius: 8px;\n  background: linear-gradient(#9fd3f5, #2f5fd0);\n}\n.body h3 {\n  margin: 0 0 4px;\n}\n.body p {\n  margin: 0;\n}\n.card {\n  grid-template-columns: 120px 1fr;\n  @media (width >= 480px) {\n    gap: 16px;\n  }\n}\n",
+    messages: ["幅 320px で、写真と文章が縦に並んでいません（480px より狭いときは縦のままにします）"],
+    elements: { card: { rect: [0, 0, 560, 120] }, photo: { rect: [12, 12, 120, 96] }, body: { rect: [148, 12, 400, 96] } },
+    states: { 320: { card: { rect: [0, 0, 320, 120] }, photo: { rect: [12, 12, 120, 96] }, body: { rect: [144, 12, 164, 96] } } },
+  },
+  {
+    lesson: "nesting-append",
+    name: "starter",
+    messages: ["暗いパネルの中のボタンが、白地に紺の文字になっていません（.btn の中に .is-dark & { … }）"],
+    elements: { b1: { rect: [12, 12, 92, 34.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} }, b2: { rect: [12, 78.39, 92, 34.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "nesting-append",
+    name: "solution",
+    messages: [],
+    elements: { b1: { rect: [12, 12, 92, 34.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(24, 32, 58)"} }, b2: { rect: [12, 78.39, 92, 34.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "nesting-append",
+    name: ".panel.is-dark &",
+    css: ".panel {\n  margin-bottom: 8px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.panel.is-dark {\n  background: #18203a;\n}\n.btn {\n  padding: 6px 14px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n  /* 暗いパネルの中では、白地のボタンにしたい */\n  .panel.is-dark & {\n    background: #fff;\n    color: #18203a;\n  }\n}\n",
+    messages: [],
+    elements: { b1: { rect: [12, 12, 92, 34.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(24, 32, 58)"} }, b2: { rect: [12, 78.39, 92, 34.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "nesting-append",
+    name: "flat .is-dark .btn",
+    css: ".panel {\n  margin-bottom: 8px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.panel.is-dark {\n  background: #18203a;\n}\n.btn {\n  padding: 6px 14px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n  /* 暗いパネルの中では、白地のボタンにしたい */\n}\n.is-dark .btn {\n  background: #fff;\n  color: #18203a;\n}\n",
+    messages: [".btn のルールの中に、& を後ろに付けた .is-dark & { … } で書きましょう"],
+    elements: { b1: { rect: [12, 12, 92, 34.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(24, 32, 58)"} }, b2: { rect: [12, 78.39, 92, 34.39], computed: {"background-color":"rgb(47, 95, 208)","color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "nesting-append",
+    name: "every button white",
+    css: ".panel {\n  margin-bottom: 8px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.panel.is-dark {\n  background: #18203a;\n}\n.btn {\n  padding: 6px 14px;\n  border: 0;\n  border-radius: 999px;\n  background: #2f5fd0;\n  color: #fff;\n  font: inherit;\n  /* 暗いパネルの中では、白地のボタンにしたい */\n}\n.btn {\n  & {\n    background: #fff;\n    color: #18203a;\n  }\n}\n/* .is-dark & */\n",
+    messages: ["明るいパネルのボタンまで変わっています（暗いパネルの中のボタンだけを変えます）"],
+    elements: { b1: { rect: [12, 12, 92, 34.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(24, 32, 58)"} }, b2: { rect: [12, 78.39, 92, 34.39], computed: {"background-color":"rgb(255, 255, 255)","color":"rgb(24, 32, 58)"} } },
+  },
+  {
+    lesson: "unlayered-wins",
+    name: "starter",
+    messages: ["ボタンの文字が白くなっていません（レイヤーの外の a の色が、どのレイヤーのスタイルにも勝っています）"],
+    elements: { btn: { rect: [0, 16, 96, 38.39], computed: {"color":"rgb(92, 102, 128)"} }, link: { rect: [100.19, 26, 95.53, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "unlayered-wins",
+    name: "solution",
+    messages: [],
+    elements: { btn: { rect: [0, 16, 96, 38.39], computed: {"color":"rgb(255, 255, 255)"} }, link: { rect: [100.19, 26, 95.53, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "unlayered-wins",
+    name: "own legacy layer declared first",
+    css: "@layer legacy, base, components;\n@layer base, components;\n@layer components {\n  .btn {\n    display: inline-block;\n    padding: 8px 16px;\n    border-radius: 999px;\n    background: #2f5fd0;\n    color: #fff;\n    text-decoration: none;\n  }\n}\n/* 古いページから持ってきた CSS */\n@layer legacy {\n  a {\n    color: #5c6680;\n  }\n}\n",
+    messages: [],
+    elements: { btn: { rect: [0, 16, 96, 38.39], computed: {"color":"rgb(255, 255, 255)"} }, link: { rect: [100.19, 26, 95.53, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "unlayered-wins",
+    name: "legacy layer appended last",
+    css: "@layer base, components;\n@layer components {\n  .btn {\n    display: inline-block;\n    padding: 8px 16px;\n    border-radius: 999px;\n    background: #2f5fd0;\n    color: #fff;\n    text-decoration: none;\n  }\n}\n/* 古いページから持ってきた CSS */\n@layer legacy {\n  a {\n    color: #5c6680;\n  }\n}\n",
+    messages: ["ボタンの文字が白くなっていません（レイヤーの外の a の色が、どのレイヤーのスタイルにも勝っています）"],
+    elements: { btn: { rect: [0, 16, 96, 38.39], computed: {"color":"rgb(92, 102, 128)"} }, link: { rect: [100.19, 26, 95.53, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "unlayered-wins",
+    name: ".btn moved out of its layer",
+    css: "@layer base, components;\n@layer components {\n  .btn {\n    display: inline-block;\n    padding: 8px 16px;\n    border-radius: 999px;\n    background: #2f5fd0;\n    color: #fff;\n    text-decoration: none;\n  }\n}\n/* 古いページから持ってきた CSS */\na {\n  color: #5c6680;\n}\n.btn {\n  color: #fff;\n}\n",
+    messages: ["古い CSS（a の色）を @layer base { … } の中に入れましょう（.btn は components レイヤーのまま）"],
+    elements: { btn: { rect: [0, 16, 96, 38.39], computed: {"color":"rgb(255, 255, 255)"} }, link: { rect: [100.19, 26, 95.53, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "unlayered-wins",
+    name: "!important",
+    css: "@layer base, components;\n@layer components {\n  .btn {\n    display: inline-block;\n    padding: 8px 16px;\n    border-radius: 999px;\n    background: #2f5fd0;\n    color: #fff !important;\n    text-decoration: none;\n  }\n}\n/* 古いページから持ってきた CSS */\na {\n  color: #5c6680;\n}\n",
+    messages: ["!important ではなく、古い CSS をレイヤーに入れて解決しましょう"],
+    elements: { btn: { rect: [0, 16, 96, 38.39], computed: {"color":"rgb(255, 255, 255)"} }, link: { rect: [100.19, 26, 95.53, 18], computed: {"color":"rgb(92, 102, 128)"} } },
+  },
+  {
+    lesson: "layer-order-statement",
+    name: "starter",
+    messages: ["お知らせの余白・左の線・背景が、reset レイヤーに消されています（後に出てきたレイヤーほど強くなります）"],
+    elements: { note: { rect: [0, 0, 596, 22.39], computed: {"padding-left":"0px","border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "layer-order-statement",
+    name: "solution",
+    messages: [],
+    elements: { note: { rect: [0, 0, 596, 38.39], computed: {"padding-left":"12px","border-left-width":"4px","background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "layer-order-statement",
+    name: "statement in the wrong order",
+    css: "@layer components, reset;\n/* components.css */\n@layer components {\n  .note {\n    padding: 8px 12px;\n    border-left: 4px solid #2f5fd0;\n    background: #eef1f8;\n  }\n}\n/* reset.css */\n@layer reset {\n  * {\n    margin: 0;\n    padding: 0;\n    border: 0;\n    background: none;\n  }\n}\n",
+    messages: ["お知らせの余白・左の線・背景が、reset レイヤーに消されています（後に出てきたレイヤーほど強くなります）"],
+    elements: { note: { rect: [0, 0, 596, 22.39], computed: {"padding-left":"0px","border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "layer-order-statement",
+    name: "statement at the bottom",
+    css: "/* components.css */\n@layer components {\n  .note {\n    padding: 8px 12px;\n    border-left: 4px solid #2f5fd0;\n    background: #eef1f8;\n  }\n}\n/* reset.css */\n@layer reset {\n  * {\n    margin: 0;\n    padding: 0;\n    border: 0;\n    background: none;\n  }\n}\n@layer reset, components;\n",
+    messages: ["お知らせの余白・左の線・背景が、reset レイヤーに消されています（後に出てきたレイヤーほど強くなります）"],
+    elements: { note: { rect: [0, 0, 596, 22.39], computed: {"padding-left":"0px","border-left-width":"0px","background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "layer-order-statement",
+    name: "statement after a comment",
+    css: "/* 読み込む順番に関係なく、弱い順に並べる */\n@layer reset, components;\n/* components.css */\n@layer components {\n  .note {\n    padding: 8px 12px;\n    border-left: 4px solid #2f5fd0;\n    background: #eef1f8;\n  }\n}\n/* reset.css */\n@layer reset {\n  * {\n    margin: 0;\n    padding: 0;\n    border: 0;\n    background: none;\n  }\n}\n",
+    messages: [],
+    elements: { note: { rect: [0, 0, 596, 38.39], computed: {"padding-left":"12px","border-left-width":"4px","background-color":"rgb(238, 241, 248)"} } },
+  },
+  {
+    lesson: "important-reverses",
+    name: "starter",
+    messages: ["hidden 属性の付いた通知が表示されています（後の components レイヤーの display: flex が、reset の display: none に勝っています）"],
+    elements: { saved: { rect: [0, 0, 596, 38.39], computed: {"display":"flex"} }, error: { rect: [0, 46.39, 596, 38.39], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "important-reverses",
+    name: "solution",
+    messages: [],
+    elements: { saved: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, error: { rect: [0, 0, 596, 38.39], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "important-reverses",
+    name: "!important without the space",
+    css: "@layer reset, components;\n@layer reset {\n  /* hidden 属性の付いた要素は表示しない */\n  [hidden] {\n    display: none!important;\n  }\n}\n@layer components {\n  .toast {\n    display: flex;\n    gap: 8px;\n    margin-bottom: 8px;\n    padding: 8px 12px;\n    border-radius: 8px;\n    background: #18203a;\n    color: #fff;\n  }\n}\n",
+    messages: [],
+    elements: { saved: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, error: { rect: [0, 0, 596, 38.39], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "important-reverses",
+    name: "!important on the component",
+    css: "@layer reset, components;\n@layer reset {\n  /* hidden 属性の付いた要素は表示しない */\n  [hidden] {\n    display: none;\n  }\n}\n@layer components {\n  .toast {\n    display: flex !important;\n    gap: 8px;\n    margin-bottom: 8px;\n    padding: 8px 12px;\n    border-radius: 8px;\n    background: #18203a;\n    color: #fff;\n  }\n}\n",
+    messages: ["hidden 属性の付いた通知が表示されています（後の components レイヤーの display: flex が、reset の display: none に勝っています）"],
+    elements: { saved: { rect: [0, 0, 596, 38.39], computed: {"display":"flex"} }, error: { rect: [0, 46.39, 596, 38.39], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "important-reverses",
+    name: ":not([hidden]) on the component",
+    css: "@layer reset, components;\n@layer reset {\n  /* hidden 属性の付いた要素は表示しない */\n  [hidden] {\n    display: none;\n  }\n}\n@layer components {\n  .toast:not([hidden]) {\n    display: flex;\n    gap: 8px;\n    margin-bottom: 8px;\n    padding: 8px 12px;\n    border-radius: 8px;\n    background: #18203a;\n    color: #fff;\n  }\n}\n",
+    messages: ["reset レイヤーの [hidden] の display: none に !important を付けましょう（!important どうしでは、先に宣言したレイヤーが勝ちます）"],
+    elements: { saved: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, error: { rect: [0, 0, 596, 38.39], computed: {"display":"flex"} } },
+  },
+  {
+    lesson: "important-reverses",
+    name: "unlayered [hidden]",
+    css: "@layer reset, components;\n@layer reset {\n  /* hidden 属性の付いた要素は表示しない */\n  [hidden] {\n    display: none;\n  }\n}\n@layer components {\n  .toast {\n    display: flex;\n    gap: 8px;\n    margin-bottom: 8px;\n    padding: 8px 12px;\n    border-radius: 8px;\n    background: #18203a;\n    color: #fff;\n  }\n}\n[hidden] {\n  display: none;\n}\n",
+    messages: ["reset レイヤーの [hidden] の display: none に !important を付けましょう（!important どうしでは、先に宣言したレイヤーが勝ちます）"],
+    elements: { saved: { rect: [0, 0, 0, 0], computed: {"display":"none"} }, error: { rect: [0, 0, 596, 38.39], computed: {"display":"flex"} } },
+  },
+];
+
+describe("margin collapsing, nesting and cascade layers in practice: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 9 lessons", () => {
+    expect([...new Set(CASCADE_CASES.map((c) => c.lesson))].sort()).toEqual([...CASCADE_LESSONS].sort());
+    for (const id of CASCADE_LESSONS) {
+      const names = CASCADE_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of CASCADE_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message per checked width and passes each solution", () => {
+    for (const id of CASCADE_LESSONS) {
+      const { challenge } = lessonById(id)!;
+      const starter = CASCADE_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = CASCADE_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter).length, id).toBeGreaterThanOrEqual(1);
+      expect(messagesFor(starter).length, id).toBeLessThanOrEqual(1 + (challenge.states?.length ?? 0));
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+
+  it("keeps the collapsed and uncollapsed gaps the lessons are about", () => {
+    const rect = (id: string, name: string, el: string): readonly number[] =>
+      CASCADE_CASES.find((c) => c.lesson === id && c.name === name)!.elements[el]!.rect!;
+    const between = (id: string, name: string, upper: string, lower: string): number =>
+      rect(id, name, lower)[1]! - (rect(id, name, upper)[1]! + rect(id, name, upper)[3]!);
+    const fromTop = (id: string, name: string, outer: string, inner: string): number =>
+      rect(id, name, inner)[1]! - rect(id, name, outer)[1]!;
+    // Rects are recorded to 0.01px, so the gaps are compared to a tenth of a pixel.
+    // 16px + 16px collapse to 16px; one 32px margin gives 32px.
+    expect(between("sibling-collapse", "starter", "title", "text")).toBeCloseTo(16, 1);
+    expect(between("sibling-collapse", "solution", "title", "text")).toBeCloseTo(32, 1);
+    // The heading's 24px escapes the card, then stays inside a flow-root card.
+    expect(between("parent-collapse", "starter", "intro", "card")).toBeCloseTo(24, 1);
+    expect(fromTop("parent-collapse", "starter", "card", "title")).toBeCloseTo(0, 1);
+    expect(between("parent-collapse", "solution", "intro", "card")).toBeCloseTo(0, 1);
+    expect(fromTop("parent-collapse", "solution", "card", "title")).toBeCloseTo(24, 1);
+    // Flex items keep both margins: 12px + 12px between, 12px before the first.
+    expect(between("flex-no-collapse", "starter", "c1", "c2")).toBeCloseTo(24, 1);
+    expect(fromTop("flex-no-collapse", "starter", "list", "c1")).toBeCloseTo(12, 1);
+    expect(between("flex-no-collapse", "solution", "c1", "c2")).toBeCloseTo(12, 1);
+    expect(fromTop("flex-no-collapse", "solution", "list", "c1")).toBeCloseTo(0, 1);
+  });
+});
