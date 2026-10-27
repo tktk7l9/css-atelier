@@ -9,7 +9,13 @@
 // hashed file of the build, so a new worker can drop the previous build's.
 
 const CACHE = "css-atelier-v1";
-const SHELL = ["/", "/index.html", "/favicon.svg", "/manifest.webmanifest"];
+// The shell is keyed by "/", never "/index.html": Workers static assets answer
+// /index.html with a 307 to /, so precaching it would store a redirected
+// response, and a redirected response may not answer a navigation (whose
+// redirect mode is "manual") — the offline fallback would fail with a network
+// error until the next online navigation replaced the entry.
+const SHELL_PAGE = "/";
+const SHELL = [SHELL_PAGE, "/favicon.svg", "/manifest.webmanifest"];
 const PRECACHE = [];
 const ASSETS = [];
 
@@ -56,11 +62,11 @@ self.addEventListener("fetch", (event) => {
           // or 5xx page must never become what every offline navigation shows.
           if (res.ok) {
             const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put("/index.html", copy));
+            caches.open(CACHE).then((c) => c.put(SHELL_PAGE, copy));
           }
           return res;
         })
-        .catch(() => caches.match("/index.html")),
+        .catch(() => caches.match(SHELL_PAGE)),
     );
     return;
   }
