@@ -9907,3 +9907,281 @@ describe("user preferences, scroll polish, content values and background boxes: 
   });
 });
 
+const NEW_FINE_LESSONS = [
+  "anchor-center",
+  "anchor-size",
+  "anchor-two-names",
+  "tabular-nums",
+  "line-break-strict",
+  "hyphens-auto",
+];
+
+const NEW_FINE_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "anchor-center",
+    name: "starter",
+    messages: ["ツールチップがボタンの中央に来ていません（left: anchor(left) を消して、justify-self: anchor-center を指定します）"],
+    elements: { btn: { rect: [120, 60, 62.67, 41] }, tip: { rect: [120, 29.61, 186.38, 30.39] } },
+  },
+  {
+    lesson: "anchor-center",
+    name: "solution",
+    messages: [],
+    elements: { btn: { rect: [120, 60, 62.67, 41] }, tip: { rect: [58.16, 29.61, 186.38, 30.39] } },
+  },
+  {
+    lesson: "anchor-center",
+    name: "left kept",
+    css: ".stage {\n  padding: 60px 0 0 120px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.tip {\n  position: absolute;\n  position-anchor: --btn;\n  bottom: anchor(top);\n  left: anchor(left);\n  padding: 4px 8px;\n  background: #18203a;\n  color: #fff;\n}\n.tip {\n  justify-self: anchor-center;\n}\n",
+    messages: ["ツールチップがボタンの中央に来ていません（left: anchor(left) を消して、justify-self: anchor-center を指定します）"],
+    elements: { btn: { rect: [120, 60, 62.67, 41] }, tip: { rect: [120, 29.61, 186.38, 30.39] } },
+  },
+  {
+    lesson: "anchor-center",
+    name: "position-area",
+    css: ".stage {\n  padding: 60px 0 0 120px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.tip {\n  position: absolute;\n  position-anchor: --btn;\n  position-area: top;\n  padding: 4px 8px;\n  background: #18203a;\n  color: #fff;\n}\n",
+    messages: [],
+    elements: { btn: { rect: [120, 60, 62.67, 41] }, tip: { rect: [58.16, 29.61, 186.38, 30.39] } },
+  },
+  {
+    lesson: "anchor-center",
+    name: "translate by half",
+    css: ".stage {\n  padding: 60px 0 0 120px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.tip {\n  position: absolute;\n  position-anchor: --btn;\n  bottom: anchor(top);\n  left: anchor(center);\n  translate: -50%;\n  padding: 4px 8px;\n  background: #18203a;\n  color: #fff;\n}\n",
+    messages: [],
+    elements: { btn: { rect: [120, 60, 62.67, 41] }, tip: { rect: [58.16, 29.61, 186.38, 30.39] } },
+  },
+  {
+    lesson: "anchor-center",
+    name: "align-self",
+    css: ".stage {\n  padding: 60px 0 0 120px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.tip {\n  position: absolute;\n  position-anchor: --btn;\n  bottom: anchor(top);\n  padding: 4px 8px;\n  background: #18203a;\n  color: #fff;\n  align-self: anchor-center;\n}\n",
+    messages: ["ツールチップがボタンの中央に来ていません（left: anchor(left) を消して、justify-self: anchor-center を指定します）"],
+    elements: { btn: { rect: [120, 60, 62.67, 41] }, tip: { rect: [120, 29.59, 186.38, 30.39] } },
+  },
+  {
+    lesson: "anchor-size",
+    name: "starter",
+    messages: ["メニューの幅がボタンと同じになっていません（.menu に width: anchor-size(width)）"],
+    elements: { btn: { rect: [16, 16, 142.64, 41] }, menu: { rect: [16, 57, 80, 60.78] } },
+  },
+  {
+    lesson: "anchor-size",
+    name: "solution",
+    messages: [],
+    elements: { btn: { rect: [16, 16, 142.64, 41] }, menu: { rect: [16, 57, 142.64, 60.78] } },
+  },
+  {
+    lesson: "anchor-size",
+    name: "height of the anchor",
+    css: ".stage {\n  padding: 16px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.menu {\n  position: absolute;\n  position-anchor: --btn;\n  top: anchor(bottom);\n  left: anchor(left);\n  margin: 0;\n  padding: 8px;\n  background: #dbe4fb;\n  list-style: none;\n  width: anchor-size(height);\n}\n",
+    messages: ["メニューの幅がボタンと同じになっていません（.menu に width: anchor-size(width)）"],
+    elements: { btn: { rect: [16, 16, 142.64, 41] }, menu: { rect: [16, 57, 41, 172.73] } },
+  },
+  {
+    lesson: "anchor-size",
+    name: "default dimension",
+    css: ".stage {\n  padding: 16px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.menu {\n  position: absolute;\n  position-anchor: --btn;\n  top: anchor(bottom);\n  left: anchor(left);\n  margin: 0;\n  padding: 8px;\n  background: #dbe4fb;\n  list-style: none;\n  width: anchor-size();\n}\n",
+    messages: [],
+    elements: { btn: { rect: [16, 16, 142.64, 41] }, menu: { rect: [16, 57, 142.64, 60.78] } },
+  },
+  {
+    lesson: "anchor-size",
+    name: "left and right edges",
+    css: ".stage {\n  padding: 16px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.menu {\n  position: absolute;\n  position-anchor: --btn;\n  top: anchor(bottom);\n  left: anchor(left);\n  margin: 0;\n  padding: 8px;\n  background: #dbe4fb;\n  list-style: none;\n}\n.menu {\n  right: anchor(right);\n}\n",
+    messages: [],
+    elements: { btn: { rect: [16, 16, 142.64, 41] }, menu: { rect: [16, 57, 142.64, 60.78] } },
+  },
+  {
+    lesson: "anchor-size",
+    name: "double",
+    css: ".stage {\n  padding: 16px;\n}\n.btn {\n  anchor-name: --btn;\n  padding: 8px 16px;\n}\n.menu {\n  position: absolute;\n  position-anchor: --btn;\n  top: anchor(bottom);\n  left: anchor(left);\n  margin: 0;\n  padding: 8px;\n  background: #dbe4fb;\n  list-style: none;\n  width: calc(anchor-size(width) * 2);\n}\n",
+    messages: ["メニューの幅がボタンと同じになっていません（.menu に width: anchor-size(width)）"],
+    elements: { btn: { rect: [16, 16, 142.64, 41] }, menu: { rect: [16, 57, 285.28, 60.78] } },
+  },
+  {
+    lesson: "anchor-two-names",
+    name: "starter",
+    messages: ["線が 2 つの箱をつないでいません（.line に left: anchor(--a right) と right: anchor(--b left)）"],
+    elements: { a: { rect: [16, 16, 64, 54.39] }, b: { rect: [516, 16, 64, 54.39] }, line: { rect: [16, 43.2, 0, 2] } },
+  },
+  {
+    lesson: "anchor-two-names",
+    name: "solution",
+    messages: [],
+    elements: { a: { rect: [16, 16, 64, 54.39] }, b: { rect: [516, 16, 64, 54.39] }, line: { rect: [80, 43.2, 436, 2] } },
+  },
+  {
+    lesson: "anchor-two-names",
+    name: "only left",
+    css: ".flow {\n  display: flex;\n  justify-content: space-between;\n  padding: 16px;\n}\n.node {\n  padding: 16px;\n  background: #dbe4fb;\n}\n.a {\n  anchor-name: --a;\n}\n.b {\n  anchor-name: --b;\n}\n/* 2 つの箱をつなぐ線 */\n.line {\n  position: absolute;\n  position-anchor: --a;\n  top: anchor(center);\n  height: 2px;\n  background: #2f5fd0;\n  left: anchor(--a right);\n}\n",
+    messages: ["線が 2 つの箱をつないでいません（.line に left: anchor(--a right) と right: anchor(--b left)）"],
+    elements: { a: { rect: [16, 16, 64, 54.39] }, b: { rect: [516, 16, 64, 54.39] }, line: { rect: [80, 43.2, 0, 2] } },
+  },
+  {
+    lesson: "anchor-two-names",
+    name: "both from a",
+    css: ".flow {\n  display: flex;\n  justify-content: space-between;\n  padding: 16px;\n}\n.node {\n  padding: 16px;\n  background: #dbe4fb;\n}\n.a {\n  anchor-name: --a;\n}\n.b {\n  anchor-name: --b;\n}\n/* 2 つの箱をつなぐ線 */\n.line {\n  position: absolute;\n  position-anchor: --a;\n  top: anchor(center);\n  height: 2px;\n  background: #2f5fd0;\n  left: anchor(--a right);\n  right: anchor(right);\n}\n",
+    messages: ["線が 2 つの箱をつないでいません（.line に left: anchor(--a right) と right: anchor(--b left)）"],
+    elements: { a: { rect: [16, 16, 64, 54.39] }, b: { rect: [516, 16, 64, 54.39] }, line: { rect: [80, 43.2, 0, 2] } },
+  },
+  {
+    lesson: "anchor-two-names",
+    name: "swapped sides",
+    css: ".flow {\n  display: flex;\n  justify-content: space-between;\n  padding: 16px;\n}\n.node {\n  padding: 16px;\n  background: #dbe4fb;\n}\n.a {\n  anchor-name: --a;\n}\n.b {\n  anchor-name: --b;\n}\n/* 2 つの箱をつなぐ線 */\n.line {\n  position: absolute;\n  position-anchor: --a;\n  top: anchor(center);\n  height: 2px;\n  background: #2f5fd0;\n  left: anchor(--a left);\n  right: anchor(--b left);\n}\n",
+    messages: ["線が 2 つの箱をつないでいません（.line に left: anchor(--a right) と right: anchor(--b left)）"],
+    elements: { a: { rect: [16, 16, 64, 54.39] }, b: { rect: [516, 16, 64, 54.39] }, line: { rect: [16, 43.2, 500, 2] } },
+  },
+  {
+    lesson: "anchor-two-names",
+    name: "default anchor for the start",
+    css: ".flow {\n  display: flex;\n  justify-content: space-between;\n  padding: 16px;\n}\n.node {\n  padding: 16px;\n  background: #dbe4fb;\n}\n.a {\n  anchor-name: --a;\n}\n.b {\n  anchor-name: --b;\n}\n/* 2 つの箱をつなぐ線 */\n.line {\n  position: absolute;\n  position-anchor: --a;\n  top: anchor(center);\n  height: 2px;\n  background: #2f5fd0;\n  left: anchor(right);\n  right: anchor(--b left);\n}\n",
+    messages: [],
+    elements: { a: { rect: [16, 16, 64, 54.39] }, b: { rect: [516, 16, 64, 54.39] }, line: { rect: [80, 43.2, 436, 2] } },
+  },
+  {
+    lesson: "tabular-nums",
+    name: "starter",
+    messages: [".prices に font-variant-numeric: tabular-nums を指定しましょう"],
+    elements: { table: { rect: [0, 0, 66.72, 98], computed: {"font-variant-numeric":"normal"} }, a: { rect: [2, 2, 62.72, 30], computed: {"font-variant-numeric":"normal"} }, b: { rect: [2, 34, 62.72, 30], computed: {"font-variant-numeric":"normal"} }, c: { rect: [2, 66, 62.72, 30], computed: {"font-variant-numeric":"normal"} } },
+  },
+  {
+    lesson: "tabular-nums",
+    name: "solution",
+    messages: [],
+    elements: { table: { rect: [0, 0, 71.27, 98], computed: {"font-variant-numeric":"tabular-nums"} }, a: { rect: [2, 2, 67.27, 30], computed: {"font-variant-numeric":"tabular-nums"} }, b: { rect: [2, 34, 67.27, 30], computed: {"font-variant-numeric":"tabular-nums"} }, c: { rect: [2, 66, 67.27, 30], computed: {"font-variant-numeric":"tabular-nums"} } },
+  },
+  {
+    lesson: "tabular-nums",
+    name: "on the cells",
+    css: ".prices {\n  font-size: 20px;\n}\n.prices td {\n  text-align: right;\n}\n.prices td {\n  font-variant-numeric: tabular-nums;\n}\n",
+    messages: [],
+    elements: { table: { rect: [0, 0, 71.27, 98], computed: {"font-variant-numeric":"normal"} }, a: { rect: [2, 2, 67.27, 30], computed: {"font-variant-numeric":"tabular-nums"} }, b: { rect: [2, 34, 67.27, 30], computed: {"font-variant-numeric":"tabular-nums"} }, c: { rect: [2, 66, 67.27, 30], computed: {"font-variant-numeric":"tabular-nums"} } },
+  },
+  {
+    lesson: "tabular-nums",
+    name: "with lining-nums",
+    css: ".prices {\n  font-size: 20px;\n}\n.prices td {\n  text-align: right;\n}\n.prices {\n  font-variant-numeric: lining-nums tabular-nums;\n}\n",
+    messages: [],
+    elements: { table: { rect: [0, 0, 71.27, 98], computed: {"font-variant-numeric":"lining-nums tabular-nums"} }, a: { rect: [2, 2, 67.27, 30], computed: {"font-variant-numeric":"lining-nums tabular-nums"} }, b: { rect: [2, 34, 67.27, 30], computed: {"font-variant-numeric":"lining-nums tabular-nums"} }, c: { rect: [2, 66, 67.27, 30], computed: {"font-variant-numeric":"lining-nums tabular-nums"} } },
+  },
+  {
+    lesson: "tabular-nums",
+    name: "proportional",
+    css: ".prices {\n  font-size: 20px;\n}\n.prices td {\n  text-align: right;\n}\n.prices {\n  font-variant-numeric: proportional-nums;\n}\n",
+    messages: [".prices に font-variant-numeric: tabular-nums を指定しましょう"],
+    elements: { table: { rect: [0, 0, 66.72, 98], computed: {"font-variant-numeric":"proportional-nums"} }, a: { rect: [2, 2, 62.72, 30], computed: {"font-variant-numeric":"proportional-nums"} }, b: { rect: [2, 34, 62.72, 30], computed: {"font-variant-numeric":"proportional-nums"} }, c: { rect: [2, 66, 62.72, 30], computed: {"font-variant-numeric":"proportional-nums"} } },
+  },
+  {
+    lesson: "tabular-nums",
+    name: "font-feature-settings",
+    css: ".prices {\n  font-size: 20px;\n}\n.prices td {\n  text-align: right;\n}\n.prices {\n  font-feature-settings: \"tnum\";\n}\n",
+    messages: [".prices に font-variant-numeric: tabular-nums を指定しましょう"],
+    elements: { table: { rect: [0, 0, 71.27, 98], computed: {"font-variant-numeric":"normal"} }, a: { rect: [2, 2, 67.27, 30], computed: {"font-variant-numeric":"normal"} }, b: { rect: [2, 34, 67.27, 30], computed: {"font-variant-numeric":"normal"} }, c: { rect: [2, 66, 67.27, 30], computed: {"font-variant-numeric":"normal"} } },
+  },
+  {
+    lesson: "line-break-strict",
+    name: "starter",
+    messages: [".para に line-break: strict を指定しましょう"],
+    elements: { para: { rect: [0, 0, 200, 89.56], computed: {"line-break":"auto"} } },
+  },
+  {
+    lesson: "line-break-strict",
+    name: "solution",
+    messages: [],
+    elements: { para: { rect: [0, 0, 200, 89.56], computed: {"line-break":"strict"} } },
+  },
+  {
+    lesson: "line-break-strict",
+    name: "loose",
+    css: ".para {\n  width: 200px;\n  margin: 0;\n}\n.para {\n  line-break: loose;\n}\n",
+    messages: [".para に line-break: strict を指定しましょう"],
+    elements: { para: { rect: [0, 0, 200, 89.56], computed: {"line-break":"loose"} } },
+  },
+  {
+    lesson: "line-break-strict",
+    name: "anywhere",
+    css: ".para {\n  width: 200px;\n  margin: 0;\n}\n.para {\n  line-break: anywhere;\n}\n",
+    messages: [".para に line-break: strict を指定しましょう"],
+    elements: { para: { rect: [0, 0, 200, 89.56], computed: {"line-break":"anywhere"} } },
+  },
+  {
+    lesson: "line-break-strict",
+    name: "word-break",
+    css: ".para {\n  width: 200px;\n  margin: 0;\n}\n.para {\n  word-break: keep-all;\n}\n",
+    messages: [".para に line-break: strict を指定しましょう"],
+    elements: { para: { rect: [0, 0, 200, 67.17], computed: {"line-break":"auto"} } },
+  },
+  {
+    lesson: "line-break-strict",
+    name: "on body",
+    css: ".para {\n  width: 200px;\n  margin: 0;\n}\nbody {\n  line-break: strict;\n}\n",
+    messages: [],
+    elements: { para: { rect: [0, 0, 200, 89.56], computed: {"line-break":"strict"} } },
+  },
+  {
+    lesson: "hyphens-auto",
+    name: "starter",
+    messages: [".para に hyphens: auto を指定しましょう（初期値は manual です）"],
+    elements: { para: { rect: [0, 0, 160, 89.56], computed: {"hyphens":"manual"} } },
+  },
+  {
+    lesson: "hyphens-auto",
+    name: "solution",
+    messages: [],
+    elements: { para: { rect: [0, 0, 160, 89.56], computed: {"hyphens":"auto"} } },
+  },
+  {
+    lesson: "hyphens-auto",
+    name: "none",
+    css: ".para {\n  width: 160px;\n  margin: 0;\n}\n.para {\n  hyphens: none;\n}\n",
+    messages: [".para に hyphens: auto を指定しましょう（初期値は manual です）"],
+    elements: { para: { rect: [0, 0, 160, 89.56], computed: {"hyphens":"none"} } },
+  },
+  {
+    lesson: "hyphens-auto",
+    name: "manual",
+    css: ".para {\n  width: 160px;\n  margin: 0;\n}\n.para {\n  hyphens: manual;\n}\n",
+    messages: [".para に hyphens: auto を指定しましょう（初期値は manual です）"],
+    elements: { para: { rect: [0, 0, 160, 89.56], computed: {"hyphens":"manual"} } },
+  },
+  {
+    lesson: "hyphens-auto",
+    name: "on body",
+    css: ".para {\n  width: 160px;\n  margin: 0;\n}\nbody {\n  hyphens: auto;\n}\n",
+    messages: [],
+    elements: { para: { rect: [0, 0, 160, 89.56], computed: {"hyphens":"auto"} } },
+  },
+  {
+    lesson: "hyphens-auto",
+    name: "overflow-wrap",
+    css: ".para {\n  width: 160px;\n  margin: 0;\n}\n.para {\n  overflow-wrap: anywhere;\n}\n",
+    messages: [".para に hyphens: auto を指定しましょう（初期値は manual です）"],
+    elements: { para: { rect: [0, 0, 160, 89.56], computed: {"hyphens":"manual"} } },
+  },
+];
+
+describe("anchors in practice and fine text adjustments: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 6 lessons", () => {
+    expect([...new Set(NEW_FINE_CASES.map((c) => c.lesson))].sort()).toEqual([...NEW_FINE_LESSONS].sort());
+    for (const id of NEW_FINE_LESSONS) {
+      const names = NEW_FINE_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of NEW_FINE_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of NEW_FINE_LESSONS) {
+      const starter = NEW_FINE_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = NEW_FINE_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+});
+

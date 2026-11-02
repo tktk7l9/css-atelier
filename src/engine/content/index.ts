@@ -73,6 +73,8 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * follows keyframes (with the same paused frames), user preferences follow the
  * entry animations, scroll polish follows scroll snap, content values follow the
  * list markers (their counters), and background boxes follow background images.
+ * Anchors in practice follow the anchor basics, and the fine text adjustments
+ * follow the first letter and line.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -328,6 +330,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "first-letter-drop-cap", title: "1 文字目を大きく: ::first-letter" },
       { id: "first-line", title: "1 行目だけ変える: ::first-line" },
       { id: "selection", title: "選択した文字の色: ::selection" },
+    ],
+  },
+  {
+    id: "text-fine",
+    title: "文字の細かな調整（tabular-nums・line-break・hyphens）",
+    summary: "font-variant-numeric: tabular-nums で数字の幅をそろえ、line-break: strict で小さな「っ」などの行頭を避け、hyphens: auto で英文を区切って折り返す。",
+    emoji: "🔬",
+    lessons: [
+      { id: "tabular-nums", title: "数字の幅をそろえる: font-variant-numeric" },
+      { id: "line-break-strict", title: "行頭の小さな文字を避ける: line-break" },
+      { id: "hyphens-auto", title: "英文を区切って折り返す: hyphens" },
     ],
   },
   {
@@ -802,6 +815,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "anchor-in-practice",
+    title: "アンカーの応用（anchor-center・anchor-size()・2 つのアンカー）",
+    summary: "justify-self: anchor-center でアンカーの中央にそろえ、anchor-size() でメニューの幅をボタンに合わせ、anchor() に名前を書いて 2 つのアンカーの間に線を渡す。",
+    emoji: "🪝",
+    lessons: [
+      { id: "anchor-center", title: "アンカーの中央にそろえる: anchor-center" },
+      { id: "anchor-size", title: "アンカーの幅に合わせる: anchor-size()" },
+      { id: "anchor-two-names", title: "2 つのアンカーをつなぐ: anchor(--名前 辺)" },
+    ],
+  },
+  {
     id: "scroll-areas",
     title: "スクロールする領域（max-height・overflow-x・min-height: 0）",
     summary: "max-height と overflow で高さに上限を付けてスクロールさせ、広い表は横にスクロールさせ、flex の中では min-height: 0 で縮められるようにする。",
@@ -1193,6 +1217,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "text-overflow": () => import("./text-overflow.js").then((m) => m.textOverflowTrack),
   typesetting: () => import("./typesetting.js").then((m) => m.typesettingTrack),
   "first-letter": () => import("./first-letter.js").then((m) => m.firstLetterTrack),
+  "text-fine": () => import("./text-fine.js").then((m) => m.textFineTrack),
   "text-effects": () => import("./text-effects.js").then((m) => m.textEffectsTrack),
   "white-space": () => import("./white-space.js").then((m) => m.whiteSpaceTrack),
   ruby: () => import("./ruby.js").then((m) => m.rubyTrack),
@@ -1237,6 +1262,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "aspect-ratio": () => import("./aspect-ratio.js").then((m) => m.aspectRatioTrack),
   "object-fit": () => import("./object-fit.js").then((m) => m.objectFitTrack),
   "anchor-positioning": () => import("./anchor-positioning.js").then((m) => m.anchorPositioningTrack),
+  "anchor-in-practice": () => import("./anchor-in-practice.js").then((m) => m.anchorInPracticeTrack),
   "scroll-areas": () => import("./scroll-areas.js").then((m) => m.scrollAreasTrack),
   sticky: () => import("./sticky.js").then((m) => m.stickyTrack),
   "sticky-in-practice": () => import("./sticky-in-practice.js").then((m) => m.stickyInPracticeTrack),
