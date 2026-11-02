@@ -8456,3 +8456,529 @@ describe("implicit grid tracks, negative margins and math functions in practice:
     expect(computed("pow-scale", "solution", "h1-1", "font-size")).toBe("27.648px");
   });
 });
+
+// Lessons added 2026-11, recorded in the real sandbox (headless Chrome 156) the same way.
+const NEW_CSS_LESSONS = [
+  "sibling-index-width",
+  "sibling-index-delay",
+  "sibling-count-ring",
+  "style-query-tone",
+  "style-query-self",
+  "contrast-color-button",
+  "field-sizing-content",
+  "placeholder-shown",
+  "file-selector-button",
+  "summary-marker",
+  "open-pseudo-class",
+  "details-content",
+];
+
+const NEW_CSS_CASES: readonly RecordedCase[] = [
+  {
+    lesson: "sibling-index-width",
+    name: "starter",
+    messages: ["帯の幅が 100px・140px・180px・220px になっていません（sibling-index() は 1 から数えます。1 本目が 100px なので calc(60px + sibling-index() * 40px)）"],
+    elements: { b1: { rect: [0, 0, 100, 30.39] }, b2: { rect: [0, 36.39, 100, 30.39] }, b3: { rect: [0, 72.78, 100, 30.39] }, b4: { rect: [0, 109.17, 100, 30.39] } },
+  },
+  {
+    lesson: "sibling-index-width",
+    name: "solution",
+    messages: [],
+    elements: { b1: { rect: [0, 0, 100, 30.39] }, b2: { rect: [0, 36.39, 140, 30.39] }, b3: { rect: [0, 72.78, 180, 30.39] }, b4: { rect: [0, 109.17, 220, 30.39] } },
+  },
+  {
+    lesson: "sibling-index-width",
+    name: "nth-child rules",
+    css: ".bars {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.bars li {\n  width: 100px;\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n}\n.bars li:nth-child(2) {\n  width: 140px;\n}\n.bars li:nth-child(3) {\n  width: 180px;\n}\n.bars li:nth-child(4) {\n  width: 220px;\n}\n",
+    messages: [],
+    elements: { b1: { rect: [0, 0, 100, 30.39] }, b2: { rect: [0, 36.39, 140, 30.39] }, b3: { rect: [0, 72.78, 180, 30.39] }, b4: { rect: [0, 109.17, 220, 30.39] } },
+  },
+  {
+    lesson: "sibling-index-width",
+    name: "multiplied without the 60px",
+    css: ".bars {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.bars li {\n  width: calc(sibling-index() * 40px);\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["帯の幅が 100px・140px・180px・220px になっていません（sibling-index() は 1 から数えます。1 本目が 100px なので calc(60px + sibling-index() * 40px)）"],
+    elements: { b1: { rect: [0, 0, 40, 52.78] }, b2: { rect: [0, 58.78, 80, 30.39] }, b3: { rect: [0, 95.17, 120, 30.39] }, b4: { rect: [0, 131.56, 160, 30.39] } },
+  },
+  {
+    lesson: "sibling-index-width",
+    name: "counted from zero",
+    css: ".bars {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.bars li {\n  width: calc(100px + (sibling-index() - 1) * 40px);\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n}\n",
+    messages: [],
+    elements: { b1: { rect: [0, 0, 100, 30.39] }, b2: { rect: [0, 36.39, 140, 30.39] }, b3: { rect: [0, 72.78, 180, 30.39] }, b4: { rect: [0, 109.17, 220, 30.39] } },
+  },
+  {
+    lesson: "sibling-index-width",
+    name: "no calc()",
+    css: ".bars {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.bars li {\n  width: 60px + sibling-index() * 40px;\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n}\n",
+    messages: ["帯の幅が 100px・140px・180px・220px になっていません（sibling-index() は 1 から数えます。1 本目が 100px なので calc(60px + sibling-index() * 40px)）"],
+    elements: { b1: { rect: [0, 0, 596, 30.39] }, b2: { rect: [0, 36.39, 596, 30.39] }, b3: { rect: [0, 72.78, 596, 30.39] }, b4: { rect: [0, 109.17, 596, 30.39] } },
+  },
+  {
+    lesson: "sibling-index-delay",
+    name: "starter",
+    messages: ["遅れが 0・0.1・0.2・0.3 秒になっていません（sibling-index() は 1 から数えるので、calc((sibling-index() - 1) * 100ms)）"],
+    elements: { n1: { rect: [0, 0, 596, 30.39], computed: {"animation-delay":"0s"} }, n2: { rect: [0, 36.39, 596, 30.39], computed: {"animation-delay":"0s"} }, n3: { rect: [0, 72.78, 596, 30.39], computed: {"animation-delay":"0s"} }, n4: { rect: [0, 109.17, 596, 30.39], computed: {"animation-delay":"0s"} } },
+  },
+  {
+    lesson: "sibling-index-delay",
+    name: "solution",
+    messages: [],
+    elements: { n1: { rect: [0, 0, 596, 30.39], computed: {"animation-delay":"0s"} }, n2: { rect: [0, 36.39, 596, 30.39], computed: {"animation-delay":"0.1s"} }, n3: { rect: [0, 72.78, 596, 30.39], computed: {"animation-delay":"0.2s"} }, n4: { rect: [0, 109.17, 596, 30.39], computed: {"animation-delay":"0.3s"} } },
+  },
+  {
+    lesson: "sibling-index-delay",
+    name: "starts at 0.1s",
+    css: "@keyframes fade-in {\n  from {\n    opacity: 0;\n  }\n}\n.news {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.item {\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n  animation: fade-in 0.4s both;\n  animation-delay: calc(sibling-index() * 100ms);\n}\n",
+    messages: ["遅れが 0・0.1・0.2・0.3 秒になっていません（sibling-index() は 1 から数えるので、calc((sibling-index() - 1) * 100ms)）"],
+    elements: { n1: { rect: [0, 0, 596, 30.39], computed: {"animation-delay":"0.1s"} }, n2: { rect: [0, 36.39, 596, 30.39], computed: {"animation-delay":"0.2s"} }, n3: { rect: [0, 72.78, 596, 30.39], computed: {"animation-delay":"0.3s"} }, n4: { rect: [0, 109.17, 596, 30.39], computed: {"animation-delay":"0.4s"} } },
+  },
+  {
+    lesson: "sibling-index-delay",
+    name: "nth-child rules",
+    css: "@keyframes fade-in {\n  from {\n    opacity: 0;\n  }\n}\n.news {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.item {\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n  animation: fade-in 0.4s both;\n}\n.item:nth-child(2) {\n  animation-delay: 0.1s;\n}\n.item:nth-child(3) {\n  animation-delay: 0.2s;\n}\n.item:nth-child(4) {\n  animation-delay: 0.3s;\n}\n",
+    messages: [],
+    elements: { n1: { rect: [0, 0, 596, 30.39], computed: {"animation-delay":"0s"} }, n2: { rect: [0, 36.39, 596, 30.39], computed: {"animation-delay":"0.1s"} }, n3: { rect: [0, 72.78, 596, 30.39], computed: {"animation-delay":"0.2s"} }, n4: { rect: [0, 109.17, 596, 30.39], computed: {"animation-delay":"0.3s"} } },
+  },
+  {
+    lesson: "sibling-index-delay",
+    name: "same delay for all",
+    css: "@keyframes fade-in {\n  from {\n    opacity: 0;\n  }\n}\n.news {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.item {\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n  animation: fade-in 0.4s both;\n}\n.item {\n  animation-delay: 0.1s;\n}\n",
+    messages: ["遅れが 0・0.1・0.2・0.3 秒になっていません（sibling-index() は 1 から数えるので、calc((sibling-index() - 1) * 100ms)）"],
+    elements: { n1: { rect: [0, 0, 596, 30.39], computed: {"animation-delay":"0.1s"} }, n2: { rect: [0, 36.39, 596, 30.39], computed: {"animation-delay":"0.1s"} }, n3: { rect: [0, 72.78, 596, 30.39], computed: {"animation-delay":"0.1s"} }, n4: { rect: [0, 109.17, 596, 30.39], computed: {"animation-delay":"0.1s"} } },
+  },
+  {
+    lesson: "sibling-index-delay",
+    name: "delay before the shorthand",
+    css: "@keyframes fade-in {\n  from {\n    opacity: 0;\n  }\n}\n.news {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.item {\n  margin-bottom: 6px;\n  padding: 4px 8px;\n  background: #dbe4fb;\n  animation-delay: calc((sibling-index() - 1) * 100ms);\n  animation: fade-in 0.4s both;\n}\n",
+    messages: ["遅れが 0・0.1・0.2・0.3 秒になっていません（sibling-index() は 1 から数えるので、calc((sibling-index() - 1) * 100ms)）"],
+    elements: { n1: { rect: [0, 0, 596, 30.39], computed: {"animation-delay":"0s"} }, n2: { rect: [0, 36.39, 596, 30.39], computed: {"animation-delay":"0s"} }, n3: { rect: [0, 72.78, 596, 30.39], computed: {"animation-delay":"0s"} }, n4: { rect: [0, 109.17, 596, 30.39], computed: {"animation-delay":"0s"} } },
+  },
+  {
+    lesson: "sibling-count-ring",
+    name: "starter",
+    messages: ["点が円の上に等間隔に並んでいません（.dot に transform: rotate(calc(360deg / sibling-count() * sibling-index())) translateY(-44px)）"],
+    elements: { r4: { rect: [0, 0, 120, 120] }, a1: { rect: [52, 52, 16, 16] }, a2: { rect: [52, 52, 16, 16] }, a3: { rect: [52, 52, 16, 16] }, a4: { rect: [52, 52, 16, 16] }, r3: { rect: [144, 0, 120, 120] }, b1: { rect: [196, 52, 16, 16] }, b2: { rect: [196, 52, 16, 16] }, b3: { rect: [196, 52, 16, 16] } },
+  },
+  {
+    lesson: "sibling-count-ring",
+    name: "solution",
+    messages: [],
+    elements: { r4: { rect: [0, 0, 120, 120] }, a1: { rect: [96, 52, 16, 16] }, a2: { rect: [52, 96, 16, 16] }, a3: { rect: [8, 52, 16, 16] }, a4: { rect: [52, 8, 16, 16] }, r3: { rect: [144, 0, 120, 120] }, b1: { rect: [231.18, 71.07, 21.86, 21.86] }, b2: { rect: [154.97, 71.07, 21.86, 21.86] }, b3: { rect: [196, 8, 16, 16] } },
+  },
+  {
+    lesson: "sibling-count-ring",
+    name: "fixed quarter turns",
+    css: ".rings {\n  display: flex;\n  gap: 24px;\n}\n.ring {\n  position: relative;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #eef1f8;\n}\n.dot {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 16px;\n  height: 16px;\n  margin: -8px;\n  border-radius: 50%;\n  background: #2f5fd0;\n  transform: rotate(calc(90deg * sibling-index())) translateY(-44px);\n}\n",
+    messages: ["点が円の上に等間隔に並んでいません（.dot に transform: rotate(calc(360deg / sibling-count() * sibling-index())) translateY(-44px)）"],
+    elements: { r4: { rect: [0, 0, 120, 120] }, a1: { rect: [96, 52, 16, 16] }, a2: { rect: [52, 96, 16, 16] }, a3: { rect: [8, 52, 16, 16] }, a4: { rect: [52, 8, 16, 16] }, r3: { rect: [144, 0, 120, 120] }, b1: { rect: [240, 52, 16, 16] }, b2: { rect: [196, 96, 16, 16] }, b3: { rect: [152, 52, 16, 16] } },
+  },
+  {
+    lesson: "sibling-count-ring",
+    name: "translate before rotate",
+    css: ".rings {\n  display: flex;\n  gap: 24px;\n}\n.ring {\n  position: relative;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #eef1f8;\n}\n.dot {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 16px;\n  height: 16px;\n  margin: -8px;\n  border-radius: 50%;\n  background: #2f5fd0;\n  transform: translateY(-44px) rotate(calc(360deg / sibling-count() * sibling-index()));\n}\n",
+    messages: ["点が円の上に等間隔に並んでいません（.dot に transform: rotate(calc(360deg / sibling-count() * sibling-index())) translateY(-44px)）"],
+    elements: { r4: { rect: [0, 0, 120, 120] }, a1: { rect: [52, 8, 16, 16] }, a2: { rect: [52, 8, 16, 16] }, a3: { rect: [52, 8, 16, 16] }, a4: { rect: [52, 8, 16, 16] }, r3: { rect: [144, 0, 120, 120] }, b1: { rect: [193.07, 5.07, 21.86, 21.86] }, b2: { rect: [193.07, 5.07, 21.86, 21.86] }, b3: { rect: [196, 8, 16, 16] } },
+  },
+  {
+    lesson: "sibling-count-ring",
+    name: "radius 30px",
+    css: ".rings {\n  display: flex;\n  gap: 24px;\n}\n.ring {\n  position: relative;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #eef1f8;\n}\n.dot {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 16px;\n  height: 16px;\n  margin: -8px;\n  border-radius: 50%;\n  background: #2f5fd0;\n  transform: rotate(calc(360deg / sibling-count() * sibling-index())) translateY(-30px);\n}\n",
+    messages: ["点が円の上に等間隔に並んでいません（.dot に transform: rotate(calc(360deg / sibling-count() * sibling-index())) translateY(-44px)）"],
+    elements: { r4: { rect: [0, 0, 120, 120] }, a1: { rect: [82, 52, 16, 16] }, a2: { rect: [52, 82, 16, 16] }, a3: { rect: [22, 52, 16, 16] }, a4: { rect: [52, 22, 16, 16] }, r3: { rect: [144, 0, 120, 120] }, b1: { rect: [219.05, 64.07, 21.86, 21.86] }, b2: { rect: [167.09, 64.07, 21.86, 21.86] }, b3: { rect: [196, 22, 16, 16] } },
+  },
+  {
+    lesson: "sibling-count-ring",
+    name: "cos and sin",
+    css: ".rings {\n  display: flex;\n  gap: 24px;\n}\n.ring {\n  position: relative;\n  width: 120px;\n  height: 120px;\n  border-radius: 50%;\n  background: #eef1f8;\n}\n.dot {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 16px;\n  height: 16px;\n  margin: -8px;\n  border-radius: 50%;\n  background: #2f5fd0;\n  translate: calc(sin(360deg / sibling-count() * sibling-index()) * 44px) calc(cos(360deg / sibling-count() * sibling-index()) * -44px);\n}\n",
+    messages: [],
+    elements: { r4: { rect: [0, 0, 120, 120] }, a1: { rect: [96, 52, 16, 16] }, a2: { rect: [52, 96, 16, 16] }, a3: { rect: [8, 52, 16, 16] }, a4: { rect: [52, 8, 16, 16] }, r3: { rect: [144, 0, 120, 120] }, b1: { rect: [234.11, 74, 16, 16] }, b2: { rect: [157.89, 74, 16, 16] }, b3: { rect: [196, 8, 16, 16] } },
+  },
+  {
+    lesson: "style-query-tone",
+    name: "starter",
+    messages: ["--tone が warn のカードの .badge の背景が #f5c400 になっていません（@container style(--tone: warn) の中に .badge のルールを書きます）"],
+    elements: { w: { rect: [12, 42.39, 48, 22], computed: {"background-color":"rgb(219, 228, 251)"} }, i: { rect: [12, 131.17, 80, 22], computed: {"background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "style-query-tone",
+    name: "solution",
+    messages: [],
+    elements: { w: { rect: [12, 42.39, 48, 22], computed: {"background-color":"rgb(245, 196, 0)"} }, i: { rect: [12, 131.17, 80, 22], computed: {"background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "style-query-tone",
+    name: "class selector",
+    css: ".warn {\n  --tone: warn;\n}\n.info {\n  --tone: info;\n}\n.card {\n  margin-bottom: 12px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.badge {\n  padding: 2px 8px;\n  border-radius: 4px;\n  background: #dbe4fb;\n}\n.warn .badge {\n  background: #f5c400;\n}\n",
+    messages: ["クラスで選ぶのではなく、@container style(--tone: warn) で --tone の値を調べましょう"],
+    elements: { w: { rect: [12, 42.39, 48, 22], computed: {"background-color":"rgb(245, 196, 0)"} }, i: { rect: [12, 131.17, 80, 22], computed: {"background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "style-query-tone",
+    name: "all badges",
+    css: ".warn {\n  --tone: warn;\n}\n.info {\n  --tone: info;\n}\n.card {\n  margin-bottom: 12px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.badge {\n  padding: 2px 8px;\n  border-radius: 4px;\n  background: #dbe4fb;\n}\n.badge {\n  background: #f5c400;\n}\n",
+    messages: ["--tone が info のカードの .badge まで変わっています（style(--tone: warn) で条件を付けます）","クラスで選ぶのではなく、@container style(--tone: warn) で --tone の値を調べましょう"],
+    elements: { w: { rect: [12, 42.39, 48, 22], computed: {"background-color":"rgb(245, 196, 0)"} }, i: { rect: [12, 131.17, 80, 22], computed: {"background-color":"rgb(245, 196, 0)"} } },
+  },
+  {
+    lesson: "style-query-tone",
+    name: "wrong value",
+    css: ".warn {\n  --tone: warn;\n}\n.info {\n  --tone: info;\n}\n.card {\n  margin-bottom: 12px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.badge {\n  padding: 2px 8px;\n  border-radius: 4px;\n  background: #dbe4fb;\n}\n@container style(--tone: danger) {\n  .badge {\n    background: #f5c400;\n  }\n}\n",
+    messages: ["--tone が warn のカードの .badge の背景が #f5c400 になっていません（@container style(--tone: warn) の中に .badge のルールを書きます）"],
+    elements: { w: { rect: [12, 42.39, 48, 22], computed: {"background-color":"rgb(219, 228, 251)"} }, i: { rect: [12, 131.17, 80, 22], computed: {"background-color":"rgb(219, 228, 251)"} } },
+  },
+  {
+    lesson: "style-query-tone",
+    name: "query for info",
+    css: ".warn {\n  --tone: warn;\n}\n.info {\n  --tone: info;\n}\n.card {\n  margin-bottom: 12px;\n  padding: 12px;\n  border-radius: 8px;\n  background: #eef1f8;\n}\n.title {\n  margin: 0 0 8px;\n  font-size: 16px;\n}\n.badge {\n  padding: 2px 8px;\n  border-radius: 4px;\n  background: #dbe4fb;\n}\n@container style(--tone: info) {\n  .badge {\n    background: #f5c400;\n  }\n}\n",
+    messages: ["--tone が warn のカードの .badge の背景が #f5c400 になっていません（@container style(--tone: warn) の中に .badge のルールを書きます）","--tone が info のカードの .badge まで変わっています（style(--tone: warn) で条件を付けます）"],
+    elements: { w: { rect: [12, 42.39, 48, 22], computed: {"background-color":"rgb(219, 228, 251)"} }, i: { rect: [12, 131.17, 80, 22], computed: {"background-color":"rgb(245, 196, 0)"} } },
+  },
+  {
+    lesson: "style-query-self",
+    name: "starter",
+    messages: ["枠が赤くなっていません（@container が調べるのは祖先です。--tone を持つ .card の子の .inner を選びます）"],
+    elements: { inner: { rect: [0, 0, 596, 50.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "style-query-self",
+    name: "solution",
+    messages: [],
+    elements: { inner: { rect: [0, 0, 596, 50.39], computed: {"border-top-color":"rgb(217, 54, 54)"} } },
+  },
+  {
+    lesson: "style-query-self",
+    name: "query removed",
+    css: ".card {\n  --tone: warn;\n}\n.inner {\n  padding: 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n.title {\n  margin: 0;\n  font-size: 16px;\n}\n/* --tone が warn のカードは、枠を赤くしたい */\n.inner {\n  border-color: #d93636;\n}\n",
+    messages: ["@container style(--tone: warn) は残したまま、中のセレクタを .inner に直しましょう"],
+    elements: { inner: { rect: [0, 0, 596, 50.39], computed: {"border-top-color":"rgb(217, 54, 54)"} } },
+  },
+  {
+    lesson: "style-query-self",
+    name: "selects the title",
+    css: ".card {\n  --tone: warn;\n}\n.inner {\n  padding: 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n.title {\n  margin: 0;\n  font-size: 16px;\n}\n/* --tone が warn のカードは、枠を赤くしたい */\n@container style(--tone: warn) {\n  .title {\n    border-color: #d93636;\n  }\n}\n",
+    messages: ["枠が赤くなっていません（@container が調べるのは祖先です。--tone を持つ .card の子の .inner を選びます）"],
+    elements: { inner: { rect: [0, 0, 596, 50.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "style-query-self",
+    name: "other value",
+    css: ".card {\n  --tone: warn;\n}\n.inner {\n  padding: 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n.title {\n  margin: 0;\n  font-size: 16px;\n}\n/* --tone が warn のカードは、枠を赤くしたい */\n@container style(--tone: info) {\n  .inner {\n    border-color: #d93636;\n  }\n}\n",
+    messages: ["枠が赤くなっていません（@container が調べるのは祖先です。--tone を持つ .card の子の .inner を選びます）"],
+    elements: { inner: { rect: [0, 0, 596, 50.39], computed: {"border-top-color":"rgb(197, 205, 224)"} } },
+  },
+  {
+    lesson: "style-query-self",
+    name: "descendant of card",
+    css: ".card {\n  --tone: warn;\n}\n.inner {\n  padding: 12px;\n  border: 2px solid #c5cde0;\n  border-radius: 8px;\n}\n.title {\n  margin: 0;\n  font-size: 16px;\n}\n/* --tone が warn のカードは、枠を赤くしたい */\n@container style(--tone: warn) {\n  .card .inner {\n    border-color: #d93636;\n  }\n}\n",
+    messages: [],
+    elements: { inner: { rect: [0, 0, 596, 50.39], computed: {"border-top-color":"rgb(217, 54, 54)"} } },
+  },
+  {
+    lesson: "contrast-color-button",
+    name: "starter",
+    messages: ["黄色のボタンの文字が黒になっていません（.btn の color を contrast-color(var(--bg)) にします）"],
+    elements: { dark: { rect: [0, 0, 85.33, 37], computed: {"color":"rgb(255, 255, 255)"} }, light: { rect: [97.33, 0, 72, 37], computed: {"color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "contrast-color-button",
+    name: "solution",
+    messages: [],
+    elements: { dark: { rect: [0, 0, 85.33, 37], computed: {"color":"rgb(255, 255, 255)"} }, light: { rect: [97.33, 0, 72, 37], computed: {"color":"rgb(0, 0, 0)"} } },
+  },
+  {
+    lesson: "contrast-color-button",
+    name: "black for all",
+    css: ".dark {\n  --bg: #18203a;\n}\n.light {\n  --bg: #f5c400;\n}\n.row {\n  display: flex;\n  gap: 12px;\n}\n.btn {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 8px;\n  background: var(--bg);\n  color: black;\n}\n",
+    messages: ["暗いボタンの文字が白になっていません（色を直接書かず、contrast-color(var(--bg)) で選ばせます）"],
+    elements: { dark: { rect: [0, 0, 85.33, 37], computed: {"color":"rgb(0, 0, 0)"} }, light: { rect: [97.33, 0, 72, 37], computed: {"color":"rgb(0, 0, 0)"} } },
+  },
+  {
+    lesson: "contrast-color-button",
+    name: "per-button colours",
+    css: ".dark {\n  --bg: #18203a;\n}\n.light {\n  --bg: #f5c400;\n}\n.row {\n  display: flex;\n  gap: 12px;\n}\n.btn {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 8px;\n  background: var(--bg);\n  color: white;\n}\n.light {\n  color: black;\n}\n",
+    messages: [],
+    elements: { dark: { rect: [0, 0, 85.33, 37], computed: {"color":"rgb(255, 255, 255)"} }, light: { rect: [97.33, 0, 72, 37], computed: {"color":"rgb(0, 0, 0)"} } },
+  },
+  {
+    lesson: "contrast-color-button",
+    name: "of the literal dark colour",
+    css: ".dark {\n  --bg: #18203a;\n}\n.light {\n  --bg: #f5c400;\n}\n.row {\n  display: flex;\n  gap: 12px;\n}\n.btn {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 8px;\n  background: var(--bg);\n  color: contrast-color(#18203a);\n}\n",
+    messages: ["黄色のボタンの文字が黒になっていません（.btn の color を contrast-color(var(--bg)) にします）"],
+    elements: { dark: { rect: [0, 0, 85.33, 37], computed: {"color":"rgb(255, 255, 255)"} }, light: { rect: [97.33, 0, 72, 37], computed: {"color":"rgb(255, 255, 255)"} } },
+  },
+  {
+    lesson: "contrast-color-button",
+    name: "of a literal light colour",
+    css: ".dark {\n  --bg: #18203a;\n}\n.light {\n  --bg: #f5c400;\n}\n.row {\n  display: flex;\n  gap: 12px;\n}\n.btn {\n  padding: 8px 16px;\n  border: 0;\n  border-radius: 8px;\n  background: var(--bg);\n  color: contrast-color(#f5c400);\n}\n",
+    messages: ["暗いボタンの文字が白になっていません（色を直接書かず、contrast-color(var(--bg)) で選ばせます）"],
+    elements: { dark: { rect: [0, 0, 85.33, 37], computed: {"color":"rgb(0, 0, 0)"} }, light: { rect: [97.33, 0, 72, 37], computed: {"color":"rgb(0, 0, 0)"} } },
+  },
+  {
+    lesson: "field-sizing-content",
+    name: "starter",
+    messages: ["欄の高さが中身に合っていません（.memo に field-sizing: content を指定します）"],
+    elements: { memo: { rect: [0, 26.39, 596, 62.78], computed: {"field-sizing":"fixed","max-height":"none"} } },
+  },
+  {
+    lesson: "field-sizing-content",
+    name: "solution",
+    messages: [],
+    elements: { memo: { rect: [0, 26.39, 596, 129.95], computed: {"field-sizing":"content","max-height":"200px"} } },
+  },
+  {
+    lesson: "field-sizing-content",
+    name: "no max-height",
+    css: ".label {\n  display: block;\n}\n.memo {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n  field-sizing: content;\n}\n",
+    messages: ["伸び続けないよう、.memo に max-height: 200px を指定しましょう"],
+    elements: { memo: { rect: [0, 26.39, 596, 129.95], computed: {"field-sizing":"content","max-height":"none"} } },
+  },
+  {
+    lesson: "field-sizing-content",
+    name: "fixed height only",
+    css: ".label {\n  display: block;\n}\n.memo {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n}\n.memo {\n  height: 130px;\n  max-height: 200px;\n}\n",
+    messages: ["欄の高さが中身に合っていません（.memo に field-sizing: content を指定します）"],
+    elements: { memo: { rect: [0, 26.39, 596, 130], computed: {"field-sizing":"fixed","max-height":"200px"} } },
+  },
+  {
+    lesson: "field-sizing-content",
+    name: "max-height only",
+    css: ".label {\n  display: block;\n}\n.memo {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n}\n.memo {\n  max-height: 200px;\n}\n",
+    messages: ["欄の高さが中身に合っていません（.memo に field-sizing: content を指定します）"],
+    elements: { memo: { rect: [0, 26.39, 596, 62.78], computed: {"field-sizing":"fixed","max-height":"200px"} } },
+  },
+  {
+    lesson: "field-sizing-content",
+    name: "block size limit by another name",
+    css: ".label {\n  display: block;\n}\n.memo {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n  field-sizing: content;\n  max-block-size: 200px;\n}\n",
+    messages: [],
+    elements: { memo: { rect: [0, 26.39, 596, 129.95], computed: {"field-sizing":"content","max-height":"200px"} } },
+  },
+  {
+    lesson: "placeholder-shown",
+    name: "starter",
+    messages: ["入力例の色か、空の欄の枠線がまだです（.field::placeholder に color: #5a6478、.field:placeholder-shown に border-style: dashed）"],
+    elements: { empty: { rect: [0, 26.39, 596, 40.39], computed: {"border-top-style":"solid"} }, filled: { rect: [0, 101.17, 596, 40.39], computed: {"border-top-style":"solid"} } },
+  },
+  {
+    lesson: "placeholder-shown",
+    name: "solution",
+    messages: [],
+    elements: { empty: { rect: [0, 26.39, 596, 40.39], computed: {"border-top-style":"dashed"} }, filled: { rect: [0, 101.17, 596, 40.39], computed: {"border-top-style":"solid"} } },
+  },
+  {
+    lesson: "placeholder-shown",
+    name: "border on every field",
+    css: ".label {\n  display: block;\n  margin-bottom: 8px;\n}\n.field {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n}\n.field {\n  border-style: dashed;\n}\n.field::placeholder {\n  color: #5a6478;\n}\n",
+    messages: ["入力済みの欄まで破線になっています（.field ではなく .field:placeholder-shown に書きます）"],
+    elements: { empty: { rect: [0, 26.39, 596, 40.39], computed: {"border-top-style":"dashed"} }, filled: { rect: [0, 101.17, 596, 40.39], computed: {"border-top-style":"dashed"} } },
+  },
+  {
+    lesson: "placeholder-shown",
+    name: "only the placeholder colour",
+    css: ".label {\n  display: block;\n  margin-bottom: 8px;\n}\n.field {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n}\n.field::placeholder {\n  color: #5a6478;\n}\n",
+    messages: ["入力例の色か、空の欄の枠線がまだです（.field::placeholder に color: #5a6478、.field:placeholder-shown に border-style: dashed）"],
+    elements: { empty: { rect: [0, 26.39, 596, 40.39], computed: {"border-top-style":"solid"} }, filled: { rect: [0, 101.17, 596, 40.39], computed: {"border-top-style":"solid"} } },
+  },
+  {
+    lesson: "placeholder-shown",
+    name: "only the dashed border",
+    css: ".label {\n  display: block;\n  margin-bottom: 8px;\n}\n.field {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n}\n.field:placeholder-shown {\n  border-style: dashed;\n}\n",
+    messages: ["入力例の色か、空の欄の枠線がまだです（.field::placeholder に color: #5a6478、.field:placeholder-shown に border-style: dashed）"],
+    elements: { empty: { rect: [0, 26.39, 596, 40.39], computed: {"border-top-style":"dashed"} }, filled: { rect: [0, 101.17, 596, 40.39], computed: {"border-top-style":"solid"} } },
+  },
+  {
+    lesson: "placeholder-shown",
+    name: "one colon on the placeholder",
+    css: ".label {\n  display: block;\n  margin-bottom: 8px;\n}\n.field {\n  display: block;\n  width: 100%;\n  margin-top: 4px;\n  padding: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n  font: inherit;\n}\n.field:placeholder {\n  color: #5a6478;\n}\n.field:placeholder-shown {\n  border-style: dashed;\n}\n",
+    messages: ["入力例の色か、空の欄の枠線がまだです（.field::placeholder に color: #5a6478、.field:placeholder-shown に border-style: dashed）"],
+    elements: { empty: { rect: [0, 26.39, 596, 40.39], computed: {"border-top-style":"dashed"} }, filled: { rect: [0, 101.17, 596, 40.39], computed: {"border-top-style":"solid"} } },
+  },
+  {
+    lesson: "file-selector-button",
+    name: "starter",
+    messages: [".file::file-selector-button の中に、padding: 12px 16px・background: #dbe4fb・border: 0 を書きましょう"],
+    elements: { file: { rect: [0, 26.39, 333, 30] } },
+  },
+  {
+    lesson: "file-selector-button",
+    name: "solution",
+    messages: [],
+    elements: { file: { rect: [0, 26.39, 333, 48] } },
+  },
+  {
+    lesson: "file-selector-button",
+    name: "padding only",
+    css: ".label {\n  display: block;\n}\n.file {\n  display: block;\n  margin-top: 4px;\n  font: inherit;\n}\n.file::file-selector-button {\n  padding: 12px 16px;\n}\n",
+    messages: [".file::file-selector-button の中に、padding: 12px 16px・background: #dbe4fb・border: 0 を書きましょう"],
+    elements: { file: { rect: [0, 26.39, 333, 52] } },
+  },
+  {
+    lesson: "file-selector-button",
+    name: "background-color and no border",
+    css: ".label {\n  display: block;\n}\n.file {\n  display: block;\n  margin-top: 4px;\n  font: inherit;\n}\n.file::file-selector-button {\n  padding: 12px 16px;\n  border: none;\n  background-color: #dbe4fb;\n}\n",
+    messages: [],
+    elements: { file: { rect: [0, 26.39, 333, 48] } },
+  },
+  {
+    lesson: "file-selector-button",
+    name: "on the input",
+    css: ".label {\n  display: block;\n}\n.file {\n  display: block;\n  margin-top: 4px;\n  font: inherit;\n}\n.file {\n  padding: 12px 16px;\n  border: 0;\n  background: #dbe4fb;\n}\n",
+    messages: [".file::file-selector-button の中に、padding: 12px 16px・background: #dbe4fb・border: 0 を書きましょう"],
+    elements: { file: { rect: [0, 26.39, 365, 54] } },
+  },
+  {
+    lesson: "file-selector-button",
+    name: "smaller padding",
+    css: ".label {\n  display: block;\n}\n.file {\n  display: block;\n  margin-top: 4px;\n  font: inherit;\n}\n.file::file-selector-button {\n  padding: 4px 8px;\n  border: 0;\n  background: #dbe4fb;\n}\n",
+    messages: [".file::file-selector-button の中に、padding: 12px 16px・background: #dbe4fb・border: 0 を書きましょう"],
+    elements: { file: { rect: [0, 26.39, 333, 32] } },
+  },
+  {
+    lesson: "summary-marker",
+    name: "starter",
+    messages: ["三角が残っています（summary の既定は display: list-item です。list-style: none で消します）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"list-style-type":"disclosure-open","display":"list-item"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"list-style-type":"disclosure-open","display":"inline"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"list-style-type":"disc","display":"block"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"list-style-type":"disclosure-closed","display":"list-item"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"list-style-type":"disclosure-closed","display":"inline"} } },
+  },
+  {
+    lesson: "summary-marker",
+    name: "solution",
+    messages: [],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"list-style-type":"none","display":"list-item"} }, l1: { rect: [13, 11, 144, 18], computed: {"list-style-type":"none","display":"inline"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"list-style-type":"disc","display":"block"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"list-style-type":"none","display":"list-item"} }, l2: { rect: [13, 81.78, 128, 18], computed: {"list-style-type":"none","display":"inline"} } },
+  },
+  {
+    lesson: "summary-marker",
+    name: "display block",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary {\n  display: block;\n}\nsummary::-webkit-details-marker {\n  display: none;\n}\n",
+    messages: [],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"list-style-type":"disclosure-open","display":"block"} }, l1: { rect: [13, 11, 144, 18], computed: {"list-style-type":"disclosure-open","display":"inline"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"list-style-type":"disc","display":"block"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"list-style-type":"disclosure-closed","display":"block"} }, l2: { rect: [13, 81.78, 128, 18], computed: {"list-style-type":"disclosure-closed","display":"inline"} } },
+  },
+  {
+    lesson: "summary-marker",
+    name: "list-style only",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary {\n  list-style: none;\n}\n",
+    messages: ["Safari のために summary::-webkit-details-marker { display: none; } も書きましょう"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"list-style-type":"none","display":"list-item"} }, l1: { rect: [13, 11, 144, 18], computed: {"list-style-type":"none","display":"inline"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"list-style-type":"disc","display":"block"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"list-style-type":"none","display":"list-item"} }, l2: { rect: [13, 81.78, 128, 18], computed: {"list-style-type":"none","display":"inline"} } },
+  },
+  {
+    lesson: "summary-marker",
+    name: "webkit only",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary::-webkit-details-marker {\n  display: none;\n}\n",
+    messages: ["三角が残っています（summary の既定は display: list-item です。list-style: none で消します）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"list-style-type":"disclosure-open","display":"list-item"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"list-style-type":"disclosure-open","display":"inline"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"list-style-type":"disc","display":"block"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"list-style-type":"disclosure-closed","display":"list-item"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"list-style-type":"disclosure-closed","display":"inline"} } },
+  },
+  {
+    lesson: "summary-marker",
+    name: "on details",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\ndetails {\n  list-style: none;\n}\nsummary::-webkit-details-marker {\n  display: none;\n}\n",
+    messages: ["三角が残っています（summary の既定は display: list-item です。list-style: none で消します）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"list-style-type":"disclosure-open","display":"list-item"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"list-style-type":"disclosure-open","display":"inline"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"list-style-type":"none","display":"block"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"list-style-type":"disclosure-closed","display":"list-item"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"list-style-type":"disclosure-closed","display":"inline"} } },
+  },
+  {
+    lesson: "open-pseudo-class",
+    name: "starter",
+    messages: ["開いている質問の背景が #dbe4fb になっていません（details:open > summary）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "open-pseudo-class",
+    name: "solution",
+    messages: [],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"background-color":"rgb(219, 228, 251)"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "open-pseudo-class",
+    name: "attribute selector",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\ndetails[open] > summary {\n  background: #dbe4fb;\n}\n",
+    messages: [],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"background-color":"rgb(219, 228, 251)"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "open-pseudo-class",
+    name: "every summary",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary {\n  background: #dbe4fb;\n}\n",
+    messages: ["閉じている質問まで色が付いています（summary だけでなく、details:open を付けて絞ります）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"background-color":"rgb(219, 228, 251)"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"background-color":"rgb(219, 228, 251)"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "open-pseudo-class",
+    name: "on details",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\ndetails:open {\n  background: #dbe4fb;\n}\n",
+    messages: ["開いている質問の背景が #dbe4fb になっていません（details:open > summary）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "open-pseudo-class",
+    name: "closed one",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\ndetails:not(:open) > summary {\n  background: #dbe4fb;\n}\n",
+    messages: ["開いている質問の背景が #dbe4fb になっていません（details:open > summary）","閉じている質問まで色が付いています（summary だけでなく、details:open を付けて絞ります）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, l1: { rect: [29.94, 11, 144, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, p1: { rect: [1, 39.39, 594, 22.39], computed: {"background-color":"rgba(0, 0, 0, 0)"} }, s2: { rect: [1, 71.78, 594, 38.39], computed: {"background-color":"rgb(219, 228, 251)"} }, l2: { rect: [29.94, 81.78, 128, 18], computed: {"background-color":"rgba(0, 0, 0, 0)"} } },
+  },
+  {
+    lesson: "details-content",
+    name: "starter",
+    messages: ["答えの左端が質問とそろっていません（.faq::details-content に padding: 0 12px 12px）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39] }, l1: { rect: [13, 11, 144, 18] }, p1: { rect: [1, 39.39, 594, 22.39] }, s2: { rect: [1, 71.78, 594, 38.39] }, l2: { rect: [13, 81.78, 128, 18] } },
+  },
+  {
+    lesson: "details-content",
+    name: "solution",
+    messages: [],
+    elements: { s1: { rect: [1, 1, 594, 38.39] }, l1: { rect: [13, 11, 144, 18] }, p1: { rect: [13, 39.39, 570, 22.39] }, s2: { rect: [1, 83.78, 594, 38.39] }, l2: { rect: [13, 93.78, 128, 18] } },
+  },
+  {
+    lesson: "details-content",
+    name: "padding on p",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary {\n  list-style: none;\n}\nsummary::-webkit-details-marker {\n  display: none;\n}\n.faq p {\n  padding: 0 12px 12px;\n}\n",
+    messages: ["答えの左端が質問とそろっていません（.faq::details-content に padding: 0 12px 12px）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39] }, l1: { rect: [13, 11, 144, 18] }, p1: { rect: [1, 39.39, 594, 34.39] }, s2: { rect: [1, 83.78, 594, 38.39] }, l2: { rect: [13, 93.78, 128, 18] } },
+  },
+  {
+    lesson: "details-content",
+    name: "padding-inline",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary {\n  list-style: none;\n}\nsummary::-webkit-details-marker {\n  display: none;\n}\n.faq::details-content {\n  padding-inline: 12px;\n}\n",
+    messages: [],
+    elements: { s1: { rect: [1, 1, 594, 38.39] }, l1: { rect: [13, 11, 144, 18] }, p1: { rect: [13, 39.39, 570, 22.39] }, s2: { rect: [1, 71.78, 594, 38.39] }, l2: { rect: [13, 81.78, 128, 18] } },
+  },
+  {
+    lesson: "details-content",
+    name: "background only",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary {\n  list-style: none;\n}\nsummary::-webkit-details-marker {\n  display: none;\n}\n.faq::details-content {\n  background: #eef1f8;\n}\n",
+    messages: ["答えの左端が質問とそろっていません（.faq::details-content に padding: 0 12px 12px）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39] }, l1: { rect: [13, 11, 144, 18] }, p1: { rect: [1, 39.39, 594, 22.39] }, s2: { rect: [1, 71.78, 594, 38.39] }, l2: { rect: [13, 81.78, 128, 18] } },
+  },
+  {
+    lesson: "details-content",
+    name: "wrong amount",
+    css: ".faq {\n  margin-bottom: 8px;\n  border: 1px solid #c5cde0;\n  border-radius: 8px;\n}\nsummary {\n  padding: 8px 12px;\n  cursor: pointer;\n}\n.faq p {\n  margin: 0;\n}\nsummary {\n  list-style: none;\n}\nsummary::-webkit-details-marker {\n  display: none;\n}\n.faq::details-content {\n  padding: 0 20px;\n}\n",
+    messages: ["答えの左端が質問とそろっていません（.faq::details-content に padding: 0 12px 12px）"],
+    elements: { s1: { rect: [1, 1, 594, 38.39] }, l1: { rect: [13, 11, 144, 18] }, p1: { rect: [21, 39.39, 554, 22.39] }, s2: { rect: [1, 71.78, 594, 38.39] }, l2: { rect: [13, 81.78, 128, 18] } },
+  },
+];
+
+describe("sibling functions, style queries, form polish and details: recorded answers", () => {
+  it("records a starter, a solution and other answers for each of the 12 lessons", () => {
+    expect([...new Set(NEW_CSS_CASES.map((c) => c.lesson))].sort()).toEqual([...NEW_CSS_LESSONS].sort());
+    for (const id of NEW_CSS_LESSONS) {
+      const names = NEW_CSS_CASES.filter((c) => c.lesson === id).map((c) => c.name);
+      expect(names, id).toEqual(expect.arrayContaining(["starter", "solution"]));
+      expect(names.length, id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  for (const c of NEW_CSS_CASES) {
+    it(`${c.lesson}: ${c.name} ${c.messages.length ? "fails with its messages" : "passes"}`, () => {
+      expect(messagesFor(c)).toEqual(c.messages);
+    });
+  }
+
+  it("fails each fresh starter with one message and passes each solution", () => {
+    for (const id of NEW_CSS_LESSONS) {
+      const starter = NEW_CSS_CASES.find((c) => c.lesson === id && c.name === "starter")!;
+      const solution = NEW_CSS_CASES.find((c) => c.lesson === id && c.name === "solution")!;
+      expect(messagesFor(starter), id).toHaveLength(1);
+      expect(messagesFor(solution), id).toEqual([]);
+    }
+  });
+});
+

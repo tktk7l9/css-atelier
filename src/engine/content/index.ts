@@ -836,6 +836,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "style-queries",
+    title: "値で切り替える部品（style() クエリ・contrast-color()）",
+    summary: "@container style() でカスタムプロパティの値に応じて中の要素を切り替え、調べる相手が祖先であることを押さえ、contrast-color() で背景に合わせた文字色を選ばせる。",
+    emoji: "🎛️",
+    lessons: [
+      { id: "style-query-tone", title: "変数の値で切り替える: @container style()" },
+      { id: "style-query-self", title: "調べるのは祖先: 自分自身には効かない" },
+      { id: "contrast-color-button", title: "読める文字色を選ばせる: contrast-color()" },
+    ],
+  },
+  {
     id: "negative-margins",
     title: "負のマージン（端まで広げる・重ねる・列から飛び出す）",
     summary: "負の margin-inline で写真をカードの余白の外まで広げ、負の margin-top でアイコンを表紙に重ね、calc(50% - 50cqi) で列の中の写真をページの端から端まで広げる。",
@@ -911,6 +922,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "form-polish",
+    title: "入力欄の仕上げ（field-sizing・::placeholder・::file-selector-button）",
+    summary: "field-sizing: content でテキストエリアを中身に合わせ、::placeholder と :placeholder-shown で入力例の見た目を整え、::file-selector-button でファイル選択のボタンを整える。",
+    emoji: "🖊️",
+    lessons: [
+      { id: "field-sizing-content", title: "中身に合わせて伸びる欄: field-sizing: content" },
+      { id: "placeholder-shown", title: "入力例の色と、空の欄: ::placeholder と :placeholder-shown" },
+      { id: "file-selector-button", title: "ファイル選択のボタン: ::file-selector-button" },
+    ],
+  },
+  {
     id: "form-states",
     title: "フォームの状態で選ぶ（:disabled・:read-only・:default）",
     summary: ":disabled で fieldset ごと無効になった欄まで灰色にし、:read-only で確認画面の欄を文字だけの表示にし、:default で最初から選ばれていたおすすめのプランに印を付ける。",
@@ -930,6 +952,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "aria-current", title: "いまのページに印: [aria-current=\"page\"]" },
       { id: "aria-expanded", title: "開閉の状態で見せ分ける: [aria-expanded]" },
       { id: "aria-pressed", title: "押されている切り替えボタン: [aria-pressed=\"true\"]" },
+    ],
+  },
+  {
+    id: "details-disclosure",
+    title: "開閉する部品（summary の印・:open・::details-content）",
+    summary: "summary の三角を list-style で消し、:open で開いている項目を目立たせ、::details-content で開く部分の余白や背景を整える。スクリプトなしで動く開閉部品の見た目を作る。",
+    emoji: "🪗",
+    lessons: [
+      { id: "summary-marker", title: "三角の印を消す: summary の list-style" },
+      { id: "open-pseudo-class", title: "開いている項目を選ぶ: :open" },
+      { id: "details-content", title: "開く部分を整える: ::details-content" },
     ],
   },
   {
@@ -1015,6 +1048,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "max-gutter", title: "最低限の余白を残す: max()" },
       { id: "minmax-min", title: "狭い箱からはみ出さない: minmax(min(200px, 100%), 1fr)" },
       { id: "pow-scale", title: "見出しの大きさを比で決める: pow()" },
+    ],
+  },
+  {
+    id: "sibling-functions",
+    title: "兄弟の番号を計算に使う（sibling-index()・sibling-count()）",
+    summary: "sibling-index() で自分が何番目かを calc() に入れて幅や遅れを変え、sibling-count() で兄弟の数に合わせて円の上に等間隔に並べる。",
+    emoji: "🧬",
+    lessons: [
+      { id: "sibling-index-width", title: "何番目かを数値で使う: sibling-index()" },
+      { id: "sibling-index-delay", title: "1 つずつ遅らせる: animation-delay と sibling-index()" },
+      { id: "sibling-count-ring", title: "数に合わせて等分する: sibling-count()" },
     ],
   },
 ];
@@ -1114,6 +1158,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "container-queries": () => import("./container-queries.js").then((m) => m.containerQueriesTrack),
   "container-queries-in-practice": () =>
     import("./container-queries-in-practice.js").then((m) => m.containerQueriesInPracticeTrack),
+  "style-queries": () => import("./style-queries.js").then((m) => m.styleQueriesTrack),
   "negative-margins": () => import("./negative-margins.js").then((m) => m.negativeMarginsTrack),
   supports: () => import("./supports.js").then((m) => m.supportsTrack),
   layers: () => import("./layers.js").then((m) => m.layersTrack),
@@ -1121,8 +1166,10 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "clip-mask": () => import("./clip-mask.js").then((m) => m.clipMaskTrack),
   filters: () => import("./filters.js").then((m) => m.filtersTrack),
   forms: () => import("./forms.js").then((m) => m.formsTrack),
+  "form-polish": () => import("./form-polish.js").then((m) => m.formPolishTrack),
   "form-states": () => import("./form-states.js").then((m) => m.formStatesTrack),
   "aria-states": () => import("./aria-states.js").then((m) => m.ariaStatesTrack),
+  "details-disclosure": () => import("./details-disclosure.js").then((m) => m.detailsDisclosureTrack),
   transitions: () => import("./transitions.js").then((m) => m.transitionsTrack),
   "transforms-2d": () => import("./transforms-2d.js").then((m) => m.transforms2dTrack),
   "transforms-3d": () => import("./transforms-3d.js").then((m) => m.transforms3dTrack),
@@ -1131,6 +1178,7 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "registered-props": () => import("./registered-props.js").then((m) => m.registeredPropsTrack),
   "math-functions": () => import("./math-functions.js").then((m) => m.mathFunctionsTrack),
   "math-in-practice": () => import("./math-in-practice.js").then((m) => m.mathInPracticeTrack),
+  "sibling-functions": () => import("./sibling-functions.js").then((m) => m.siblingFunctionsTrack),
 };
 
 export function loadTrack(id: TrackId): Promise<Track> {
