@@ -31,7 +31,7 @@ export const styleQueriesTrack: Track = {
   id: "style-queries",
   title: "値で切り替える部品（style() クエリ・contrast-color()）",
   summary: "@container style() でカスタムプロパティの値に応じて中の要素を切り替え、調べる相手が祖先であることを押さえ、contrast-color() で背景に合わせた文字色を選ばせる。",
-  emoji: "🎛️",
+  emoji: "🎏",
   lessons: [
     {
       id: "style-query-tone",
@@ -68,7 +68,7 @@ export const styleQueriesTrack: Track = {
       id: "style-query-self",
       title: "調べるのは祖先: 自分自身には効かない",
       explanation:
-        "<p><code>@container</code> が調べるのは<b>祖先</b>で、ルールが選んだ要素自身ではありません。<code>--tone</code> を付けた <code>.card</code> を <code>@container style(--tone: warn)</code> の中で選んでも、調べられるのは <code>.card</code> の親なので、条件は成り立ちません。</p><p><code>--tone</code> は継承されるので、親に値がなければ false です。見た目を変える要素を、<code>--tone</code> を持つ要素の<b>子</b>にすれば（ここでは <code>.inner</code>）、親の <code>.card</code> が調べられて条件が成り立ちます。幅のコンテナクエリで、コンテナ自身の大きさを変えられないのと同じ考え方です。</p><p>" +
+        "<p><code>@container</code> が調べるのは<b>祖先</b>で、ルールが選んだ要素自身ではありません。<code>--tone</code> を付けた <code>.card</code> を <code>@container style(--tone: warn)</code> の中で選んでも、調べられるのは <code>.card</code> の親なので、条件は成り立ちません。</p><p>親には <code>--tone</code> がないので false です。見た目を変える要素を、<code>--tone</code> を持つ要素の<b>子</b>にすれば（ここでは <code>.inner</code>）、親の <code>.card</code> が調べられて条件が成り立ちます。幅のコンテナクエリで、コンテナ自身の大きさを変えられないのと同じ考え方です。</p><p>" +
         STYLE_SUPPORT +
         "</p>",
       mdnPath: "/ja/docs/Web/CSS/Guides/Containment/Container_size_and_style_queries",

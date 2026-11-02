@@ -53,7 +53,7 @@ export const siblingFunctionsTrack: Track = {
   id: "sibling-functions",
   title: "兄弟の番号を計算に使う（sibling-index()・sibling-count()）",
   summary: "sibling-index() で自分が何番目かを calc() に入れて幅や遅れを変え、sibling-count() で兄弟の数に合わせて円の上に等間隔に並べる。",
-  emoji: "🧬",
+  emoji: "🪢",
   lessons: [
     {
       id: "sibling-index-width",

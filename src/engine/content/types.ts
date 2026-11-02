@@ -31,6 +31,7 @@ export type TrackId =
   | "specificity"
   | "generated-content"
   | "list-markers"
+  | "content-values"
   | "attribute-selectors"
   | "nesting"
   | "nesting-in-practice"
@@ -75,18 +76,22 @@ export type TrackId =
   | "color-functions"
   | "gradients"
   | "backgrounds"
+  | "background-boxes"
   | "outline-shadow"
   | "text-wrap"
   | "text-overflow"
   | "typesetting"
+  | "first-letter"
   | "text-effects"
   | "white-space"
+  | "ruby"
   | "subgrid"
   | "anchor-positioning"
   | "scroll-areas"
   | "sticky"
   | "sticky-in-practice"
   | "scroll-snap"
+  | "scroll-polish"
   | "overflow-clip"
   | "clip-mask"
   | "filters"
@@ -99,7 +104,9 @@ export type TrackId =
   | "transforms-2d"
   | "transforms-3d"
   | "keyframes"
-  | "entry-animations";
+  | "easing"
+  | "entry-animations"
+  | "user-preferences";
 
 /** Drives the 3D concept visualizer. `subjectId`/`containerId` tell the pure
  *  viz-map which element to read for box-model / flex / grid extraction; for
