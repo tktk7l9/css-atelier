@@ -65,7 +65,16 @@ import type { Lesson, LessonMeta, Track, TrackId, TrackMeta } from "./types.js";
  * follows the sticky basics, with the same scroll set-up. The implicit grid
  * tracks follow the card rows; negative margins follow container queries in
  * practice (the breakout lesson uses cqi); and math functions in practice
- * come last, after the math functions they use.
+ * come after the math functions they use.
+ * Sibling functions come last: they use calc(), animations and transforms from
+ * earlier tracks. Style queries follow container queries in practice, form
+ * polish follows the form styling track, details follow the ARIA states, ruby
+ * follows the text tracks, the first letter and line follow typesetting, easing
+ * follows keyframes (with the same paused frames), user preferences follow the
+ * entry animations, scroll polish follows scroll snap, content values follow the
+ * list markers (their counters), and background boxes follow background images.
+ * Anchors in practice follow the anchor basics, and the fine text adjustments
+ * follow the first letter and line.
  *
  * This catalogue (titles, summaries, emoji and lesson titles) is all the first
  * screen needs, so it is the only content in the initial bundle. Each track's
@@ -259,6 +268,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "background-boxes",
+    title: "背景の範囲（background-clip・文字の形の背景・background-origin）",
+    summary: "background-clip で背景が枠線の下へ広がるのを止め、text の値で背景を文字の形に切り抜き、background-origin で背景の基準を padding の内側に動かす。",
+    emoji: "🖌️",
+    lessons: [
+      { id: "background-clip", title: "背景を枠線の内側で止める: background-clip" },
+      { id: "background-clip-text", title: "背景を文字の形に: background-clip: text" },
+      { id: "background-origin", title: "背景の基準を動かす: background-origin" },
+    ],
+  },
+  {
     id: "outline-shadow",
     title: "枠線と影（outline・box-shadow・border-radius）",
     summary: "outline で大きさを変えずに選択を示し、box-shadow を重ねて自然に浮かせ、border-radius で丸い写真とピル形のボタンを作る。",
@@ -302,6 +322,28 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "first-letter",
+    title: "段落の始まりを飾る（::first-letter・::first-line・::selection）",
+    summary: "::first-letter で 1 文字目を大きく落とし、::first-line で 1 行目だけを変え、::selection で選択した文字の色を変える。どれも書ける値が限られる擬似要素を使い分ける。",
+    emoji: "🅰️",
+    lessons: [
+      { id: "first-letter-drop-cap", title: "1 文字目を大きく: ::first-letter" },
+      { id: "first-line", title: "1 行目だけ変える: ::first-line" },
+      { id: "selection", title: "選択した文字の色: ::selection" },
+    ],
+  },
+  {
+    id: "text-fine",
+    title: "文字の細かな調整（tabular-nums・line-break・hyphens）",
+    summary: "font-variant-numeric: tabular-nums で数字の幅をそろえ、line-break: strict で小さな「っ」などの行頭を避け、hyphens: auto で英文を区切って折り返す。",
+    emoji: "🔬",
+    lessons: [
+      { id: "tabular-nums", title: "数字の幅をそろえる: font-variant-numeric" },
+      { id: "line-break-strict", title: "行頭の小さな文字を避ける: line-break" },
+      { id: "hyphens-auto", title: "英文を区切って折り返す: hyphens" },
+    ],
+  },
+  {
     id: "text-effects",
     title: "文字の飾り（text-shadow・傍点・大文字）",
     summary: "text-shadow で明るい背景の上の白い文字を読みやすくし、text-emphasis で強調したい語に傍点を付け、text-transform と letter-spacing で英字の小見出しを大文字にそろえる。",
@@ -321,6 +363,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "white-space-pre-line", title: "HTML の改行をそのまま: white-space: pre-line" },
       { id: "white-space-nowrap", title: "値段を途中で折り返さない: white-space: nowrap" },
       { id: "tab-size", title: "コードのタブの幅を詰める: tab-size" },
+    ],
+  },
+  {
+    id: "ruby",
+    title: "ふりがな（ruby-position・ruby-align・行の間隔）",
+    summary: "ruby-position でふりがなを下に置き、ruby-align で親文字より長いふりがなの寄せ方を決め、line-height でふりがなのある行だけ間隔が広がるのを防ぐ。",
+    emoji: "🏯",
+    lessons: [
+      { id: "ruby-position", title: "ふりがなを下に: ruby-position" },
+      { id: "ruby-align", title: "長いふりがなの寄せ方: ruby-align" },
+      { id: "ruby-line-height", title: "ふりがなの行だけ広がらないように: line-height" },
     ],
   },
   {
@@ -375,6 +428,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "list-style-none", title: "メニューの点と字下げを消す: list-style: none" },
       { id: "list-style-string", title: "印を文字に変える: list-style-type: \"✓ \"" },
       { id: "list-style-inside", title: "印を文字といっしょに並べる: list-style-position: inside" },
+    ],
+  },
+  {
+    id: "content-values",
+    title: "content の値（attr()・quotes・@counter-style）",
+    summary: "attr() で属性の値を表示し、quotes で <q> の括弧を日本語のかぎ括弧にし、@counter-style で ① ② ③ のような番号の形を自分で定義する。",
+    emoji: "💬",
+    lessons: [
+      { id: "attr-content", title: "属性の値を表示する: attr()" },
+      { id: "quotes-property", title: "括弧を決める: quotes" },
+      { id: "counter-style", title: "番号の形を作る: @counter-style" },
     ],
   },
   {
@@ -751,6 +815,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "anchor-in-practice",
+    title: "アンカーの応用（anchor-center・anchor-size()・2 つのアンカー）",
+    summary: "justify-self: anchor-center でアンカーの中央にそろえ、anchor-size() でメニューの幅をボタンに合わせ、anchor() に名前を書いて 2 つのアンカーの間に線を渡す。",
+    emoji: "🪝",
+    lessons: [
+      { id: "anchor-center", title: "アンカーの中央にそろえる: anchor-center" },
+      { id: "anchor-size", title: "アンカーの幅に合わせる: anchor-size()" },
+      { id: "anchor-two-names", title: "2 つのアンカーをつなぐ: anchor(--名前 辺)" },
+    ],
+  },
+  {
     id: "scroll-areas",
     title: "スクロールする領域（max-height・overflow-x・min-height: 0）",
     summary: "max-height と overflow で高さに上限を付けてスクロールさせ、広い表は横にスクロールさせ、flex の中では min-height: 0 で縮められるようにする。",
@@ -794,6 +869,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "scroll-polish",
+    title: "スクロールの仕上げ（overscroll-behavior・scrollbar-gutter・scrollbar-color）",
+    summary: "overscroll-behavior で端まで来たスクロールが背後へ伝わるのを止め、scrollbar-gutter でスクロールバーの場所を空けておき、scrollbar-width と scrollbar-color で太さと色を決める。",
+    emoji: "🛝",
+    lessons: [
+      { id: "overscroll-behavior", title: "背後のページを動かさない: overscroll-behavior" },
+      { id: "scrollbar-gutter", title: "バーの場所を空けておく: scrollbar-gutter" },
+      { id: "scrollbar-color", title: "細く、色を合わせる: scrollbar-width と scrollbar-color" },
+    ],
+  },
+  {
     id: "overflow-clip",
     title: "はみ出しの切り取り（overflow: clip と hidden の違い）",
     summary: "overflow-x: hidden で縦まで切れるのを overflow-x: clip で防ぎ、sticky を止めずに切り取り、clip では囲めない float を display: flow-root で囲む。",
@@ -833,6 +919,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "cq-units", title: "カードの幅に合わせる: cqi 単位" },
       { id: "container-name", title: "外側のコンテナを名指しする: container-name" },
       { id: "inline-size-zero", title: "コンテナにしたら幅がつぶれた: 幅を明示する" },
+    ],
+  },
+  {
+    id: "style-queries",
+    title: "値で切り替える部品（style() クエリ・contrast-color()）",
+    summary: "@container style() でカスタムプロパティの値に応じて中の要素を切り替え、調べる相手が祖先であることを押さえ、contrast-color() で背景に合わせた文字色を選ばせる。",
+    emoji: "🎏",
+    lessons: [
+      { id: "style-query-tone", title: "変数の値で切り替える: @container style()" },
+      { id: "style-query-self", title: "調べるのは祖先: 自分自身には効かない" },
+      { id: "contrast-color-button", title: "読める文字色を選ばせる: contrast-color()" },
     ],
   },
   {
@@ -911,6 +1008,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "form-polish",
+    title: "入力欄の仕上げ（field-sizing・::placeholder・::file-selector-button）",
+    summary: "field-sizing: content でテキストエリアを中身に合わせ、::placeholder と :placeholder-shown で入力例の見た目を整え、::file-selector-button でファイル選択のボタンを整える。",
+    emoji: "🖊️",
+    lessons: [
+      { id: "field-sizing-content", title: "中身に合わせて伸びる欄: field-sizing: content" },
+      { id: "placeholder-shown", title: "入力例の色と、空の欄: ::placeholder と :placeholder-shown" },
+      { id: "file-selector-button", title: "ファイル選択のボタン: ::file-selector-button" },
+    ],
+  },
+  {
     id: "form-states",
     title: "フォームの状態で選ぶ（:disabled・:read-only・:default）",
     summary: ":disabled で fieldset ごと無効になった欄まで灰色にし、:read-only で確認画面の欄を文字だけの表示にし、:default で最初から選ばれていたおすすめのプランに印を付ける。",
@@ -930,6 +1038,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "aria-current", title: "いまのページに印: [aria-current=\"page\"]" },
       { id: "aria-expanded", title: "開閉の状態で見せ分ける: [aria-expanded]" },
       { id: "aria-pressed", title: "押されている切り替えボタン: [aria-pressed=\"true\"]" },
+    ],
+  },
+  {
+    id: "details-disclosure",
+    title: "開閉する部品（summary の印・:open・::details-content）",
+    summary: "summary の三角を list-style で消し、:open で開いている項目を目立たせ、::details-content で開く部分の余白や背景を整える。スクリプトなしで動く開閉部品の見た目を作る。",
+    emoji: "🪗",
+    lessons: [
+      { id: "summary-marker", title: "三角の印を消す: summary の list-style" },
+      { id: "open-pseudo-class", title: "開いている項目を選ぶ: :open" },
+      { id: "details-content", title: "開く部分を整える: ::details-content" },
     ],
   },
   {
@@ -976,6 +1095,17 @@ export const TRACKS: readonly TrackMeta[] = [
     ],
   },
   {
+    id: "easing",
+    title: "動きの緩急（cubic-bezier()・linear()・animation-direction）",
+    summary: "cubic-bezier() で速さの変化を自分で決め、linear() で折れ線の点を並べて弾む動きを作り、animation-direction: alternate で行って戻る動きにする。",
+    emoji: "🏓",
+    lessons: [
+      { id: "cubic-bezier", title: "速さの変化を描く: cubic-bezier()" },
+      { id: "linear-easing", title: "折れ線で弾ませる: linear()" },
+      { id: "animation-direction", title: "行って戻る: animation-direction: alternate" },
+    ],
+  },
+  {
     id: "entry-animations",
     title: "出現と退場のアニメーション",
     summary: "@starting-style と allow-discrete で、display: none からの出入りを滑らかに。",
@@ -983,6 +1113,17 @@ export const TRACKS: readonly TrackMeta[] = [
     lessons: [
       { id: "entry-starting-style", title: "現れる瞬間の出発点: @starting-style" },
       { id: "exit-allow-discrete", title: "消えるときも滑らかに: transition-behavior" },
+    ],
+  },
+  {
+    id: "user-preferences",
+    title: "利用者の環境に合わせる（prefers-reduced-motion・hover・scroll-behavior）",
+    summary: "動きを減らす設定を prefers-reduced-motion で尊重し、ホバーできない端末に効果が残らないよう @media (hover: hover) で囲み、スムーズスクロールも設定に合わせる。",
+    emoji: "🌙",
+    lessons: [
+      { id: "prefers-reduced-motion", title: "動きを減らす設定を尊重する: prefers-reduced-motion" },
+      { id: "hover-media-feature", title: "ホバーできる端末だけ: @media (hover: hover)" },
+      { id: "scroll-behavior", title: "なめらかなスクロールも設定に合わせる: scroll-behavior" },
     ],
   },
   {
@@ -1015,6 +1156,17 @@ export const TRACKS: readonly TrackMeta[] = [
       { id: "max-gutter", title: "最低限の余白を残す: max()" },
       { id: "minmax-min", title: "狭い箱からはみ出さない: minmax(min(200px, 100%), 1fr)" },
       { id: "pow-scale", title: "見出しの大きさを比で決める: pow()" },
+    ],
+  },
+  {
+    id: "sibling-functions",
+    title: "兄弟の番号を計算に使う（sibling-index()・sibling-count()）",
+    summary: "sibling-index() で自分が何番目かを calc() に入れて幅や遅れを変え、sibling-count() で兄弟の数に合わせて円の上に等間隔に並べる。",
+    emoji: "🪢",
+    lessons: [
+      { id: "sibling-index-width", title: "何番目かを数値で使う: sibling-index()" },
+      { id: "sibling-index-delay", title: "1 つずつ遅らせる: animation-delay と sibling-index()" },
+      { id: "sibling-count-ring", title: "数に合わせて等分する: sibling-count()" },
     ],
   },
 ];
@@ -1059,17 +1211,22 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "color-functions": () => import("./color-functions.js").then((m) => m.colorFunctionsTrack),
   gradients: () => import("./gradients.js").then((m) => m.gradientsTrack),
   backgrounds: () => import("./backgrounds.js").then((m) => m.backgroundsTrack),
+  "background-boxes": () => import("./background-boxes.js").then((m) => m.backgroundBoxesTrack),
   "outline-shadow": () => import("./outline-shadow.js").then((m) => m.outlineShadowTrack),
   "text-wrap": () => import("./text-wrap.js").then((m) => m.textWrapTrack),
   "text-overflow": () => import("./text-overflow.js").then((m) => m.textOverflowTrack),
   typesetting: () => import("./typesetting.js").then((m) => m.typesettingTrack),
+  "first-letter": () => import("./first-letter.js").then((m) => m.firstLetterTrack),
+  "text-fine": () => import("./text-fine.js").then((m) => m.textFineTrack),
   "text-effects": () => import("./text-effects.js").then((m) => m.textEffectsTrack),
   "white-space": () => import("./white-space.js").then((m) => m.whiteSpaceTrack),
+  ruby: () => import("./ruby.js").then((m) => m.rubyTrack),
   "modern-selectors": () => import("./modern-selectors.js").then((m) => m.modernSelectorsTrack),
   "has-patterns": () => import("./has-patterns.js").then((m) => m.hasPatternsTrack),
   specificity: () => import("./specificity.js").then((m) => m.specificityTrack),
   "generated-content": () => import("./generated-content.js").then((m) => m.generatedContentTrack),
   "list-markers": () => import("./list-markers.js").then((m) => m.listMarkersTrack),
+  "content-values": () => import("./content-values.js").then((m) => m.contentValuesTrack),
   "attribute-selectors": () => import("./attribute-selectors.js").then((m) => m.attributeSelectorsTrack),
   nesting: () => import("./nesting.js").then((m) => m.nestingTrack),
   "nesting-in-practice": () => import("./nesting-in-practice.js").then((m) => m.nestingInPracticeTrack),
@@ -1105,15 +1262,18 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "aspect-ratio": () => import("./aspect-ratio.js").then((m) => m.aspectRatioTrack),
   "object-fit": () => import("./object-fit.js").then((m) => m.objectFitTrack),
   "anchor-positioning": () => import("./anchor-positioning.js").then((m) => m.anchorPositioningTrack),
+  "anchor-in-practice": () => import("./anchor-in-practice.js").then((m) => m.anchorInPracticeTrack),
   "scroll-areas": () => import("./scroll-areas.js").then((m) => m.scrollAreasTrack),
   sticky: () => import("./sticky.js").then((m) => m.stickyTrack),
   "sticky-in-practice": () => import("./sticky-in-practice.js").then((m) => m.stickyInPracticeTrack),
   "scroll-snap": () => import("./scroll-snap.js").then((m) => m.scrollSnapTrack),
+  "scroll-polish": () => import("./scroll-polish.js").then((m) => m.scrollPolishTrack),
   "overflow-clip": () => import("./overflow-clip.js").then((m) => m.overflowClipTrack),
   "media-queries": () => import("./media-queries.js").then((m) => m.mediaQueriesTrack),
   "container-queries": () => import("./container-queries.js").then((m) => m.containerQueriesTrack),
   "container-queries-in-practice": () =>
     import("./container-queries-in-practice.js").then((m) => m.containerQueriesInPracticeTrack),
+  "style-queries": () => import("./style-queries.js").then((m) => m.styleQueriesTrack),
   "negative-margins": () => import("./negative-margins.js").then((m) => m.negativeMarginsTrack),
   supports: () => import("./supports.js").then((m) => m.supportsTrack),
   layers: () => import("./layers.js").then((m) => m.layersTrack),
@@ -1121,16 +1281,21 @@ const LOADERS: Record<TrackId, () => Promise<Track>> = {
   "clip-mask": () => import("./clip-mask.js").then((m) => m.clipMaskTrack),
   filters: () => import("./filters.js").then((m) => m.filtersTrack),
   forms: () => import("./forms.js").then((m) => m.formsTrack),
+  "form-polish": () => import("./form-polish.js").then((m) => m.formPolishTrack),
   "form-states": () => import("./form-states.js").then((m) => m.formStatesTrack),
   "aria-states": () => import("./aria-states.js").then((m) => m.ariaStatesTrack),
+  "details-disclosure": () => import("./details-disclosure.js").then((m) => m.detailsDisclosureTrack),
   transitions: () => import("./transitions.js").then((m) => m.transitionsTrack),
   "transforms-2d": () => import("./transforms-2d.js").then((m) => m.transforms2dTrack),
   "transforms-3d": () => import("./transforms-3d.js").then((m) => m.transforms3dTrack),
   keyframes: () => import("./keyframes.js").then((m) => m.keyframesTrack),
+  easing: () => import("./easing.js").then((m) => m.easingTrack),
   "entry-animations": () => import("./entry-animations.js").then((m) => m.entryAnimationsTrack),
+  "user-preferences": () => import("./user-preferences.js").then((m) => m.userPreferencesTrack),
   "registered-props": () => import("./registered-props.js").then((m) => m.registeredPropsTrack),
   "math-functions": () => import("./math-functions.js").then((m) => m.mathFunctionsTrack),
   "math-in-practice": () => import("./math-in-practice.js").then((m) => m.mathInPracticeTrack),
+  "sibling-functions": () => import("./sibling-functions.js").then((m) => m.siblingFunctionsTrack),
 };
 
 export function loadTrack(id: TrackId): Promise<Track> {

@@ -41,7 +41,7 @@ export const entryAnimationsTrack: Track = {
       id: "exit-allow-discrete",
       title: "消えるときも滑らかに: transition-behavior",
       explanation:
-        "<p>消えるときは逆の問題が起きます。<code>display</code> は中間の値を持たない<b>離散的</b>なプロパティなので、<code>none</code> に変わった瞬間に要素が消え、フェードアウトを見せる時間がありません。</p><p><code>transition-behavior: allow-discrete</code>（<code>transition</code> の中にも書けます）で <code>display</code> もトランジション対象にすると、<code>none</code> への切り替えが<b>アニメーションの最後まで待つ</b>ようになります。</p><p><code>transition-behavior</code> 自体は Baseline 2024 ですが、<code>display</code> のトランジションは Chrome 117 / Safari 18 以降で、Firefox は未対応です（2026 年 10 月時点）。未対応のブラウザではこれまでどおり即座に消えるだけなので、安心して足せます。</p>",
+        "<p>消えるときは逆の問題が起きます。<code>display</code> は中間の値を持たない<b>離散的</b>なプロパティなので、<code>none</code> に変わった瞬間に要素が消え、フェードアウトを見せる時間がありません。</p><p><code>transition-behavior: allow-discrete</code>（<code>transition</code> の中にも書けます）で <code>display</code> もトランジション対象にすると、<code>none</code> への切り替えが<b>アニメーションの最後まで待つ</b>ようになります。</p><p><code>transition-behavior</code> 自体は Baseline 2024 ですが、<code>display</code> のトランジションは Chrome 117 / Safari 18 以降で、Firefox は未対応です（2026 年 11 月時点）。未対応のブラウザではこれまでどおり即座に消えるだけなので、安心して足せます。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/transition-behavior",
       viz: { concept: "none" },
       challenge: {

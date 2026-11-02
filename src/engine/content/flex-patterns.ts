@@ -64,7 +64,7 @@ export const flexPatternsTrack: Track = {
       id: "flex-wrap",
       title: "折り返して並べる: flex-wrap",
       explanation:
-        "<p>flex コンテナーの子（フレックスアイテム）は、既定（<code>flex-wrap: nowrap</code>）では<b>1 行に並べられます</b>。入りきらないときは、アイテムが<b>縮んで</b>（<code>flex-shrink</code> の既定は 1）無理に収まり、縮みきれないぶんはコンテナーからはみ出します。</p><p><code>flex-wrap: wrap</code> を flex コンテナーに指定すると、入りきらないアイテムは<b>次の行へ折り返し</b>、それぞれの幅を保ったまま並びます。行の間も <code>gap</code> で空きます。<code>flex-direction</code> とまとめて <code>flex-flow: row wrap</code> とも書けます。<code>wrap-reverse</code> にすると、行が下から上へ積まれます。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能。Chrome 29・Firefox 28・Safari 9 から）。行ごとの数をならす <code>wrap balance</code> という新しい指定もありますが、2026 年 10 月時点では Chrome 150 以降だけの実験的な機能です。</p>",
+        "<p>flex コンテナーの子（フレックスアイテム）は、既定（<code>flex-wrap: nowrap</code>）では<b>1 行に並べられます</b>。入りきらないときは、アイテムが<b>縮んで</b>（<code>flex-shrink</code> の既定は 1）無理に収まり、縮みきれないぶんはコンテナーからはみ出します。</p><p><code>flex-wrap: wrap</code> を flex コンテナーに指定すると、入りきらないアイテムは<b>次の行へ折り返し</b>、それぞれの幅を保ったまま並びます。行の間も <code>gap</code> で空きます。<code>flex-direction</code> とまとめて <code>flex-flow: row wrap</code> とも書けます。<code>wrap-reverse</code> にすると、行が下から上へ積まれます。</p><p>主要ブラウザすべてで使えます（Baseline: 広く利用可能。Chrome 29・Firefox 28・Safari 9 から）。行ごとの数をならす <code>wrap balance</code> という新しい指定もありますが、2026 年 11 月時点では Chrome 150 以降だけの実験的な機能です。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/flex-wrap",
       viz: { concept: "none" },
       challenge: {

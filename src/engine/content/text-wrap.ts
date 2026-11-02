@@ -36,7 +36,7 @@ export const textWrapTrack: Track = {
       id: "text-wrap-pretty",
       title: "本文の最後の 1 語を救う: text-wrap: pretty",
       explanation:
-        "<p>本文の段落では、最後の行に 1〜2 文字だけが取り残される「孤立した行」が起きがちです。<code>text-wrap: pretty</code> は段落の終わりのほうの折り返しを見直して、これを避けようとします。<code>balance</code> と違い長い文章にも使える前提の値です。</p><p><code>pretty</code> は Chrome 117 / Safari 26 以降で使えますが、Firefox は未対応です（2026 年 10 月時点・Baseline 未達）。未対応のブラウザではふつうの折り返しになるだけなので、本文全体に気軽に足せます。採点は書いた CSS で行うので、どのブラウザでもクリアできます。</p>",
+        "<p>本文の段落では、最後の行に 1〜2 文字だけが取り残される「孤立した行」が起きがちです。<code>text-wrap: pretty</code> は段落の終わりのほうの折り返しを見直して、これを避けようとします。<code>balance</code> と違い長い文章にも使える前提の値です。</p><p><code>pretty</code> は Chrome 117 / Safari 26 以降で使えますが、Firefox は未対応です（2026 年 11 月時点・Baseline 未達）。未対応のブラウザではふつうの折り返しになるだけなので、本文全体に気軽に足せます。採点は書いた CSS で行うので、どのブラウザでもクリアできます。</p>",
       mdnPath: "/ja/docs/Web/CSS/Reference/Properties/text-wrap-style",
       viz: { concept: "none" },
       challenge: {
