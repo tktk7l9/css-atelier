@@ -1,6 +1,6 @@
 import type { Track } from "./types.js";
 
-// The sandbox reads elements, and // generated text is not in the DOM, so attr() is judged by the CSS text, quotes by
+// The sandbox reads elements, and generated text is not in the DOM, so attr() is judged by the CSS text, quotes by
 // its computed value, and @counter-style by the computed list-style-type together
 // with the at-rule in the CSS text.
 
